@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Arabic-optimized typography design system for Madinaty app.
-///
-/// Configures text styles with appropriate line heights, font weights,
-/// and fallback font families suitable for Arabic UI rendering.
 abstract class AppTypography {
   // Prevent instantiation
   const AppTypography._();

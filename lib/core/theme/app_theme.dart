@@ -2,13 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
-/// Central theme provider for the Madinaty application.
-///
-/// Implements Material 3 design tokens matching the Figma reference:
-/// - Light warm cream scaffold background
-/// - Terracotta primary accent with dark charcoal button styles
-/// - Rounded card, input, button, and chip components
-/// - Native RTL & Arabic typography support
 abstract class AppTheme {
   // Prevent instantiation
   const AppTheme._();

@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Design system color tokens based on the Figma design.
-///
-/// Palette tailored for Madinaty Arabic UI:
-/// - Warm cream/beige background canvas
-/// - Rich terracotta / chestnut brown primary accent
-/// - Dark charcoal primary buttons and high-contrast elements
-/// - Soft warm beige surfaces and borders
 abstract class AppColors {
   // Prevent instantiation
   const AppColors._();
