@@ -18,7 +18,7 @@ class BottomCafesCards extends StatelessWidget {
       height: 210,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding:  EdgeInsets.symmetric(horizontal: 12),
         itemCount: state.cafes.length,
         itemBuilder: (context, index) {
           final cafe = state.cafes[index];
@@ -39,7 +39,7 @@ class CafeCardItem extends StatelessWidget {
       height: 95,
       width: double.infinity,
       color: Colors.grey[300],
-      child: const Icon(Icons.local_cafe, size: 40, color: Colors.grey),
+      child:  Icon(Icons.local_cafe, size: 40, color: Colors.grey),
     );
   }
 
@@ -47,20 +47,19 @@ class CafeCardItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 260,
-      margin: const EdgeInsets.symmetric(horizontal: 6),
+      margin:  EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8)],
+        boxShadow:  [BoxShadow(color: Colors.black12, blurRadius: 8)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Header Image & Rating Badge
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
+                borderRadius:  BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
                 child: cafe.photos.isNotEmpty
@@ -79,7 +78,7 @@ class CafeCardItem extends StatelessWidget {
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
+                  padding:  EdgeInsets.symmetric(
                     horizontal: 8,
                     vertical: 2,
                   ),
@@ -92,43 +91,41 @@ class CafeCardItem extends StatelessWidget {
                     children: [
                       Text(
                         '${cafe.rating}',
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 2),
-                      const Icon(Icons.star, color: Colors.amber, size: 14),
+                       SizedBox(width: 2),
+                       Icon(Icons.star, color: Colors.amber, size: 14),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-
-          // Details Section
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      const Icon(
+                       Icon(
                         Icons.bookmark_border,
                         size: 20,
                         color: Colors.black54,
                       ),
-                      const SizedBox(width: 8),
+                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           cafe.name,
                           textAlign: TextAlign.right,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -141,9 +138,9 @@ class CafeCardItem extends StatelessWidget {
                     textAlign: TextAlign.right,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    style:  TextStyle(color: Colors.grey, fontSize: 11),
                   ),
-                  const Row(
+                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(

@@ -13,20 +13,20 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   final LocationService locationService;
 
   DiscoveryCubit({required this.repository, required this.locationService})
-    : super(const DiscoveryInitial());
+    : super(DiscoveryInitial());
 
   List<CafeEntity> allCafes = [];
 
   LatLng? currentLocation;
 
   Future<void> loadNearbyCafes() async {
-    emit(const DiscoveryLoading());
+    emit(DiscoveryLoading());
 
     try {
       final position = await locationService.getCurrentLocation();
 
       if (position == null) {
-        emit(const DiscoveryError('Unable to get your current location'));
+        emit(DiscoveryError('Unable to get your current location'));
         return;
       }
 
@@ -40,7 +40,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       allCafes = cafes;
 
       if (cafes.isEmpty) {
-        emit(const DiscoveryEmpty());
+        emit(DiscoveryEmpty());
         return;
       }
 
@@ -58,7 +58,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       return;
     }
 
-    emit(const DiscoveryLoading());
+    emit(DiscoveryLoading());
 
     try {
       final cafes = await repository.searchCafes(query: trueQuery);
@@ -66,7 +66,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       allCafes = cafes;
 
       if (cafes.isEmpty) {
-        emit(const DiscoveryEmpty());
+        emit(DiscoveryEmpty());
         return;
       }
 
@@ -83,7 +83,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       return;
     }
 
-    emit(const DiscoveryLoading());
+    emit(DiscoveryLoading());
 
     try {
       final cafes = await repository.getCafesByCategory(category: categories);
@@ -91,7 +91,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       allCafes = cafes;
 
       if (cafes.isEmpty) {
-        emit(const DiscoveryEmpty());
+        emit(DiscoveryEmpty());
         return;
       }
 

@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/Icon_Button.dart';
 
-class DiscoveryTopOverlay extends StatelessWidget {
+class DiscoveryTopOverlay extends StatefulWidget {
   final VoidCallback onBack;
   final VoidCallback onNotificationTap;
   final LatLng? userLocation;
@@ -28,6 +30,29 @@ class DiscoveryTopOverlay extends StatelessWidget {
   });
 
   @override
+  State<DiscoveryTopOverlay> createState() => _DiscoveryTopOverlayState();
+}
+
+class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
+  final TextEditingController searchController = TextEditingController();
+
+  Timer? debounce;
+
+  void onSearchChanged(String query) {
+    debounce?.cancel();
+    debounce = Timer(Duration(milliseconds: 500), () {
+      widget.onSearch(query);
+    });
+  }
+
+  @override
+  void dispose() {
+    debounce?.cancel();
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Positioned(
       top: 12,
@@ -38,39 +63,37 @@ class DiscoveryTopOverlay extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButtonWidget(icon: Icons.arrow_forward_ios, onTap: onBack),
+              IconButtonWidget(
+                icon: Icons.arrow_forward_ios,
+                onTap: widget.onBack,
+              ),
 
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 4),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on_outlined,
                       size: 16,
                       color: Colors.black54,
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
 
-                    if (userLocation != null)
+                    if (widget.userLocation != null)
                       FutureBuilder<String>(
-                        future: getLocationName(
-                          userLocation!.latitude,
-                          userLocation!.longitude,
+                        future: widget.getLocationName(
+                          widget.userLocation!.latitude,
+                          widget.userLocation!.longitude,
                         ),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const Text(
+                            return Text(
                               'جاري التحديد..',
                               style: TextStyle(
                                 fontSize: 12,
@@ -81,7 +104,7 @@ class DiscoveryTopOverlay extends StatelessWidget {
 
                           return Text(
                             snapshot.data ?? 'موقعي الحالي',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
@@ -89,7 +112,7 @@ class DiscoveryTopOverlay extends StatelessWidget {
                         },
                       )
                     else
-                      const Text(
+                      Text(
                         'موقعي الحالي',
                         style: TextStyle(
                           fontSize: 13,
@@ -100,70 +123,62 @@ class DiscoveryTopOverlay extends StatelessWidget {
                 ),
               ),
 
-              // Notification Button
               IconButtonWidget(
                 icon: Icons.notifications_none_outlined,
-                onTap: onNotificationTap,
+                onTap: widget.onNotificationTap,
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 6),
-              ],
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
             ),
             child: TextField(
-              onSubmitted: onSearch,
+              controller: searchController,
               textAlign: TextAlign.right,
+              onChanged: onSearchChanged,
               decoration: InputDecoration(
                 hintText: 'ابحث عن كافيه، منطقة',
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                 border: InputBorder.none,
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+
+                prefixIcon: Icon(Icons.search, color: Colors.grey),
+
                 suffixIcon: GestureDetector(
-                  onTap: onFilterTap,
-                  child: const Icon(Icons.tune, color: Colors.grey),
+                  onTap: widget.onFilterTap,
+                  child: Icon(Icons.tune, color: Colors.grey),
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 10),
-
-          // Filter Chips
+          SizedBox(height: 10),
           SizedBox(
             height: 36,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: filters.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemCount: widget.filters.length,
+              separatorBuilder: (_, __) => SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final isSelected = selectedChipIndex == index;
-
+                final isSelected = widget.selectedChipIndex == index;
                 return GestureDetector(
-                  onTap: () => onChipSelected(index),
+                  onTap: () => widget.onChipSelected(index),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFF5D4037)
-                          : Colors.white,
+                      color: isSelected ? Color(0xFF5D4037) : Colors.white,
                       borderRadius: BorderRadius.circular(18),
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(color: Colors.black12, blurRadius: 2),
                       ],
                     ),
                     child: Text(
-                      filters[index],
+                      widget.filters[index],
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.black87,
                         fontSize: 12,

@@ -16,8 +16,8 @@ class _IconButtonWidgetState extends State<IconButtonWidget> {
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: const BoxDecoration(
+        padding:  EdgeInsets.all(8),
+        decoration:  BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
           boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],

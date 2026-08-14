@@ -24,8 +24,8 @@ class CafeDetailsBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -56,11 +56,7 @@ class CafeDetailsBottomSheet extends StatelessWidget {
                     color: Colors.black,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.coffee,
-                    color: Colors.white,
-                    size: 28,
-                  ),
+                  child: Icon(Icons.coffee, color: Colors.white, size: 28),
                 ),
 
                 SizedBox(width: 14),
@@ -98,18 +94,31 @@ class CafeDetailsBottomSheet extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _InfoItem(
-                  icon: Icons.star,
-                  text: cafe.rating > 0 ? cafe.rating.toString() : 'No rating',
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.star, size: 18),
+                    SizedBox(width: 5),
+                    Text(
+                      cafe.rating > 0 ? cafe.rating.toString() : 'No rating',
+                    ),
+                  ],
                 ),
-                _InfoItem(
-                  icon: cafe.isOpen ? Icons.check_circle : Icons.cancel,
-                  text: cafe.isOpen ? 'Open' : 'Closed',
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      cafe.isOpen ? Icons.check_circle : Icons.cancel,
+                      size: 18,
+                    ),
+                    SizedBox(width: 5),
+                    Text(cafe.isOpen ? 'Open' : 'Closed'),
+                  ],
                 ),
               ],
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             SizedBox(
               width: double.infinity,
@@ -123,21 +132,6 @@ class CafeDetailsBottomSheet extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _InfoItem extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  const _InfoItem({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [Icon(icon, size: 18),  SizedBox(width: 5), Text(text)],
     );
   }
 }

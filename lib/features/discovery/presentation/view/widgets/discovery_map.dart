@@ -8,7 +8,7 @@ class DiscoveryMapWidget extends StatefulWidget {
   final LatLng userLocation;
   final List<CafeEntity> cafes;
 
-  DiscoveryMapWidget({
+  const DiscoveryMapWidget({
     super.key,
     required this.userLocation,
     required this.cafes,
@@ -37,11 +37,9 @@ class _DiscoveryMapWidgetState extends State<DiscoveryMapWidget> {
               color: Colors.black87,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
-              boxShadow: const [
-                BoxShadow(color: Colors.black26, blurRadius: 4),
-              ],
+              boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
             ),
-            child: const Icon(Icons.coffee, color: Colors.white, size: 22),
+            child: Icon(Icons.coffee, color: Colors.white, size: 22),
           ),
         ),
       );

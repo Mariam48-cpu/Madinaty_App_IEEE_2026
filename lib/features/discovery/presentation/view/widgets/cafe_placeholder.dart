@@ -9,7 +9,7 @@ class CafePlaceholder extends StatelessWidget {
       height: 95,
       width: double.infinity,
       color: Colors.brown.shade100,
-      child: const Icon(Icons.storefront, size: 45, color: Colors.brown),
+      child:  Icon(Icons.storefront, size: 45, color: Colors.brown),
     );
   }
 }

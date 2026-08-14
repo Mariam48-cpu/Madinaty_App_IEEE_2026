@@ -1,11 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
-
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/bottom_cafes_cards.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_map.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_top_overlay.dart';
@@ -22,7 +20,7 @@ class ExploreMapScreen extends StatefulWidget {
 }
 
 class _ExploreMapScreenState extends State<ExploreMapScreen> {
-  final MapController _mapController = MapController();
+  final MapController mapController = MapController();
 
   int selectedChipIndex = 0;
 
@@ -44,7 +42,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
 
   @override
   void dispose() {
-    _mapController.dispose();
+    mapController.dispose();
     super.dispose();
   }
 
@@ -74,7 +72,6 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
               address['city'] ??
               address['suburb'] ??
               '';
-
           final String state = address['state'] ?? address['governorate'] ?? '';
 
           if (townOrCity.isNotEmpty && state.isNotEmpty) {
@@ -117,9 +114,6 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
         body: SafeArea(
           child: Stack(
             children: [
-              // =========================
-              // MAP + BOTTOM CARDS
-              // =========================
               BlocConsumer<DiscoveryCubit, DiscoveryState>(
                 listener: (context, state) {
                   if (state is DiscoveryError) {
@@ -133,34 +127,27 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                 },
                 builder: (context, state) {
                   if (state is DiscoveryInitial || state is DiscoveryLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return  Center(child: CircularProgressIndicator());
                   }
-
                   if (state is DiscoveryError) {
                     return Center(child: Text(state.message));
                   }
-
                   if (state is DiscoveryEmpty) {
-                    return const Center(
+                    return  Center(
                       child: Text('لم يتم العثور على كافيهات قريبة.'),
                     );
                   }
-
                   if (state is DiscoverySuccess) {
                     final location =
-                        state.currentLocation ?? const LatLng(30.0988, 31.6263);
-
+                        state.currentLocation ?? LatLng(30.0988, 31.6263);
                     return Stack(
                       children: [
-                        // MAP
                         DiscoveryMapWidget(
-                          mapController: _mapController,
+                          mapController: mapController,
                           location: location,
                           cafes: state.cafes,
                           userLocation: location,
                         ),
-
-                        // BOTTOM CAFES
                         Positioned(
                           bottom: 16,
                           left: 0,
@@ -174,53 +161,35 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                     );
                   }
 
-                  return const SizedBox.shrink();
+                  return  SizedBox.shrink();
                 },
               ),
-
-              // =========================
-              // TOP OVERLAY
-              // =========================
               BlocBuilder<DiscoveryCubit, DiscoveryState>(
                 buildWhen: (previous, current) {
-                  // نخلي الـ Overlay يعيد البناء فقط
-                  // لو الـ location اتغيرت.
                   if (previous is DiscoverySuccess &&
                       current is DiscoverySuccess) {
                     return previous.currentLocation != current.currentLocation;
                   }
-
                   return current is DiscoverySuccess;
                 },
                 builder: (context, state) {
                   LatLng? location;
-
                   if (state is DiscoverySuccess) {
                     location = state.currentLocation;
                   } else {
                     location = widget.cubit.currentLocation;
                   }
-
                   return DiscoveryTopOverlay(
                     onBack: () {
                       Navigator.pop(context);
                     },
-
                     onNotificationTap: () {},
-
                     userLocation: location,
-
                     filters: filters,
-
                     selectedChipIndex: selectedChipIndex,
-
                     onFilterTap: onFilterTap,
-
                     onChipSelected: onChipSelected,
-
                     getLocationName: getLocationName,
-
-                    // SEARCH
                     onSearch: onSearch,
                   );
                 },
