@@ -12,6 +12,7 @@ class DiscoveryTopOverlay extends StatelessWidget {
   final ValueChanged<int> onChipSelected;
   final Future<String> Function(double latitude, double longitude)
   getLocationName;
+  final ValueChanged<String> onSearch;
 
   const DiscoveryTopOverlay({
     super.key,
@@ -23,6 +24,7 @@ class DiscoveryTopOverlay extends StatelessWidget {
     required this.onFilterTap,
     required this.onChipSelected,
     required this.getLocationName,
+    required this.onSearch,
   });
 
   @override
@@ -107,8 +109,6 @@ class DiscoveryTopOverlay extends StatelessWidget {
           ),
 
           const SizedBox(height: 12),
-
-          // Search Bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
@@ -119,14 +119,13 @@ class DiscoveryTopOverlay extends StatelessWidget {
               ],
             ),
             child: TextField(
+              onSubmitted: onSearch,
               textAlign: TextAlign.right,
               decoration: InputDecoration(
                 hintText: 'ابحث عن كافيه، منطقة',
                 hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
                 border: InputBorder.none,
-
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
-
                 suffixIcon: GestureDetector(
                   onTap: onFilterTap,
                   child: const Icon(Icons.tune, color: Colors.grey),

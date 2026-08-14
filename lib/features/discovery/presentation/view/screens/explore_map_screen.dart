@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/bottom_cafes_cards.dart';
 
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/bottom_cafes_cards.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_map.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_top_overlay.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
@@ -26,7 +26,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
 
   int selectedChipIndex = 0;
 
-  final List<String> _filters = [
+  final List<String> filters = [
     'مفتوح الآن',
     'Wi-Fi',
     'هادئ للعمل',
@@ -36,9 +36,16 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.cubit.loadNearbyCafes();
     });
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   Future<String> getLocationName(double latitude, double longitude) async {
@@ -67,10 +74,13 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
               address['city'] ??
               address['suburb'] ??
               '';
+
           final String state = address['state'] ?? address['governorate'] ?? '';
+
           if (townOrCity.isNotEmpty && state.isNotEmpty) {
             return '$state، $townOrCity';
           }
+
           if (townOrCity.isNotEmpty) {
             return townOrCity;
           }
@@ -83,6 +93,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
     } catch (e) {
       debugPrint('Reverse Geocoding Error: $e');
     }
+
     return 'موقعي الحالي';
   }
 
@@ -92,7 +103,11 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
     });
   }
 
-  void _onFilterTap() {}
+  void onFilterTap() {}
+
+  void onSearch(String query) {
+    widget.cubit.searchCafes(query: query);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,75 +115,117 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
       value: widget.cubit,
       child: Scaffold(
         body: SafeArea(
-          child: BlocConsumer<DiscoveryCubit, DiscoveryState>(
-            listener: (context, state) {
-              if (state is DiscoveryError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            builder: (context, state) {
-              if (state is DiscoveryInitial || state is DiscoveryLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (state is DiscoveryError) {
-                return Center(child: Text(state.message));
-              }
-
-              if (state is DiscoveryEmpty) {
-                return const Center(
-                  child: Text('لم يتم العثور على كافيهات قريبة.'),
-                );
-              }
-
-              if (state is DiscoverySuccess) {
-                final location =
-                    state.currentLocation ?? const LatLng(30.0988, 31.6263);
-
-                return Stack(
-                  children: [
-                    DiscoveryMapWidget(
-                      mapController: _mapController,
-                      location: location,
-                      cafes: state.cafes,
-                      userLocation: location,
-                    ),
-
-                    DiscoveryTopOverlay(
-                      onBack: () {
-                        Navigator.pop(context);
-                      },
-                      onNotificationTap: () {},
-
-                      userLocation: location,
-
-                      filters: _filters,
-                      selectedChipIndex: selectedChipIndex,
-                      onFilterTap: _onFilterTap,
-                      onChipSelected: onChipSelected,
-                      getLocationName: getLocationName,
-                    ),
-
-                    Positioned(
-                      bottom: 16,
-                      left: 0,
-                      right: 0,
-                      child: BottomCafesCards(
-                        cafeList: state.cafes,
-                        state: state,
+          child: Stack(
+            children: [
+              // =========================
+              // MAP + BOTTOM CARDS
+              // =========================
+              BlocConsumer<DiscoveryCubit, DiscoveryState>(
+                listener: (context, state) {
+                  if (state is DiscoveryError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Colors.red,
                       ),
-                    ),
-                  ],
-                );
-              }
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is DiscoveryInitial || state is DiscoveryLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-              return const SizedBox.shrink();
-            },
+                  if (state is DiscoveryError) {
+                    return Center(child: Text(state.message));
+                  }
+
+                  if (state is DiscoveryEmpty) {
+                    return const Center(
+                      child: Text('لم يتم العثور على كافيهات قريبة.'),
+                    );
+                  }
+
+                  if (state is DiscoverySuccess) {
+                    final location =
+                        state.currentLocation ?? const LatLng(30.0988, 31.6263);
+
+                    return Stack(
+                      children: [
+                        // MAP
+                        DiscoveryMapWidget(
+                          mapController: _mapController,
+                          location: location,
+                          cafes: state.cafes,
+                          userLocation: location,
+                        ),
+
+                        // BOTTOM CAFES
+                        Positioned(
+                          bottom: 16,
+                          left: 0,
+                          right: 0,
+                          child: BottomCafesCards(
+                            cafeList: state.cafes,
+                            state: state,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+
+              // =========================
+              // TOP OVERLAY
+              // =========================
+              BlocBuilder<DiscoveryCubit, DiscoveryState>(
+                buildWhen: (previous, current) {
+                  // نخلي الـ Overlay يعيد البناء فقط
+                  // لو الـ location اتغيرت.
+                  if (previous is DiscoverySuccess &&
+                      current is DiscoverySuccess) {
+                    return previous.currentLocation != current.currentLocation;
+                  }
+
+                  return current is DiscoverySuccess;
+                },
+                builder: (context, state) {
+                  LatLng? location;
+
+                  if (state is DiscoverySuccess) {
+                    location = state.currentLocation;
+                  } else {
+                    location = widget.cubit.currentLocation;
+                  }
+
+                  return DiscoveryTopOverlay(
+                    onBack: () {
+                      Navigator.pop(context);
+                    },
+
+                    onNotificationTap: () {},
+
+                    userLocation: location,
+
+                    filters: filters,
+
+                    selectedChipIndex: selectedChipIndex,
+
+                    onFilterTap: onFilterTap,
+
+                    onChipSelected: onChipSelected,
+
+                    getLocationName: getLocationName,
+
+                    // SEARCH
+                    onSearch: onSearch,
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
