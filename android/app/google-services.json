@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "514367928999",
+    "project_id": "madinaty-bb278",
+    "storage_bucket": "madinaty-bb278.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514367928999:android:2c02011681763eed4af982",
+        "android_client_info": {
+          "package_name": "com.example.madinaty_app_ieee_2026"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "514367928999-ikrik9hi016j2236uq11hkcg4mu4dkp4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.madinaty_app_ieee_2026",
+            "certificate_hash": "90da571f9572b2bdc250d615a3df22f5dc60a924"
+          }
+        },
+        {
+          "client_id": "514367928999-jev2bi7ta5h8id93eekrv6qtrsci0k0b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTilfV_-K9HXj0PG8eEH5l1RbsGa4lCr4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "514367928999-jev2bi7ta5h8id93eekrv6qtrsci0k0b.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "514367928999-t46a1eipgdgoj45nr3adig1b7immoafo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.madinatyAppIeee2026"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
