@@ -70,6 +70,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/fonts/cairo/
 
 
   # Custom font family definition for Cairo (Arabic UI)
