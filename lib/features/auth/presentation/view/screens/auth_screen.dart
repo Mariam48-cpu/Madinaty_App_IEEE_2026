@@ -115,7 +115,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               backgroundColor: Colors.green.shade700,
             ),
           );
-          // TODO: الانتقال للشاشة الرئيسية
+          // TODO: Navigation to Home Screen
         }
       },
       builder: (context, state) {
@@ -221,7 +221,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                         ),
                         child: Column(
                           children: [
-                            // Tabs
                             Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
