@@ -1,4 +1,3 @@
-// data/repositories/cafe_repository_impl.dart
 import 'package:injectable/injectable.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/data/data_sources/google_places_datasource.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
@@ -8,8 +7,7 @@ import 'package:madinaty_app_ieee_2026/features/discovery/domain/repositories/ca
 class CafeRepositoryImpl implements CafeRepositoryInterface {
   final GooglePlacesDataSource dataSource;
 
-  CafeRepositoryImpl(this.dataSource);
-
+  CafeRepositoryImpl({required this.dataSource});
   @override
   Future<List<CafeEntity>> getNearbyCafes({
     required double latitude,
@@ -25,7 +23,8 @@ class CafeRepositoryImpl implements CafeRepositoryInterface {
   @override
   Future<List<CafeEntity>> searchCafes({required String query}) async {
     final cafeDtos = await dataSource.searchCafes(query: query);
-    return cafeDtos.map((dto) => dto.toEntity()).toList();
+
+    return cafeDtos.map((cafe) => cafe.toEntity()).toList();
   }
 
   @override
@@ -33,6 +32,6 @@ class CafeRepositoryImpl implements CafeRepositoryInterface {
     required String category,
   }) async {
     final cafeDtos = await dataSource.getCafesByCategory(category: category);
-    return cafeDtos.map((dto) => dto.toEntity()).toList();
+    return cafeDtos.map((cafe) => cafe.toEntity()).toList();
   }
 }

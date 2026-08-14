@@ -3,14 +3,14 @@ import 'package:injectable/injectable.dart';
 
 @injectable
 class LocationService {
-  Future<bool> checkPermission() async {
+  Future<Position?> getCurrentLocation() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!serviceEnabled) {
-      return false;
+      return null;
     }
 
-    LocationPermission permission = await Geolocator.checkPermission();
+    var permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -18,28 +18,16 @@ class LocationService {
 
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
-      return false;
+      return null;
     }
 
-    return true;
-  }
-
-  Future<Position?> getCurrentLocation() async {
     try {
-      final hasPermission = await checkPermission();
-
-      if (!hasPermission) {
-        return null;
-      }
-
-      final position = await Geolocator.getCurrentPosition(
+      return await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
-      ).timeout(const Duration(seconds: 10));
-
-      return position;
-    } catch (e) {
+      );
+    } catch (_) {
       return null;
     }
   }

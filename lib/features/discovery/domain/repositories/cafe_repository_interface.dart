@@ -5,8 +5,6 @@ abstract class CafeRepositoryInterface {
     required double latitude,
     required double longitude,
   });
-
   Future<List<CafeEntity>> searchCafes({required String query});
-
   Future<List<CafeEntity>> getCafesByCategory({required String category});
 }

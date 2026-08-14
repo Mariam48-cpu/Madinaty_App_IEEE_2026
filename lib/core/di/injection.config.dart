@@ -34,16 +34,12 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i162.LocationService>(() => _i162.LocationService());
-    gh.lazySingleton<_i1013.GooglePlacesDataSource>(
+    gh.factory<_i1013.GooglePlacesDataSource>(
       () => _i1013.GooglePlacesDataSource(),
     );
     gh.factory<_i1020.CafeRepositoryInterface>(
-      () => _i525.CafeRepositoryImpl(gh<_i1013.GooglePlacesDataSource>()),
-    );
-    gh.factory<_i708.DiscoveryCubit>(
-      () => _i708.DiscoveryCubit(
-        repository: gh<_i1020.CafeRepositoryInterface>(),
-        locationService: gh<_i162.LocationService>(),
+      () => _i525.CafeRepositoryImpl(
+        dataSource: gh<_i1013.GooglePlacesDataSource>(),
       ),
     );
     gh.factory<_i784.GetNearbyCafes>(
@@ -51,6 +47,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i616.SearchCafes>(
       () => _i616.SearchCafes(gh<_i1020.CafeRepositoryInterface>()),
+    );
+    gh.factory<_i708.DiscoveryCubit>(
+      () => _i708.DiscoveryCubit(
+        repository: gh<_i1020.CafeRepositoryInterface>(),
+        locationService: gh<_i162.LocationService>(),
+      ),
     );
     return this;
   }

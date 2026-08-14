@@ -1,10 +1,10 @@
-import 'package:latlong2/latlong.dart' as latlong;
+import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 class CafeDto {
   final String id;
   final String name;
-  final latlong.LatLng location;
+  final LatLng location;
   final double rating;
   final List<String> photos;
   final String address;
@@ -21,12 +21,14 @@ class CafeDto {
   });
 
   factory CafeDto.fromJson(Map<String, dynamic> json) {
+    final location = json['location'] as Map<String, dynamic>?;
+
     return CafeDto(
       id: json['id'] ?? '',
       name: json['displayName']?['text'] ?? '',
-      location: latlong.LatLng(
-        (json['location']?['latitude'] ?? 0.0).toDouble(),
-        (json['location']?['longitude'] ?? 0.0).toDouble(),
+      location: LatLng(
+        (location?['latitude'] ?? 0.0).toDouble(),
+        (location?['longitude'] ?? 0.0).toDouble(),
       ),
       rating: (json['rating'] ?? 0.0).toDouble(),
       photos: [],
@@ -34,6 +36,7 @@ class CafeDto {
       isOpen: json['currentOpeningHours']?['openNow'] ?? false,
     );
   }
+
   CafeEntity toEntity() {
     return CafeEntity(
       id: id,

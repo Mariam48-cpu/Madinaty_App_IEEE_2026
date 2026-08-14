@@ -1,4 +1,5 @@
 import 'package:latlong2/latlong.dart';
+
 class CafeEntity {
   final String id;
   final String name;
