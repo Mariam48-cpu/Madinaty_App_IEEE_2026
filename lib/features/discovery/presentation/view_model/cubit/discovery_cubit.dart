@@ -54,6 +54,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     final trueQuery = query.trim();
 
     if (trueQuery.isEmpty) {
+      await loadNearbyCafes();
       return;
     }
 
@@ -74,8 +75,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       emit(DiscoveryError(e.toString()));
     }
   }
-
-
 
   Future<void> getCafesByCategory({required String category}) async {
     final categories = category.trim();
