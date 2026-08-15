@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/cafe_placeholder.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/store_icon.dart.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_state.dart';
 
 class BottomCafesCards extends StatelessWidget {
@@ -62,10 +62,10 @@ class CafeCardItem extends StatelessWidget {
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return CafePlaceholder();
+                            return StoreIcon();
                           },
                         )
-                      : CafePlaceholder(),
+                      : StoreIcon(),
                 ),
                 Positioned(
                   top: 8,

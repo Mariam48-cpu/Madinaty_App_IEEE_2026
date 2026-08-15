@@ -21,7 +21,7 @@ class DiscoveryMapWidget extends StatefulWidget {
 }
 
 class _DiscoveryMapWidgetState extends State<DiscoveryMapWidget> {
-  final MapController _mapController = MapController();
+  final MapController mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class _DiscoveryMapWidgetState extends State<DiscoveryMapWidget> {
     }).toList();
 
     return FlutterMap(
-      mapController: _mapController,
+      mapController: mapController,
       options: MapOptions(
         initialCenter: widget.userLocation,
         initialZoom: 14.0,

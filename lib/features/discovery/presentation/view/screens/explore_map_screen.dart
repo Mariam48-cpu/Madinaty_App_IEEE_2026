@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/category_results_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/bottom_cafes_cards.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_map.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_top_overlay.dart';
@@ -27,9 +28,18 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   final List<String> filters = [
     'مفتوح الآن',
     'Wi-Fi',
-    'هادئ للعمل',
+    'هادئ للمذاكرة',
     'قهوة مختصة',
   ];
+  void onFilterTap() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            CategoryResultsScreen(cubit: widget.cubit, category: 'الكل'),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -98,9 +108,38 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
     setState(() {
       selectedChipIndex = index;
     });
-  }
 
-  void onFilterTap() {}
+    String category;
+
+    switch (index) {
+      case 0:
+        category = 'مفتوح الآن';
+        break;
+
+      case 1:
+        category = 'Wi-Fi';
+        break;
+
+      case 2:
+        category = 'هادئ للمذاكرة';
+        break;
+
+      case 3:
+        category = 'قهوة مختصة';
+        break;
+
+      default:
+        category = 'الكل';
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            CategoryResultsScreen(cubit: widget.cubit, category: category),
+      ),
+    );
+  }
 
   void onSearch(String query) {
     widget.cubit.searchCafes(query: query);
@@ -127,13 +166,13 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                 },
                 builder: (context, state) {
                   if (state is DiscoveryInitial || state is DiscoveryLoading) {
-                    return  Center(child: CircularProgressIndicator());
+                    return Center(child: CircularProgressIndicator());
                   }
                   if (state is DiscoveryError) {
                     return Center(child: Text(state.message));
                   }
                   if (state is DiscoveryEmpty) {
-                    return  Center(
+                    return Center(
                       child: Text('لم يتم العثور على كافيهات قريبة.'),
                     );
                   }
@@ -161,7 +200,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                     );
                   }
 
-                  return  SizedBox.shrink();
+                  return SizedBox.shrink();
                 },
               ),
               BlocBuilder<DiscoveryCubit, DiscoveryState>(

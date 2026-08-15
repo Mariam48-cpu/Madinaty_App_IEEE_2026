@@ -146,9 +146,7 @@ class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
                 hintText: 'ابحث عن كافيه، منطقة',
                 hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                 border: InputBorder.none,
-
                 prefixIcon: Icon(Icons.search, color: Colors.grey),
-
                 suffixIcon: GestureDetector(
                   onTap: widget.onFilterTap,
                   child: Icon(Icons.tune, color: Colors.grey),

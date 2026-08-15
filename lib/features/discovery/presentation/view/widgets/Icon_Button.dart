@@ -13,16 +13,21 @@ class IconButtonWidget extends StatefulWidget {
 class _IconButtonWidgetState extends State<IconButtonWidget> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Container(
-        padding:  EdgeInsets.all(8),
-        decoration:  BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: widget.onTap,
+        child: Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Color(0xFFE8DED8)),
+          ),
+          child: Icon(widget.icon, size: 19, color: Color(0xFF4A403B)),
         ),
-        child: Icon(widget.icon, size: 18, color: Colors.black87),
       ),
     );
   }

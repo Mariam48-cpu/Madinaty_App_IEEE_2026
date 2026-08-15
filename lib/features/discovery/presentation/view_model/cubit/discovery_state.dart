@@ -2,30 +2,30 @@ import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 abstract class DiscoveryState {
-   DiscoveryState();
+  DiscoveryState();
 }
 
 class DiscoveryInitial extends DiscoveryState {
-   DiscoveryInitial();
+  DiscoveryInitial();
 }
 
 class DiscoveryLoading extends DiscoveryState {
-   DiscoveryLoading();
+  DiscoveryLoading();
 }
 
 class DiscoverySuccess extends DiscoveryState {
   final List<CafeEntity> cafes;
   final LatLng? currentLocation;
 
-   DiscoverySuccess({required this.cafes, this.currentLocation});
+  DiscoverySuccess({required this.cafes, this.currentLocation});
 }
 
 class DiscoveryEmpty extends DiscoveryState {
-   DiscoveryEmpty();
+  DiscoveryEmpty();
 }
 
 class DiscoveryError extends DiscoveryState {
   final String message;
 
-   DiscoveryError(this.message);
+  DiscoveryError(this.message);
 }
