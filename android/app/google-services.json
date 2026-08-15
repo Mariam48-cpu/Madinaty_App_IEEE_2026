@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "514367928999",
+    "project_id": "madinaty-bb278",
+    "storage_bucket": "madinaty-bb278.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514367928999:android:2c02011681763eed4af982",
+        "android_client_info": {
+          "package_name": "com.example.madinaty_app_ieee_2026"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTilfV_-K9HXj0PG8eEH5l1RbsGa4lCr4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
