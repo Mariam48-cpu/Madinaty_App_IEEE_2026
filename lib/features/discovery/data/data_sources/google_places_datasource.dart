@@ -9,6 +9,7 @@ class GooglePlacesDataSource {
   String getPhotoUrl(String photoName) {
     return 'https://places.googleapis.com/v1/$photoName/media?maxHeightPx=400&maxWidthPx=400&key=$apiKey';
   }
+
   Future<List<CafeDto>> getNearbyCafes({
     required double latitude,
     required double longitude,
@@ -19,6 +20,7 @@ class GooglePlacesDataSource {
 
     final response = await http.post(
       url,
+
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
