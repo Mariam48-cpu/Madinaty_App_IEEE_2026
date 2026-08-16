@@ -3,10 +3,13 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
 import 'core/localization/app_locale.dart';
 import 'core/services/firebase_service.dart';
+import 'core/routes/app_routes.dart';
+import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseService.init();
+
 
   runApp(const MyApp());
 }
@@ -30,7 +33,7 @@ class _MyAppState extends State<MyApp> {
 
   void _initializeLocalization() {
     _localization.init(
-      initLanguageCode: 'ar', // 👈 اللغة الافتراضية
+      initLanguageCode: 'ar',
       mapLocales: [
         const MapLocale(
           'ar',
@@ -85,3 +88,14 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+Widget build(BuildContext context) {
+  return MaterialApp(
+    title: 'Madinaty',
+    debugShowCheckedModeBanner: false,
+    theme: AppTheme.lightTheme,
+    initialRoute: AppRoutes.initial,
+    onGenerateRoute: AppRoutes.onGenerateRoute,
+  );
+}
+
+
