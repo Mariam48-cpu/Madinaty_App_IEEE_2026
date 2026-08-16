@@ -1,7 +1,7 @@
+import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:latlong2/latlong.dart';
-
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/repositories/cafe_repository_interface.dart';
@@ -37,14 +37,21 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         longitude: position.longitude,
       );
 
-      allCafes = cafes;
+      final cafesWithPhotos = await _addRandomPhotosToCafes(cafes);
 
-      if (cafes.isEmpty) {
+      allCafes = cafesWithPhotos;
+
+      if (cafesWithPhotos.isEmpty) {
         emit(DiscoveryEmpty());
         return;
       }
 
-      emit(DiscoverySuccess(cafes: cafes, currentLocation: currentLocation));
+      emit(
+        DiscoverySuccess(
+          cafes: cafesWithPhotos,
+          currentLocation: currentLocation,
+        ),
+      );
     } catch (e) {
       emit(DiscoveryError(e.toString()));
     }
@@ -63,14 +70,21 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     try {
       final cafes = await repository.searchCafes(query: trueQuery);
 
-      allCafes = cafes;
+      final cafesWithPhotos = await _addRandomPhotosToCafes(cafes);
 
-      if (cafes.isEmpty) {
+      allCafes = cafesWithPhotos;
+
+      if (cafesWithPhotos.isEmpty) {
         emit(DiscoveryEmpty());
         return;
       }
 
-      emit(DiscoverySuccess(cafes: cafes, currentLocation: currentLocation));
+      emit(
+        DiscoverySuccess(
+          cafes: cafesWithPhotos,
+          currentLocation: currentLocation,
+        ),
+      );
     } catch (e) {
       emit(DiscoveryError(e.toString()));
     }
@@ -88,16 +102,53 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     try {
       final cafes = await repository.getCafesByCategory(category: categories);
 
-      allCafes = cafes;
+      final cafesWithPhotos = await _addRandomPhotosToCafes(cafes);
 
-      if (cafes.isEmpty) {
+      allCafes = cafesWithPhotos;
+
+      if (cafesWithPhotos.isEmpty) {
         emit(DiscoveryEmpty());
         return;
       }
 
-      emit(DiscoverySuccess(cafes: cafes, currentLocation: currentLocation));
+      emit(
+        DiscoverySuccess(
+          cafes: cafesWithPhotos,
+          currentLocation: currentLocation,
+        ),
+      );
     } catch (e) {
       emit(DiscoveryError(e.toString()));
     }
+  }
+
+  Future<List<CafeEntity>> _addRandomPhotosToCafes(
+    List<CafeEntity> cafes,
+  ) async {
+    final photos = await repository.getRandomCafePhotos();
+
+    if (photos.isEmpty) {
+      return cafes;
+    }
+
+    final random = Random();
+
+    return cafes.map((cafe) {
+      final randomPhoto = photos[random.nextInt(photos.length)];
+
+      return CafeEntity(
+        id: cafe.id,
+        name: cafe.name,
+        location: cafe.location,
+        rating: cafe.rating,
+        photos: [randomPhoto],
+        address: cafe.address,
+        isOpen: cafe.isOpen,
+        description: cafe.description,
+        reviewsCount: cafe.reviewsCount,
+        openingHours: cafe.openingHours,
+        attributes: cafe.attributes,
+      );
+    }).toList();
   }
 }
