@@ -193,6 +193,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                           menu: experience.menu,
                                           onProductTap:
                                               (ProductEntity product) {},
+                                          experience: experience,
                                         ),
                                       ),
 

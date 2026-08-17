@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-
+import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/cafe_experience_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
-
 import 'full_menu.dart';
 import 'popular_products.dart';
 
 class CafeMenuSection extends StatelessWidget {
   final List<MenuCategoryEntity> menu;
+  final CafeExperienceEntity experience;
   final void Function(ProductEntity product)? onProductTap;
 
-  const CafeMenuSection({super.key, required this.menu, this.onProductTap});
+  const CafeMenuSection({super.key, required this.menu, this.onProductTap, required this.experience});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class CafeMenuSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        PopularProducts(menu: menu, onProductTap: onProductTap),
+        PopularProducts(menu: menu, onProductTap: onProductTap, experience: experience,),
 
         FullMenu(menu: menu, onProductTap: onProductTap),
       ],
