@@ -1,101 +1,48 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localization/flutter_localization.dart';
-import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
-import 'core/localization/app_locale.dart';
-import 'core/services/firebase_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
+import 'package:madinaty_app_ieee_2026/firebase_options.dart';
+
 import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FirebaseService.init();
 
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  configureDependencies();
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final FlutterLocalization _localization = FlutterLocalization.instance;
-
-  @override
-  void initState() {
-    _localization.onTranslatedLanguage = _onTranslatedLanguage;
-    _initializeLocalization();
-    super.initState();
-  }
-
-  void _initializeLocalization() {
-    _localization.init(
-      initLanguageCode: 'ar',
-      mapLocales: [
-        const MapLocale(
-          'ar',
-          AppLocale.AR,
-          countryCode: 'EG',
-          fontFamily: 'Cairo',
-        ),
-        const MapLocale(
-          'en',
-          AppLocale.EN,
-          countryCode: 'US',
-          fontFamily: 'Cairo',
-        ),
-        const MapLocale(
-          'km',
-          AppLocale.KM,
-          countryCode: 'KH',
-        ),
-        const MapLocale(
-          'ja',
-          AppLocale.JA,
-          countryCode: 'JP',
-        ),
-      ],
-    );
-  }
-
-  void _onTranslatedLanguage(Locale? locale) {
-    setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isArabic = _localization.currentLocale?.languageCode == 'ar';
-
     return MaterialApp(
       title: 'Madinaty',
       debugShowCheckedModeBanner: false,
-      supportedLocales: _localization.supportedLocales,
-      localizationsDelegates: _localization.localizationsDelegates,
-      theme: ThemeData(
-        fontFamily: _localization.fontFamily ?? 'Cairo',
-        scaffoldBackgroundColor: const Color(0xFFF9F6F0),
-      ),
-      builder: (context, child) {
-        return Directionality(
-          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-          child: child!,
-        );
-      },
-      home: const AuthScreen(),
+      theme: AppTheme.lightTheme,
+
+      initialRoute: AppRoutes.initial,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
+
+      locale: Locale('ar'),
+
+      supportedLocales: [Locale('ar'), Locale('en')],
+
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      home: LocationPermissionGate(),
     );
   }
 }
-Widget build(BuildContext context) {
-  return MaterialApp(
-    title: 'Madinaty',
-    debugShowCheckedModeBanner: false,
-    theme: AppTheme.lightTheme,
-    initialRoute: AppRoutes.initial,
-    onGenerateRoute: AppRoutes.onGenerateRoute,
-  );
-}
-
-
