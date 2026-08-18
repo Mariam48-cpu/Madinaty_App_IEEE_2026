@@ -7,7 +7,9 @@ import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/scre
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 
 import 'core/routes/app_routes.dart';
+import 'core/services/firebase_service.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/view/screens/auth_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
