@@ -87,10 +87,10 @@ class PopularProductMenuCard extends StatelessWidget {
                       quantity: quantity,
                       onAdd: onAdd,
                       onRemove: onRemove,
-                      backgroundColor: const Color(0xFF17120F),
-                      iconColor: const Color(0xFFF7F4F2),
-                      textColor: const Color(0xFF2D2521),
-                      borderColor: const Color(0xFF17120F),
+                      backgroundColor: Color(0xFF17120F),
+                      iconColor: Color(0xFFF7F4F2),
+                      textColor: Color(0xFFF7F4F2),
+                      borderColor: Color(0xFF17120F),
                     ),
 
                     Text(

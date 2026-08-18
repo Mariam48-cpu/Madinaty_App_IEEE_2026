@@ -3,6 +3,25 @@ import 'package:injectable/injectable.dart';
 
 @injectable
 class LocationService {
+  Future<bool> isLocationPermissionGranted() async {
+    final permission = await Geolocator.checkPermission();
+
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+  }
+
+  Future<LocationPermission> checkPermission() async {
+    return Geolocator.checkPermission();
+  }
+
+  Future<LocationPermission> requestPermission() async {
+    return Geolocator.requestPermission();
+  }
+
+  Future<bool> isLocationServiceEnabled() async {
+    return Geolocator.isLocationServiceEnabled();
+  }
+
   Future<Position?> getCurrentLocation() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
@@ -21,14 +40,16 @@ class LocationService {
       return null;
     }
 
-    try {
-      return await Geolocator.getCurrentPosition(
-        locationSettings:  LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      );
-    } catch (_) {
-      return null;
-    }
+    return Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    );
+  }
+
+  Future<bool> openAppSettings() async {
+    return Geolocator.openAppSettings();
+  }
+
+  Future<bool> openLocationSettings() async {
+    return Geolocator.openLocationSettings();
   }
 }

@@ -24,6 +24,8 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   final MapController mapController = MapController();
 
   int selectedChipIndex = 0;
+  String? cachedLocationName;
+  LatLng? lastGeocodedLocation;
 
   final List<String> filters = [
     'مفتوح الآن',
@@ -31,6 +33,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
     'هادئ للمذاكرة',
     'قهوة مختصة',
   ];
+
   void onFilterTap() {
     Navigator.push(
       context,
@@ -44,10 +47,9 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (widget.cubit.currentLocation == null) {
       widget.cubit.loadNearbyCafes();
-    });
+    }
   }
 
   @override
@@ -57,6 +59,19 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   }
 
   Future<String> getLocationName(double latitude, double longitude) async {
+    if (lastGeocodedLocation != null &&
+        (lastGeocodedLocation!.latitude != latitude ||
+            lastGeocodedLocation!.longitude != longitude)) {
+      cachedLocationName = null;
+    }
+
+    if (lastGeocodedLocation != null &&
+        lastGeocodedLocation!.latitude == latitude &&
+        lastGeocodedLocation!.longitude == longitude &&
+        cachedLocationName != null) {
+      return cachedLocationName!;
+    }
+
     try {
       final url = Uri.parse(
         'https://nominatim.openstreetmap.org/reverse'
@@ -71,6 +86,8 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
         headers: {'User-Agent': 'madinaty_app_ieee_2026'},
       );
 
+      if (!mounted) return cachedLocationName ?? 'جاري تحديد الموقع...';
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final address = data['address'];
@@ -84,24 +101,25 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
               '';
           final String state = address['state'] ?? address['governorate'] ?? '';
 
+          String resultName = 'موقعي الحالي';
           if (townOrCity.isNotEmpty && state.isNotEmpty) {
-            return '$state، $townOrCity';
+            resultName = '$state، $townOrCity';
+          } else if (townOrCity.isNotEmpty) {
+            resultName = townOrCity;
+          } else if (state.isNotEmpty) {
+            resultName = state;
           }
 
-          if (townOrCity.isNotEmpty) {
-            return townOrCity;
-          }
-
-          if (state.isNotEmpty) {
-            return state;
-          }
+          cachedLocationName = resultName;
+          lastGeocodedLocation = LatLng(latitude, longitude);
+          return resultName;
         }
       }
     } catch (e) {
       debugPrint('Reverse Geocoding Error: $e');
     }
 
-    return 'موقعي الحالي';
+    return cachedLocationName ?? 'موقعي الحالي';
   }
 
   void onChipSelected(int index) {
@@ -210,7 +228,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                       current is DiscoverySuccess) {
                     return previous.currentLocation != current.currentLocation;
                   }
-                  return current is DiscoverySuccess;
+                  return true;
                 },
                 builder: (context, state) {
                   LatLng? location;
@@ -219,10 +237,9 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                   } else {
                     location = widget.cubit.currentLocation;
                   }
+
                   return DiscoveryTopOverlay(
-                    onBack: () {
-                      Navigator.pop(context);
-                    },
+                    onBack: () => Navigator.pop(context),
                     onNotificationTap: () {},
                     userLocation: location,
                     filters: filters,

@@ -44,9 +44,9 @@ class _RegularProductMenuCardState extends State<RegularProductMenuCard> {
             quantity: widget.quantity,
             onAdd: widget.onAdd,
             onRemove: widget.onRemove,
-            backgroundColor: const Color(0xFFFFF0E6),
-            iconColor: const Color(0xFF8D6654),
-            textColor: const Color(0xFF8D6654),
+            backgroundColor: Color(0xFFFFF0E6),
+            iconColor: Color(0xFF8D6654),
+            textColor: Color(0xFF8D6654),
           ),
           SizedBox(width: 12),
 

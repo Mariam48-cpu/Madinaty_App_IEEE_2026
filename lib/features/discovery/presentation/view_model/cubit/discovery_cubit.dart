@@ -1,7 +1,9 @@
 import 'dart:math';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:latlong2/latlong.dart';
+
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/repositories/cafe_repository_interface.dart';
@@ -16,10 +18,24 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     : super(DiscoveryInitial());
 
   List<CafeEntity> allCafes = [];
-
+  bool isManualLocation = false;
   LatLng? currentLocation;
 
+  Future<Object> requestLocationPermission() async {
+    try {
+      final permission = await locationService.requestPermission();
+
+      return permission;
+    } catch (e) {
+      emit(DiscoveryError(e.toString()));
+      return false;
+    }
+  }
+
   Future<void> loadNearbyCafes() async {
+    if (isManualLocation && currentLocation != null) {
+      return;
+    }
     emit(DiscoveryLoading());
 
     try {
@@ -37,7 +53,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         longitude: position.longitude,
       );
 
-      final cafesWithPhotos = await _addRandomPhotosToCafes(cafes);
+      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
 
       allCafes = cafesWithPhotos;
 
@@ -70,7 +86,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     try {
       final cafes = await repository.searchCafes(query: trueQuery);
 
-      final cafesWithPhotos = await _addRandomPhotosToCafes(cafes);
+      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
 
       allCafes = cafesWithPhotos;
 
@@ -102,7 +118,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     try {
       final cafes = await repository.getCafesByCategory(category: categories);
 
-      final cafesWithPhotos = await _addRandomPhotosToCafes(cafes);
+      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
 
       allCafes = cafesWithPhotos;
 
@@ -122,7 +138,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     }
   }
 
-  Future<List<CafeEntity>> _addRandomPhotosToCafes(
+  Future<List<CafeEntity>> addRandomPhotosToCafes(
     List<CafeEntity> cafes,
   ) async {
     final photos = await repository.getRandomCafePhotos();
@@ -150,5 +166,39 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         attributes: cafe.attributes,
       );
     }).toList();
+  }
+
+  Future<void> loadCafesByManualLocation({
+    required double latitude,
+    required double longitude,
+  }) async {
+    emit(DiscoveryLoading());
+
+    try {
+      isManualLocation = true;
+      currentLocation = LatLng(latitude, longitude);
+
+      final cafes = await repository.getNearbyCafes(
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
+      allCafes = cafesWithPhotos;
+
+      if (cafesWithPhotos.isEmpty) {
+        emit(DiscoveryEmpty());
+        return;
+      }
+
+      emit(
+        DiscoverySuccess(
+          cafes: cafesWithPhotos,
+          currentLocation: currentLocation,
+        ),
+      );
+    } catch (e) {
+      emit(DiscoveryError(e.toString()));
+    }
   }
 }
