@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import '../../../../../core/localization/app_locale.dart';
+import '../../../../../core/routes/app_routes.dart';
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
 import '../../../domain/use_cases/google_signin_usecase.dart';
@@ -115,7 +116,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               backgroundColor: Colors.green.shade700,
             ),
           );
-          // TODO: Navigation to Home Screen
+          Navigator.of(context).pushReplacementNamed(AppRoutes.personalization);
         }
       },
       builder: (context, state) {

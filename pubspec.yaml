@@ -43,6 +43,8 @@ dependencies:
   cloud_firestore: ^6.8.0
   google_sign_in: ^7.2.0
   flutter_localization: 0.2.2
+  flutter_svg: ^2.3.0
+  toastification: ^3.2.0
 
 dev_dependencies:
   flutter_test:
