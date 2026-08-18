@@ -17,7 +17,6 @@ class MenuCategoryModel {
 
   factory MenuCategoryModel.fromJson(Map<String, dynamic> json) {
     final productsJson = json['products'] as List? ?? [];
-
     return MenuCategoryModel(
       id: json['id'] ?? '',
       cafeId: json['cafeId'] ?? '',

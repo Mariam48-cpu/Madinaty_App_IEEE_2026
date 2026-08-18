@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 
-class MenuProductItem extends StatelessWidget {
+class MenuProductItem extends StatefulWidget {
   final ProductEntity product;
   final VoidCallback? onTap;
 
   const MenuProductItem({super.key, required this.product, this.onTap});
 
   @override
+  State<MenuProductItem> createState() => _MenuProductItemState();
+}
+
+class _MenuProductItemState extends State<MenuProductItem> {
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         width: 145,
         margin: EdgeInsets.only(left: 10),
@@ -28,9 +33,9 @@ class MenuProductItem extends StatelessWidget {
               child: SizedBox(
                 height: 82,
                 width: double.infinity,
-                child: product.image.isNotEmpty
+                child: widget.product.image.isNotEmpty
                     ? Image.network(
-                        product.image,
+                        widget.product.image,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) {
                           return Container(
@@ -64,7 +69,9 @@ class MenuProductItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    product.name.isNotEmpty ? product.name : 'منتج',
+                    widget.product.name.isNotEmpty
+                        ? widget.product.name
+                        : 'منتج',
                     textAlign: TextAlign.right,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -74,7 +81,7 @@ class MenuProductItem extends StatelessWidget {
                   SizedBox(height: 4),
 
                   Text(
-                    '${product.price.toStringAsFixed(0)} ج.م',
+                    '${widget.product.price.toStringAsFixed(0)} ج.م',
                     style: TextStyle(
                       color: Color(0xFF8D6654),
                       fontSize: 10,

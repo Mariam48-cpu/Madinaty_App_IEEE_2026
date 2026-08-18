@@ -22,7 +22,6 @@ class CafeBottomButtons extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // اطلب مسبقًا
           Expanded(
             child: SizedBox(
               height: 48,
@@ -45,8 +44,6 @@ class CafeBottomButtons extends StatelessWidget {
           ),
 
           SizedBox(width: 8),
-
-          // احجز مكانك
           Expanded(
             flex: 1,
             child: SizedBox(

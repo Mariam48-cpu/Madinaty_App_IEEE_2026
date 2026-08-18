@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_menu/quantity_control.dart';
 
-class RegularProductMenuCard extends StatelessWidget {
+class RegularProductMenuCard extends StatefulWidget {
   final ProductEntity product;
   final int quantity;
   final VoidCallback onAdd;
   final VoidCallback onRemove;
-
+  final VoidCallback onTap;
   const RegularProductMenuCard({
     super.key,
     required this.product,
     required this.quantity,
     required this.onAdd,
     required this.onRemove,
+    required this.onTap,
   });
 
+  @override
+  State<RegularProductMenuCard> createState() => _RegularProductMenuCardState();
+}
+
+class _RegularProductMenuCardState extends State<RegularProductMenuCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -35,9 +41,9 @@ class RegularProductMenuCard extends StatelessWidget {
       child: Row(
         children: [
           QuantityControl(
-            quantity: quantity,
-            onAdd: onAdd,
-            onRemove: onRemove,
+            quantity: widget.quantity,
+            onAdd: widget.onAdd,
+            onRemove: widget.onRemove,
             backgroundColor: const Color(0xFFFFF0E6),
             iconColor: const Color(0xFF8D6654),
             textColor: const Color(0xFF8D6654),
@@ -49,7 +55,7 @@ class RegularProductMenuCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  product.name,
+                  widget.product.name,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -60,7 +66,7 @@ class RegularProductMenuCard extends StatelessWidget {
                 SizedBox(height: 2),
 
                 Text(
-                  product.description,
+                  widget.product.description,
                   textAlign: TextAlign.right,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -70,7 +76,7 @@ class RegularProductMenuCard extends StatelessWidget {
                 SizedBox(height: 6),
 
                 Text(
-                  '${product.price.toInt()} ج.م',
+                  '${widget.product.price.toInt()} ج.م',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -83,18 +89,21 @@ class RegularProductMenuCard extends StatelessWidget {
 
           SizedBox(width: 12),
 
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              product.image,
-              height: 65,
-              width: 65,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+          GestureDetector(
+            onTap: widget.onTap,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                widget.product.image,
                 height: 65,
                 width: 65,
-                color: Colors.grey.shade200,
-                child: Icon(Icons.coffee, color: Colors.grey),
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 65,
+                  width: 65,
+                  color: Colors.grey.shade200,
+                  child: Icon(Icons.coffee, color: Colors.grey),
+                ),
               ),
             ),
           ),

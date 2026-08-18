@@ -131,26 +131,18 @@ class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
           ),
 
           SizedBox(height: 12),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
-            ),
-            child: TextField(
-              controller: searchController,
-              textAlign: TextAlign.right,
-              onChanged: onSearchChanged,
-              decoration: InputDecoration(
-                hintText: 'ابحث عن كافيه، منطقة',
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                border: InputBorder.none,
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
-                suffixIcon: GestureDetector(
-                  onTap: widget.onFilterTap,
-                  child: Icon(Icons.tune, color: Colors.grey),
-                ),
+          TextField(
+            controller: searchController,
+            textAlign: TextAlign.right,
+            onChanged: onSearchChanged,
+            decoration: InputDecoration(
+              hintText: 'ابحث عن كافيه، منطقة',
+              hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+              border: InputBorder.none,
+              prefixIcon: Icon(Icons.search, color: Colors.grey),
+              suffixIcon: GestureDetector(
+                onTap: widget.onFilterTap,
+                child: Icon(Icons.tune, color: Colors.grey),
               ),
             ),
           ),

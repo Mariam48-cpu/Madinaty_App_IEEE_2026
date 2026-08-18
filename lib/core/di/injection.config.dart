@@ -19,6 +19,10 @@ import 'package:madinaty_app_ieee_2026/features/cafe/data/repositories/cafe_repo
     as _i920;
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/repositories/cafe_repository_interface.dart'
     as _i297;
+import 'package:madinaty_app_ieee_2026/features/cafe/domain/use_cases/get_cafe_experience_use_case.dart'
+    as _i473;
+import 'package:madinaty_app_ieee_2026/features/cafe/domain/use_cases/get_cafe_menu_use_case.dart'
+    as _i297;
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view_model/cubit/cafe_cubit.dart'
     as _i1062;
 import 'package:madinaty_app_ieee_2026/features/discovery/data/data_sources/google_places_datasource.dart'
@@ -49,7 +53,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i1013.GooglePlacesDataSource(),
     );
     gh.factory<_i297.CafeeRepositoryInterface>(
-      () => _i920.CafeRepositoryFirebase(),
+      () => _i920.CafeRepositoryFirebase(
+        dataSource: gh<_i793.CafeFirestoreDataSource>(),
+      ),
     );
     gh.factory<_i1020.CafeRepositoryInterface>(
       () => _i525.CafeRepositoryImpl(
@@ -57,8 +63,15 @@ extension GetItInjectableX on _i174.GetIt {
         firebaseDataSource: gh<_i793.CafeFirestoreDataSource>(),
       ),
     );
-    gh.factory<_i1062.CafeCubit>(
-      () => _i1062.CafeCubit(repository: gh<_i297.CafeeRepositoryInterface>()),
+    gh.factory<_i473.GetCafeExperienceUseCase>(
+      () => _i473.GetCafeExperienceUseCase(
+        repository: gh<_i297.CafeeRepositoryInterface>(),
+      ),
+    );
+    gh.factory<_i297.GetCafeMenuUseCase>(
+      () => _i297.GetCafeMenuUseCase(
+        repository: gh<_i297.CafeeRepositoryInterface>(),
+      ),
     );
     gh.factory<_i784.GetNearbyCafes>(
       () => _i784.GetNearbyCafes(gh<_i1020.CafeRepositoryInterface>()),
@@ -70,6 +83,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i708.DiscoveryCubit(
         repository: gh<_i1020.CafeRepositoryInterface>(),
         locationService: gh<_i162.LocationService>(),
+      ),
+    );
+    gh.factory<_i1062.CafeCubit>(
+      () => _i1062.CafeCubit(
+        getCafeExperienceUseCase: gh<_i473.GetCafeExperienceUseCase>(),
+        getCafeMenuUseCase: gh<_i297.GetCafeMenuUseCase>(),
       ),
     );
     return this;

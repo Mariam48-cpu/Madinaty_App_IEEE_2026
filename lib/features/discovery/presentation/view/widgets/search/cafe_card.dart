@@ -21,8 +21,7 @@ class CafeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          _buildImage(),
-
+          buildImage(),
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(10),
@@ -30,7 +29,26 @@ class CafeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildName(),
+                  Row(
+                    children: [
+                      Icon(Icons.bookmark_border, size: 19, color: Colors.grey),
+
+                      SizedBox(width: 6),
+
+                      Expanded(
+                        child: Text(
+                          cafe.name,
+                          textAlign: TextAlign.right,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
 
                   Text(
                     cafe.address,
@@ -39,7 +57,22 @@ class CafeCard extends StatelessWidget {
                     style: TextStyle(color: Colors.grey, fontSize: 10),
                   ),
 
-                  _buildRating(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${cafe.rating}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+
+                      SizedBox(width: 3),
+
+                      Icon(Icons.star, color: Colors.amber, size: 14),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -49,11 +82,15 @@ class CafeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImage() {
+  Widget buildImage() {
     if (cafe.photos.isEmpty) {
-      return _placeholderImage();
+      return Container(
+        height: 125,
+        width: double.infinity,
+        color: Color(0xFFE8E0DC),
+        child: Icon(Icons.local_cafe, size: 50, color: Color(0xFF8D6654)),
+      );
     }
-
     return ClipRRect(
       borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       child: Image.network(
@@ -62,54 +99,14 @@ class CafeCard extends StatelessWidget {
         width: double.infinity,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) {
-          return _placeholderImage();
+          return Container(
+            height: 125,
+            width: double.infinity,
+            color: Color(0xFFE8E0DC),
+            child: Icon(Icons.local_cafe, size: 50, color: Color(0xFF8D6654)),
+          );
         },
       ),
-    );
-  }
-
-  Widget _placeholderImage() {
-    return Container(
-      height: 125,
-      width: double.infinity,
-      color: Color(0xFFE8E0DC),
-      child: Icon(Icons.local_cafe, size: 50, color: Color(0xFF8D6654)),
-    );
-  }
-
-  Widget _buildName() {
-    return Row(
-      children: [
-        Icon(Icons.bookmark_border, size: 19, color: Colors.grey),
-
-        SizedBox(width: 6),
-
-        Expanded(
-          child: Text(
-            cafe.name,
-            textAlign: TextAlign.right,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRating() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          '${cafe.rating}',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-        ),
-
-        SizedBox(width: 3),
-
-        Icon(Icons.star, color: Colors.amber, size: 14),
-      ],
     );
   }
 }

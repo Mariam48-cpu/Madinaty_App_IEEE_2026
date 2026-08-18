@@ -7,6 +7,7 @@ class PopularProductMenuCard extends StatelessWidget {
   final int quantity;
   final VoidCallback onAdd;
   final VoidCallback onRemove;
+  final VoidCallback onTap;
 
   const PopularProductMenuCard({
     super.key,
@@ -14,6 +15,7 @@ class PopularProductMenuCard extends StatelessWidget {
     required this.quantity,
     required this.onAdd,
     required this.onRemove,
+    required this.onTap,
   });
 
   @override
@@ -34,17 +36,20 @@ class PopularProductMenuCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            child: Image.network(
-              product.image,
-              height: 160,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+          GestureDetector(
+            onTap: onTap,
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              child: Image.network(
+                product.image,
                 height: 160,
-                color: Colors.grey.shade200,
-                child: Icon(Icons.coffee, size: 50, color: Colors.grey),
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 160,
+                  color: Colors.grey.shade200,
+                  child: Icon(Icons.coffee, size: 50, color: Colors.grey),
+                ),
               ),
             ),
           ),
@@ -82,8 +87,8 @@ class PopularProductMenuCard extends StatelessWidget {
                       quantity: quantity,
                       onAdd: onAdd,
                       onRemove: onRemove,
-                      backgroundColor: const Color(0xFFF7F4F2),
-                      iconColor: const Color(0xFF17120F),
+                      backgroundColor: const Color(0xFF17120F),
+                      iconColor: const Color(0xFFF7F4F2),
                       textColor: const Color(0xFF2D2521),
                       borderColor: const Color(0xFF17120F),
                     ),

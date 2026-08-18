@@ -1,21 +1,25 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:madinaty_app_ieee_2026/features/cafe/domain/repositories/cafe_repository_interface.dart';
+import 'package:madinaty_app_ieee_2026/features/cafe/domain/use_cases/get_cafe_experience_use_case.dart';
+import 'package:madinaty_app_ieee_2026/features/cafe/domain/use_cases/get_cafe_menu_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
-
 import 'cafe_state.dart';
 
 @injectable
 class CafeCubit extends Cubit<CafeState> {
-  final CafeeRepositoryInterface repository;
+  final GetCafeExperienceUseCase getCafeExperienceUseCase;
+  final GetCafeMenuUseCase getCafeMenuUseCase;
 
-  CafeCubit({required this.repository}) : super(CafeInitial());
+  CafeCubit({
+    required this.getCafeExperienceUseCase,
+    required this.getCafeMenuUseCase,
+  }) : super(const CafeInitial());
 
   Future<void> getCafeExperience(CafeEntity cafe) async {
-    emit(CafeLoading());
+    emit(const CafeLoading());
 
     try {
-      final experience = await repository.getCafeExperience(cafe);
+      final experience = await getCafeExperienceUseCase(cafe);
 
       emit(CafeLoaded(experience: experience));
     } catch (e) {
@@ -25,7 +29,7 @@ class CafeCubit extends Cubit<CafeState> {
 
   Future<void> getCafeMenu(String cafeId) async {
     try {
-      final menu = await repository.getCafeMenu(cafeId);
+      final menu = await getCafeMenuUseCase(cafeId);
 
       emit(CafeMenuLoaded(menu: menu));
     } catch (e) {

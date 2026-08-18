@@ -4,6 +4,7 @@ import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/cafe_experi
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/cafe_menu_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/product_datails_screen.dart';
 import 'popular_product_card.dart';
 
 class PopularProducts extends StatelessWidget {
@@ -22,10 +23,6 @@ class PopularProducts extends StatelessWidget {
         .expand((category) => category.products)
         .take(6)
         .toList();
-
-    if (products.isEmpty) {
-      return const SizedBox.shrink();
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -80,7 +77,13 @@ class PopularProducts extends StatelessWidget {
               return PopularProductCard(
                 product: product,
                 onTap: () {
-                  onProductTap?.call(product);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProductDetailsScreen(product: product),
+                    ),
+                  );
                 },
               );
             },

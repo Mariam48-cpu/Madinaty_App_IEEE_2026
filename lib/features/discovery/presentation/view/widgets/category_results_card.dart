@@ -96,13 +96,10 @@ class CategoryResultsCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 9),
+                SizedBox(height: 9),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 9,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9),
                   decoration: BoxDecoration(
                     color: Color(0xFFFFF8F4),
                     borderRadius: BorderRadius.circular(10),

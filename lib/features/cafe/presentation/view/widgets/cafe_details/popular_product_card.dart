@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 
-class PopularProductCard extends StatelessWidget {
+class PopularProductCard extends StatefulWidget {
   final ProductEntity product;
   final VoidCallback? onTap;
 
   const PopularProductCard({super.key, required this.product, this.onTap});
 
   @override
+  State<PopularProductCard> createState() => _PopularProductCardState();
+}
+
+class _PopularProductCardState extends State<PopularProductCard> {
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         width: 145,
         margin: EdgeInsets.only(left: 10),
@@ -34,9 +39,9 @@ class PopularProductCard extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 height: 85,
-                child: product.image.isNotEmpty
+                child: widget.product.image.isNotEmpty
                     ? Image.network(
-                        product.image,
+                        widget.product.image,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) {
                           return Container(
@@ -70,7 +75,7 @@ class PopularProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    product.name,
+                    widget.product.name,
                     textAlign: TextAlign.right,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -80,7 +85,7 @@ class PopularProductCard extends StatelessWidget {
                   SizedBox(height: 4),
 
                   Text(
-                    '${product.price.toStringAsFixed(0)} ج.م',
+                    '${widget.product.price.toStringAsFixed(0)} ج.م',
                     style: TextStyle(
                       color: Color(0xFF8D6654),
                       fontSize: 10,

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/product_datails_screen.dart';
 
 import 'menu_product_item.dart';
 
 class FullMenu extends StatelessWidget {
   final List<MenuCategoryEntity> menu;
   final void Function(ProductEntity product)? onProductTap;
+
   const FullMenu({super.key, required this.menu, this.onProductTap});
 
   @override
@@ -67,7 +69,13 @@ class FullMenu extends StatelessWidget {
                       return MenuProductItem(
                         product: product,
                         onTap: () {
-                          onProductTap?.call(product);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProductDetailsScreen(product: product),
+                            ),
+                          );
                         },
                       );
                     },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/cafe_experience_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/product_datails_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_menu/cafe_menu_header.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_menu/cart_bottom_bar.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_menu/menu_category_chips.dart';
@@ -130,6 +131,15 @@ class _CafeMenuScreenState extends State<CafeMenuScreen> {
                             quantity: getProductQuantity(product),
                             onAdd: () => addToCart(product),
                             onRemove: () => removeFromCart(product),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ProductDetailsScreen(product: product),
+                                ),
+                              );
+                            },
                           ),
                         ),
 
@@ -157,6 +167,15 @@ class _CafeMenuScreenState extends State<CafeMenuScreen> {
                             quantity: getProductQuantity(product),
                             onAdd: () => addToCart(product),
                             onRemove: () => removeFromCart(product),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ProductDetailsScreen(product: product),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
