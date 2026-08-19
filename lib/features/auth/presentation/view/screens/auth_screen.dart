@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
 import '../../../../../core/localization/app_locale.dart';
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
@@ -115,7 +116,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               backgroundColor: Colors.green.shade700,
             ),
           );
-          // TODO: Navigation to Home Screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
+          );
         }
       },
       builder: (context, state) {
@@ -134,7 +138,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // زر تبديل اللغة
                       Align(
                         alignment: Alignment.topRight,
                         child: TextButton.icon(

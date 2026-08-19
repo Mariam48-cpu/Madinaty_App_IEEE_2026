@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
 
-      home: LocationPermissionGate(),
+      home: const AuthScreen(),
     );
   }
 }
