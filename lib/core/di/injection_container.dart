@@ -1,0 +1,150 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../features/onboarding/data/data_sources/onboarding_local_data_source.dart';
+import '../../features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import '../../features/onboarding/domain/repositories/onboarding_repository.dart';
+import '../../features/onboarding/domain/use_cases/get_onboarding_pages.dart';
+import '../../features/onboarding/domain/use_cases/is_onboarding_seen.dart';
+import '../../features/onboarding/domain/use_cases/set_onboarding_seen.dart';
+import '../../features/onboarding/presentation/view_model/onboarding_bloc.dart';
+
+import '../../features/personalization/data/data_sources/personalization_remote_data_source_imp.dart';
+import '../../features/personalization/data/data_sources/personalization_remote_data_source_interface.dart';
+import '../../features/personalization/data/repositories/personalization_repo_imp.dart';
+import '../../features/personalization/domain/repositories/personalization_repository_interface.dart';
+import '../../features/personalization/domain/use_cases/get_user_preferences_usecase.dart';
+import '../../features/personalization/domain/use_cases/save_user_preferences_usecase.dart';
+
+import '../../features/home/data/data_sources/google_places_datasource.dart';
+import '../../features/home/data/repositories/recommendation_repository_impl.dart';
+import '../../features/home/domain/repositories/recommendation_repository.dart';
+import '../../features/home/domain/use_cases/get_recommendations_use_case.dart';
+import '../../features/home/domain/use_cases/search_cafes_use_case.dart';
+import '../../features/home/presentation/view_model/home_cubit.dart';
+
+final GetIt sl = GetIt.instance;
+
+Future<void> initDependencies() async {
+
+  final sharedPreferences =
+      await SharedPreferences.getInstance();
+
+  sl.registerLazySingleton<SharedPreferences>(
+    () => sharedPreferences,
+  );
+
+  sl.registerLazySingleton<FirebaseFirestore>(
+    () => FirebaseFirestore.instance,
+  );
+
+  sl.registerLazySingleton<FirebaseAuth>(
+    () => FirebaseAuth.instance,
+  );
+
+  sl.registerLazySingleton<OnboardingLocalDataSource>(
+    () => OnboardingLocalDataSource(
+      sl<SharedPreferences>(),
+    ),
+  );
+
+  sl.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(
+      sl<OnboardingLocalDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetOnboardingPages>(
+    () => GetOnboardingPages(
+      sl<OnboardingRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SetOnboardingSeen>(
+    () => SetOnboardingSeen(
+      sl<OnboardingRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<IsOnboardingSeen>(
+    () => IsOnboardingSeen(
+      sl<OnboardingRepository>(),
+    ),
+  );
+
+  sl.registerFactory<OnboardingBloc>(
+    () => OnboardingBloc(
+      getOnboardingPages:
+          sl<GetOnboardingPages>(),
+      setOnboardingSeen:
+          sl<SetOnboardingSeen>(),
+    ),
+  );
+
+  sl.registerLazySingleton<
+      PersonalizationRemoteDataSourceInterface>(
+    () => PersonalizationRemoteDataSourceImpl(
+      firebaseAuth: sl<FirebaseAuth>(),
+      firestore: sl<FirebaseFirestore>(),
+    ),
+  );
+
+  sl.registerLazySingleton<
+      PersonalizationRepositoryInterface>(
+    () => PersonalizationRepoImpl(
+      remoteDataSource:
+          sl<PersonalizationRemoteDataSourceInterface>(),
+    ),
+  );
+
+  sl.registerLazySingleton<
+      GetUserPreferencesUseCase>(
+    () => GetUserPreferencesUseCase(
+      sl<PersonalizationRepositoryInterface>(),
+    ),
+  );
+
+  sl.registerLazySingleton<
+      SaveUserPreferencesUseCase>(
+    () => SaveUserPreferencesUseCase(
+      sl<PersonalizationRepositoryInterface>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GooglePlacesDataSource>(
+    () => GooglePlacesDataSource(),
+  );
+
+  sl.registerLazySingleton<RecommendationRepository>(
+    () => RecommendationRepositoryImpl(
+      sl<GooglePlacesDataSource>(),
+      sl<FirebaseFirestore>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetRecommendationsUseCase>(
+    () => GetRecommendationsUseCase(
+      sl<RecommendationRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SearchCafesUseCase>(
+    () => SearchCafesUseCase(
+      sl<RecommendationRepository>(),
+    ),
+  );
+
+  sl.registerFactoryParam<HomeCubit, String, void>(
+    (currentUserId, _) => HomeCubit(
+      getRecommendationsUseCase:
+          sl<GetRecommendationsUseCase>(),
+      getUserPreferencesUseCase:
+          sl<GetUserPreferencesUseCase>(),
+      searchCafesUseCase:
+          sl<SearchCafesUseCase>(),
+      currentUserId: currentUserId,
+    ),
+  );
+}

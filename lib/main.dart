@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-
+import 'core/di/injection_container.dart';
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
 import 'core/services/firebase_service.dart';
 import 'core/theme/app_theme.dart';
+import 'features/onboarding/presentation/view/screens/splash_screen.dart';
+import 'features/onboarding/presentation/view_model/onboarding_bloc.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await FirebaseService.init();
+  
+  await initDependencies();
 
-  runApp(const MyApp());
+  runApp(
+    BlocProvider(
+      create: (_) => sl<OnboardingBloc>(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -29,8 +39,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
-    _localization.onTranslatedLanguage =
-        _onTranslatedLanguage;
+    _localization.onTranslatedLanguage = _onTranslatedLanguage;
 
     _initializeLocalization();
   }
@@ -91,8 +100,7 @@ class _MyAppState extends State<MyApp> {
           child: child ?? const SizedBox.shrink(),
         );
       },
-
-      initialRoute: AppRoutes.initial,
+      home: const SplashScreen(),
       onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }
