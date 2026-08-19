@@ -1,6 +1,11 @@
+import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+
+import 'firebase_options.dart';
+
+import 'core/di/injection.dart';
 import 'core/di/injection_container.dart';
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
@@ -11,9 +16,12 @@ import 'features/onboarding/presentation/view_model/onboarding_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   await FirebaseService.init();
-  
+  configureDependencies();
   await initDependencies();
 
   runApp(
@@ -100,7 +108,9 @@ class _MyAppState extends State<MyApp> {
           child: child ?? const SizedBox.shrink(),
         );
       },
+
       home: const SplashScreen(),
+
       onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }

@@ -97,8 +97,9 @@ class _PersonalizationViewState
                   context: context,
                   title: AppLocale.toastSuccess
                       .getString(context),
-                  description: AppLocale.preferencesSavedSuccess
-                      .getString(context),
+                  description:
+                      AppLocale.preferencesSavedSuccess
+                          .getString(context),
                   type: ToastificationType.success,
                 );
               }
@@ -108,8 +109,8 @@ class _PersonalizationViewState
               if (state.errorMessage != null) {
                 AppToast.showToast(
                   context: context,
-                  title: AppLocale.toastError
-                      .getString(context),
+                  title:
+                      AppLocale.toastError.getString(context),
                   description:
                       state.errorMessage!.getString(context),
                   type: ToastificationType.error,
@@ -175,10 +176,6 @@ class _PersonalizationViewState
     );
   }
 
-  // ==========================================
-  // SCREEN 1: Interests Selection
-  // ==========================================
-
   Widget _buildInterestsScreen(
     BuildContext context,
     PersonalizationLoadedState state,
@@ -196,14 +193,12 @@ class _PersonalizationViewState
       },
       {
         'id': 'study',
-        'label':
-            AppLocale.study.getString(context),
+        'label': AppLocale.study.getString(context),
         'svg': AppAssets.studyIcon,
       },
       {
         'id': 'work',
-        'label':
-            AppLocale.work.getString(context),
+        'label': AppLocale.work.getString(context),
         'svg': AppAssets.workIcon,
       },
       {
@@ -220,8 +215,7 @@ class _PersonalizationViewState
       },
       {
         'id': 'date',
-        'label':
-            AppLocale.date.getString(context),
+        'label': AppLocale.date.getString(context),
         'svg': AppAssets.dateIcon,
       },
       {
@@ -261,9 +255,7 @@ class _PersonalizationViewState
               ),
             ),
           ),
-
           const SizedBox(height: 18),
-
           Center(
             child: Column(
               children: [
@@ -286,17 +278,14 @@ class _PersonalizationViewState
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall
                       ?.copyWith(
-                    color:
-                        AppColors.textSecondary,
+                    color: AppColors.textSecondary,
                     fontSize: 13,
                   ),
                 ),
               ],
             ),
           ),
-
           const SizedBox(height: 20),
-
           Expanded(
             child: GridView.builder(
               physics:
@@ -326,9 +315,7 @@ class _PersonalizationViewState
               },
             ),
           ),
-
           const SizedBox(height: 14),
-
           CustomButton(
             text: AppLocale.continueBtn
                 .getString(context),
@@ -347,16 +334,11 @@ class _PersonalizationViewState
             onPressed: () =>
                 cubit.goToNextStep(),
           ),
-
           const SizedBox(height: 10),
         ],
       ),
     );
   }
-
-  // ==========================================
-  // SCREEN 2: Mood / Occasion Selection
-  // ==========================================
 
   Widget _buildMoodOccasionScreen(
     BuildContext context,
@@ -375,8 +357,7 @@ class _PersonalizationViewState
       },
       {
         'id': 'date',
-        'label':
-            AppLocale.date.getString(context),
+        'label': AppLocale.date.getString(context),
         'svg': AppAssets.dateIcon,
       },
       {
@@ -387,14 +368,12 @@ class _PersonalizationViewState
       },
       {
         'id': 'study',
-        'label':
-            AppLocale.study.getString(context),
+        'label': AppLocale.study.getString(context),
         'svg': AppAssets.studyIcon,
       },
       {
         'id': 'work',
-        'label':
-            AppLocale.work.getString(context),
+        'label': AppLocale.work.getString(context),
         'svg': AppAssets.workIcon,
       },
       {
@@ -407,8 +386,7 @@ class _PersonalizationViewState
         'id': 'quick_coffee',
         'label': AppLocale.quickCoffee
             .getString(context),
-        'svg':
-            AppAssets.specialtyCoffeeIcon,
+        'svg': AppAssets.specialtyCoffeeIcon,
       },
       {
         'id': 'nile_view',
@@ -435,8 +413,7 @@ class _PersonalizationViewState
                 children: [
                   const Icon(
                     Icons.location_on_outlined,
-                    color:
-                        AppColors.textPrimary,
+                    color: AppColors.textPrimary,
                     size: 20,
                   ),
                   const SizedBox(width: 4),
@@ -446,10 +423,8 @@ class _PersonalizationViewState
                     style: theme.textTheme
                         .titleMedium
                         ?.copyWith(
-                      fontWeight:
-                          FontWeight.bold,
-                      color:
-                          AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -460,17 +435,14 @@ class _PersonalizationViewState
                     const BoxConstraints(),
                 icon: const Icon(
                   Icons.notifications_none_rounded,
-                  color:
-                      AppColors.textPrimary,
+                  color: AppColors.textPrimary,
                   size: 22,
                 ),
                 onPressed: () {},
               ),
             ],
           ),
-
           const SizedBox(height: 18),
-
           Center(
             child: Column(
               children: [
@@ -481,10 +453,8 @@ class _PersonalizationViewState
                   style: theme.textTheme
                       .headlineMedium
                       ?.copyWith(
-                    fontWeight:
-                        FontWeight.bold,
-                    color:
-                        AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                     fontSize: 22,
                   ),
                 ),
@@ -495,17 +465,14 @@ class _PersonalizationViewState
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall
                       ?.copyWith(
-                    color:
-                        AppColors.textSecondary,
+                    color: AppColors.textSecondary,
                     fontSize: 13,
                   ),
                 ),
               ],
             ),
           ),
-
           const SizedBox(height: 20),
-
           Expanded(
             child: GridView.builder(
               physics:
@@ -524,22 +491,19 @@ class _PersonalizationViewState
 
                 final isSelected =
                     state.selectedMood == id ||
-                    state.selectedOccasion == id;
+                        state.selectedOccasion == id;
 
                 return PersonalizationGridCard(
                   title: item['label']!,
                   svgAsset: item['svg']!,
-                  isSelected:
-                      isSelected,
+                  isSelected: isSelected,
                   onTap: () =>
                       cubit.selectOption(id),
                 );
               },
             ),
           ),
-
           const SizedBox(height: 12),
-
           CustomButton(
             text: AppLocale
                 .showSuitablePlaces
@@ -557,16 +521,11 @@ class _PersonalizationViewState
                     cubit.savePreferences();
                   },
           ),
-
           const SizedBox(height: 4),
         ],
       ),
     );
   }
-
-  // ==========================================
-  // Bottom Navigation Bar
-  // ==========================================
 
   Widget _buildBottomNavBar() {
     return Container(

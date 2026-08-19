@@ -9,6 +9,11 @@ class CafeEntity {
   final String address;
   final bool isOpen;
 
+  final String description;
+  final int reviewsCount;
+  final String openingHours;
+  final List<String> attributes;
+
   const CafeEntity({
     this.id = '',
     this.name = '',
@@ -17,5 +22,9 @@ class CafeEntity {
     this.photos = const [],
     this.address = '',
     this.isOpen = false,
+    this.description = '',
+    this.reviewsCount = 0,
+    this.openingHours = '',
+    this.attributes = const [],
   });
 }

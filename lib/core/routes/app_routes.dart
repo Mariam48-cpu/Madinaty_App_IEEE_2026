@@ -2,8 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
-import '../../features/home/presentation/view/screens/home_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/home/presentation/view/screens/home_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/home/presentation/view_model/home_cubit.dart';
+
+import '../../features/auth/presentation/view/screens/auth_screen.dart';
+import '../../features/personalization/presentation/view/screens/personalization_screen.dart';
 
 abstract class AppRoutes {
   const AppRoutes._();
@@ -12,17 +15,33 @@ abstract class AppRoutes {
   static const String home = '/home';
   static const String splash = '/splash';
   static const String auth = '/auth';
+  static const String personalization = '/personalization';
   static const String cafeDetails = '/cafe_details';
   static const String booking = '/booking';
   static const String orders = '/orders';
   static const String notifications = '/notifications';
   static const String profile = '/profile';
 
-  static Map<String, WidgetBuilder> get routes => {};
+  static Map<String, WidgetBuilder> get routes => {
+        auth: (_) => const AuthScreen(),
+        personalization: (_) => const PersonalizationScreen(),
+      };
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case initial:
+      case auth:
+        return MaterialPageRoute(
+          builder: (_) => const AuthScreen(),
+          settings: settings,
+        );
+
+      case personalization:
+        return MaterialPageRoute(
+          builder: (_) => const PersonalizationScreen(),
+          settings: settings,
+        );
+
       case home:
         final user = FirebaseAuth.instance.currentUser;
 
@@ -46,7 +65,6 @@ abstract class AppRoutes {
           ),
           settings: settings,
         );
-
 
       default:
         return MaterialPageRoute(

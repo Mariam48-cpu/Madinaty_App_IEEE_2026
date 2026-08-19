@@ -46,6 +46,10 @@ class CafeDto {
       photos: photos,
       address: address,
       isOpen: isOpen,
+      description: '',
+      reviewsCount: 0,
+      openingHours: '',
+      attributes: const [],
     );
   }
 }

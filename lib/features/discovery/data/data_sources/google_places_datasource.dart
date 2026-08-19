@@ -6,10 +6,6 @@ import 'package:madinaty_app_ieee_2026/features/discovery/data/models/cafe_dto.d
 @injectable
 class GooglePlacesDataSource {
   final String apiKey = 'AIzaSyAUyp5BGoG23a36VGYfbxyC_Dg7P9jDmY4';
-  String getPhotoUrl(String photoName) {
-    return 'https://places.googleapis.com/v1/$photoName/media?maxHeightPx=400&maxWidthPx=400&key=$apiKey';
-  }
-
   Future<List<CafeDto>> getNearbyCafes({
     required double latitude,
     required double longitude,
