@@ -1,14 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/features/home/presentation/view/screens/home_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/home/presentation/view_model/home_cubit.dart';
+
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
 import '../../features/discovery/presentation/view/screens/main_navigation_screen.dart';
 import '../../features/personalization/presentation/view/screens/personalization_screen.dart';
 
-/// Centralized route names and router configuration for Madinaty app.
 abstract class AppRoutes {
-  // Prevent instantiation
   const AppRoutes._();
 
-  // --- Route Name Constants ---
   static const String initial = '/';
   static const String home = '/home';
   static const String splash = '/splash';
@@ -20,14 +23,11 @@ abstract class AppRoutes {
   static const String notifications = '/notifications';
   static const String profile = '/profile';
 
-  /// Pre-configured route map for [MaterialApp.routes].
   static Map<String, WidgetBuilder> get routes => {
         auth: (_) => const AuthScreen(),
         personalization: (_) => const PersonalizationScreen(),
-        home: (_) => const MainNavigationScreen(),
       };
 
-  /// Generates dynamic routes for navigation.
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case initial:
@@ -36,20 +36,40 @@ abstract class AppRoutes {
           builder: (_) => const AuthScreen(),
           settings: settings,
         );
+
       case personalization:
         return MaterialPageRoute(
           builder: (_) => const PersonalizationScreen(),
           settings: settings,
         );
+
       case home:
+        final user = FirebaseAuth.instance.currentUser;
+
+        if (user == null) {
+          return MaterialPageRoute(
+            builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('User is not logged in'),
+              ),
+            ),
+            settings: settings,
+          );
+        }
+
         return MaterialPageRoute(
           builder: (_) => const MainNavigationScreen(),
           settings: settings,
         );
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            body: Center(child: Text('No route defined for ${settings.name}')),
+            body: Center(
+              child: Text(
+                'No route defined for ${settings.name}',
+              ),
+            ),
           ),
           settings: settings,
         );

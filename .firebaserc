@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "madinaty-bb278"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }
