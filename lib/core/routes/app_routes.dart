@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
+import '../../features/discovery/presentation/view/screens/main_navigation_screen.dart';
 import '../../features/personalization/presentation/view/screens/personalization_screen.dart';
 
 /// Centralized route names and router configuration for Madinaty app.
@@ -23,7 +24,7 @@ abstract class AppRoutes {
   static Map<String, WidgetBuilder> get routes => {
         auth: (_) => const AuthScreen(),
         personalization: (_) => const PersonalizationScreen(),
-        home: (_) => const Scaffold(body: Center(child: Text('Home'))),
+        home: (_) => const MainNavigationScreen(),
       };
 
   /// Generates dynamic routes for navigation.
@@ -42,7 +43,7 @@ abstract class AppRoutes {
         );
       case home:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(body: Center(child: Text('Home'))),
+          builder: (_) => const MainNavigationScreen(),
           settings: settings,
         );
       default:

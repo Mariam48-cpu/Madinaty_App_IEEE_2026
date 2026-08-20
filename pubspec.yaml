@@ -49,6 +49,7 @@ dependencies:
   http: ^1.6.0
   flutter_dotenv: ^6.0.1
   flutter_map: ^8.3.1
+  flutter_svg: ^2.2.3
   latlong2: ^0.10.1
   geocoding: ^3.0.0
   location: ^10.0.2
@@ -57,6 +58,7 @@ dependencies:
   shared_preferences: ^2.2.0
   google_sign_in: ^7.2.0
   flutter_localization: 0.2.2
+  toastification: ^3.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

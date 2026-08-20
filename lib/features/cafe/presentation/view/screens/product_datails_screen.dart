@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/product_datails/product_add_ons_widget.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/product_datails/product_bottom_bar_widget.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/product_datails/product_header_widget.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/product_datails/product_option_selector_widget.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/product_datails/similar_products_widget.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/entities/favorite_item_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/is_favorite_use_case.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductEntity product;
@@ -26,6 +30,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String selectedSize = 'وسط';
   String selectedMilk = 'حليب بقري';
   int quantity = 1;
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavorite();
+  }
+
+  Future<void> _checkFavorite() async {
+    final isFav = await getIt<IsFavoriteUseCase>()(
+      targetId: widget.product.id,
+      type: FavoriteTargetType.product,
+    );
+    if (mounted) {
+      setState(() => _isFavorite = isFav);
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    final item = FavoriteItemEntity.fromProduct(widget.product);
+    await getIt<ToggleFavoriteUseCase>()(item);
+    if (mounted) {
+      setState(() => _isFavorite = !_isFavorite);
+    }
+  }
 
   final Map<String, Map<String, dynamic>> addOns = {
     'إكسترا شوت': {'price': 20.0, 'selected': false},
@@ -46,19 +75,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFFFBF8),
+      backgroundColor: const Color(0xFFFFFBF8),
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: EdgeInsets.only(bottom: 100),
+            padding: const EdgeInsets.only(bottom: 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 ProductHeaderWidget(
                   imageUrl: widget.product.image,
+                  isFavorite: _isFavorite,
                   onBackPressed: () => Navigator.pop(context),
-                  onFavoritePressed: () {},
+                  onFavoritePressed: _toggleFavorite,
                 ),
+
                 Transform.translate(
                   offset: Offset(0, -20),
                   child: Container(
