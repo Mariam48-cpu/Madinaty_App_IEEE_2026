@@ -9,7 +9,6 @@ class CafeEntity {
   final String address;
   final bool isOpen;
 
-  // Task 9
   final String description;
   final int reviewsCount;
   final String openingHours;
@@ -23,8 +22,6 @@ class CafeEntity {
     this.photos = const [],
     this.address = '',
     this.isOpen = false,
-
-    // Task 9
     this.description = '',
     this.reviewsCount = 0,
     this.openingHours = '',

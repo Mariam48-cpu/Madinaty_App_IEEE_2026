@@ -31,33 +31,30 @@ abstract class AppToast {
 
     toastification.show(
       context: context,
-
       type: type,
-
       style: ToastificationStyle.flatColored,
-
       alignment: Alignment.topCenter,
-
-      margin: const EdgeInsets.only(top: 70, left: 20, right: 20),
-
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-
+      margin: const EdgeInsets.only(
+        top: 70,
+        left: 20,
+        right: 20,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 10,
+      ),
       borderRadius: BorderRadius.circular(14),
-
       autoCloseDuration: const Duration(seconds: 2),
-
       animationDuration: const Duration(milliseconds: 400),
-
       showProgressBar: true,
-
       dragToClose: true,
-
       backgroundColor: backgroundColor,
-
       foregroundColor: textColor,
-
-      icon: Icon(icon, color: textColor, size: 28),
-
+      icon: Icon(
+        icon,
+        color: textColor,
+        size: 28,
+      ),
       title: Text(
         title,
         style: TextStyle(
@@ -66,7 +63,6 @@ abstract class AppToast {
           fontWeight: FontWeight.bold,
         ),
       ),
-
       description: Text(
         description,
         maxLines: 2,
@@ -77,8 +73,9 @@ abstract class AppToast {
           fontWeight: FontWeight.w500,
         ),
       ),
-
-      progressBarTheme: ProgressIndicatorThemeData(color: textColor),
+      progressBarTheme: ProgressIndicatorThemeData(
+        color: textColor,
+      ),
     );
   }
 }
