@@ -5,11 +5,21 @@ import '../../../../booking/domain/entities/booking_entity.dart';
 
 class CheckoutSummaryCard extends StatelessWidget {
   final BookingEntity booking;
+  final double reservationFee;
+  final double taxRate;
 
-  const CheckoutSummaryCard({super.key, required this.booking});
+  const CheckoutSummaryCard({
+    super.key,
+    required this.booking,
+    this.reservationFee = 50.0,
+    this.taxRate = 0.14,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final double taxAmount = reservationFee * taxRate;
+    final double totalAmount = reservationFee + taxAmount;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -27,21 +37,15 @@ class CheckoutSummaryCard extends StatelessWidget {
       child: Column(
         children: [
           _buildSummaryRow(
-            title: 'المجموع الفرعي للطلبات',
-            value: '${booking.preOrdersSubtotal.toStringAsFixed(1)} ج.م',
-          ),
-          const SizedBox(height: 10),
-
-          _buildSummaryRow(
             title: 'رسوم حجز الطاولة',
             subtitle: '(تخصم من الفاتورة)',
-            value: '${booking.tableReservationFee.toStringAsFixed(0)} ج.م',
+            value: '${reservationFee.toStringAsFixed(0)} ج.م',
           ),
           const SizedBox(height: 10),
 
           _buildSummaryRow(
-            title: 'الضرائب (${(booking.taxRate * 100).toInt()}%)',
-            value: '${booking.taxAmount.toStringAsFixed(1)} ج.م',
+            title: 'الضرائب (${(taxRate * 100).toInt()}%)',
+            value: '${taxAmount.toStringAsFixed(1)} ج.م',
           ),
 
           const Padding(
@@ -58,7 +62,7 @@ class CheckoutSummaryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${booking.totalAmount.toStringAsFixed(1)} ج.م',
+                    '${totalAmount.toStringAsFixed(1)} ج.م',
                     style: AppTypography.headlineMedium.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,

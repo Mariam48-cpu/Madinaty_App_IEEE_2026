@@ -18,7 +18,6 @@ import '../../../domain/use_cases/get_paymob_wallet_url_usecase.dart';
 import '../../view_model/checkout_cubit.dart';
 import '../../view_model/checkout_state.dart';
 import '../widgets/reservation_details_card.dart';
-import '../widgets/pre_orders_section.dart';
 import '../widgets/payment_methods_section.dart';
 import '../widgets/checkout_summary_card.dart';
 
@@ -56,7 +55,6 @@ class _CheckoutView extends StatefulWidget {
 
 class _CheckoutViewState extends State<_CheckoutView> {
   late final TextEditingController _phoneWalletController;
-
   BookingEntity? _cachedBooking;
 
   @override
@@ -165,22 +163,15 @@ class _CheckoutViewState extends State<_CheckoutView> {
                   isSelected: true,
                 );
 
+          // المبلغ الافتراضي لرسوم حجز الطاولة
+          const double reservationFee = 50.0;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Column(
               children: [
                 ReservationDetailsCard(booking: booking),
                 const SizedBox(height: 20),
-
-                PreOrdersSection(
-                  preOrderItems: booking.preOrderItems,
-                  onQuantityChanged: (itemId, newQty) {
-                    cubit.updateItemQuantity(itemId, newQty);
-                  },
-                  onEditPressed: () => Navigator.of(context).pop(),
-                ),
-                if (booking.preOrderItems.isNotEmpty)
-                  const SizedBox(height: 20),
 
                 PaymentMethodsSection(
                   selectedMethod: selectedMethod,
@@ -213,9 +204,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
 
                             cubit.confirmAndPay(
                               walletDetails: walletDetails,
-                              totalAmount: booking.totalAmount > 0
-                                  ? booking.totalAmount
-                                  : 100.0,
+                              totalAmount: reservationFee,
                               userEmail: user?.email ?? 'customer@madinaty.com',
                               userPhone: user?.phoneNumber ?? '+201000000000',
                               userName: user?.displayName ?? 'عميل مدينتي',
@@ -260,7 +249,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(
-                    'العودة للسلة',
+                    'العودة',
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                     ),

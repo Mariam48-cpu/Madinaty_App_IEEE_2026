@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/data/models/booking_model.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/data/data_sources/payment_data_source_interface.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,8 +23,8 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
     FirebaseAuth? auth,
     http.Client? client,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-       _auth = auth ?? FirebaseAuth.instance,
-       _client = client ?? http.Client();
+        _auth = auth ?? FirebaseAuth.instance,
+        _client = client ?? http.Client();
 
   @override
   Future<String> getPaymobWalletUrl({
@@ -228,33 +229,21 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
       throw Exception('يرجى تسجيل الدخول أولاً لإتمام الحجز');
     }
 
-    if (booking.idempotencyKey != null) {
-      final query = await _firestore
-          .collection('bookings')
-          .where('idempotencyKey', isEqualTo: booking.idempotencyKey)
-          .limit(1)
-          .get();
-
-      if (query.docs.isNotEmpty) {
-        final doc = query.docs.first;
-        return BookingModel.fromEntity(
-          booking.copyWith(
-            id: doc.id,
-            status: doc.data()['status'] ?? 'confirmed',
-          ),
-        );
-      }
-    }
-
     final docRef = _firestore.collection('bookings').doc();
-    final confirmedBooking = booking.copyWith(
+    final confirmedBooking = BookingModel(
       id: docRef.id,
       userId: user.uid,
-      status: 'confirmed',
+      cafeId: booking.cafeId,
+      date: booking.date,
+      time: booking.time,
+      guests: booking.guests,
+      occasion: booking.occasion,
+      seatingPreference: booking.seatingPreference,
+      status: BookingStatus.approved,
+      createdAt: DateTime.now(),
     );
 
-    final bookingModel = BookingModel.fromEntity(confirmedBooking);
-    await docRef.set(bookingModel.toMap());
+    await docRef.set(confirmedBooking.toFirestore());
 
     try {
       final cartSnap = await _firestore
@@ -272,6 +261,6 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
       print('Warning: Failed to clear cart after booking confirmation: $e');
     }
 
-    return bookingModel;
+    return confirmedBooking;
   }
 }

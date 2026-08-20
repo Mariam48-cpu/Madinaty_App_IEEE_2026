@@ -82,6 +82,85 @@ mixin AppLocale {
   static const String loginRequiredError = 'loginRequiredError';
 
   // ==========================================
+  // PERSONALIZATION KEYS
+  // ==========================================
+  static const String step2Of3 = 'step2Of3';
+  static const String whatDoYouLikeTitle = 'whatDoYouLikeTitle';
+  static const String whatDoYouLikeSubtitle = 'whatDoYouLikeSubtitle';
+  static const String continueBtn = 'continueBtn';
+
+  static const String whyGoingOutTitle = 'whyGoingOutTitle';
+  static const String whyGoingOutSubtitle = 'whyGoingOutSubtitle';
+  static const String showSuitablePlaces = 'showSuitablePlaces';
+
+  // Interests / Moods / Occasions labels
+  static const String specialtyCoffee = 'specialtyCoffee';
+  static const String study = 'study';
+  static const String work = 'work';
+  static const String quietChill = 'quietChill';
+  static const String birthday = 'birthday';
+  static const String romanticDate = 'romanticDate'; // تم تعديل الاسم هنا لتفادي التكرار
+  static const String withFriends = 'withFriends';
+  static const String friendsOuting = 'friendsOuting';
+  static const String nileView = 'nileView';
+  static const String chillSitting = 'chillSitting';
+  static const String quickCoffee = 'quickCoffee';
+  static const String placeWithView = 'placeWithView';
+
+  // Bottom Navigation
+  static const String navHome = 'navHome';
+  static const String navMap = 'navMap';
+  static const String navMyLists = 'navMyLists';
+  static const String navMyAccount = 'navMyAccount';
+
+  // Feedback & Loading
+  static const String loadingPreferences = 'loadingPreferences';
+  static const String preferencesSavedSuccess = 'preferencesSavedSuccess';
+  static const String selectAtLeastOneInterest = 'selectAtLeastOneInterest';
+  static const String selectFavoriteInterests = 'selectFavoriteInterests';
+  static const String selectGoingOutReason = 'selectGoingOutReason';
+  static const String toastSuccess = 'toastSuccess';
+  static const String toastError = 'toastError';
+
+  // Additional widget labels
+  static const String whatAreYourInterests = 'whatAreYourInterests';
+  static const String interestsSubtitle = 'interestsSubtitle';
+  static const String multiSelect = 'multiSelect';
+  static const String singleSelect = 'singleSelect';
+  static const String whatsYourMoodToday = 'whatsYourMoodToday';
+  static const String chooseGeneralVibe = 'chooseGeneralVibe';
+  static const String whatIsYourOccasion = 'whatIsYourOccasion';
+  static const String selectOccasionType = 'selectOccasionType';
+
+  // 🔑 Favorites & My Lists
+  static const String places = 'places';
+  static const String products = 'products';
+  static const String noFavoritesYet = 'noFavoritesYet';
+
+  // 🔑 Reviews & Ratings
+  static const String reviewsAndRatings = 'reviewsAndRatings';
+  static const String basedOn = 'basedOn';
+  static const String ratingsCountSuffix = 'ratingsCountSuffix';
+  static const String writeYourReview = 'writeYourReview';
+  static const String coffee = 'coffee';
+  static const String atmosphere = 'atmosphere';
+  static const String service = 'service';
+  static const String all = 'all';
+  static const String withPhotos = 'withPhotos';
+  static const String highestRating = 'highestRating';
+  static const String helpful = 'helpful';
+  static const String noReviewsYet = 'noReviewsYet';
+  static const String submitReview = 'submitReview';
+  static const String yourRating = 'yourRating';
+  static const String writeReviewHint = 'writeReviewHint';
+  static const String ratingRequired = 'ratingRequired';
+  static const String commentRequired = 'commentRequired';
+  static const String reviewSubmittedSuccess = 'reviewSubmittedSuccess';
+  static const String editReview = 'editReview';
+  static const String retry = 'retry';
+  static const String loginRequiredToReview = 'loginRequiredToReview';
+
+  // ==========================================
   // ARABIC
   // ==========================================
   static const Map<String, dynamic> AR = {
@@ -157,6 +236,77 @@ mixin AppLocale {
     paymentFailedError: 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى أو اختيار طريقة دفع أخرى',
     walletValidationError: 'يرجى إدخال رقم محفظة إلكترونية صحيح (11 رقماً يبدأ بـ 01)',
     loginRequiredError: 'يرجى تسجيل الدخول أولاً لإتمام الحجز',
+
+    // Personalization AR
+    step2Of3: 'الخطوة 2 من 3',
+    whatDoYouLikeTitle: 'إيه اللي بتحبه؟',
+    whatDoYouLikeSubtitle: 'اختياراتك هتساعدنا نرشحلك أماكن مناسبة ليك.',
+    continueBtn: 'كمل  ←',
+
+    whyGoingOutTitle: 'إنت خارج النهارده ليه؟',
+    whyGoingOutSubtitle: 'اختار اللي يناسبك وإحنا هنرشحلك المكان.',
+    showSuitablePlaces: 'اعرض الأماكن المناسبة',
+
+    specialtyCoffee: 'قهوة مختصة',
+    study: 'مذاكرة',
+    work: 'شغل',
+    quietChill: 'جلسة هادئة',
+    birthday: 'عيد ميلاد',
+    romanticDate: 'Date',
+    withFriends: 'مع الأصحاب',
+    friendsOuting: 'خروجة مع الأصحاب',
+    nileView: 'إطلالة على النيل',
+    chillSitting: 'قعدة هادية',
+    quickCoffee: 'قهوة سريعة',
+    placeWithView: 'مكان بإطلالة',
+
+    navHome: 'الرئيسية',
+    navMap: 'الخريطة',
+    navMyLists: 'قوائمي',
+    navMyAccount: 'حسابي',
+
+    loadingPreferences: 'جاري تحميل تفضيلاتك...',
+    preferencesSavedSuccess: 'تم حفظ تفضيلاتك بنجاح!',
+    selectAtLeastOneInterest: 'يرجى اختيار اهتمام واحد على الأقل للمتابعة',
+    selectFavoriteInterests: 'يرجى اختيار اهتماماتك المفضلة',
+    selectGoingOutReason: 'يرجى تحديد سبب الخروج اليوم',
+    toastSuccess: 'نجاح',
+    toastError: 'خطأ',
+
+    whatAreYourInterests: 'ما هي اهتماماتك؟',
+    interestsSubtitle: 'يمكنك اختيار أكثر من خيار للحصول على ترشيحات دقيقة',
+    multiSelect: 'متعدد الاختيارات',
+    singleSelect: 'اختيار فردي',
+    whatsYourMoodToday: 'على مزاجك إيه النهاردة؟',
+    chooseGeneralVibe: 'اختر الجو العام اللي بتفضله',
+    whatIsYourOccasion: 'ما هي مناسبتك؟',
+    selectOccasionType: 'حدد نوع الخروجة أو المناسبة الحالية',
+
+    // Favorites & Reviews AR
+    places: 'الأماكن',
+    products: 'المنتجات',
+    noFavoritesYet: 'لا توجد عناصر في المفضلة حتى الآن',
+    reviewsAndRatings: 'التقييمات والمراجعات',
+    basedOn: 'بناءً على',
+    ratingsCountSuffix: 'تقييم',
+    writeYourReview: 'اكتب تقييمك',
+    coffee: 'القهوة',
+    atmosphere: 'الجو العام',
+    service: 'الخدمة',
+    all: 'الكل',
+    withPhotos: 'لديها صور',
+    highestRating: 'أعلى تقييم',
+    helpful: 'مفيد',
+    noReviewsYet: 'لا توجد تقييمات حتى الآن',
+    submitReview: 'إرسال التقييم',
+    yourRating: 'تقييمك',
+    writeReviewHint: 'اكتب رأيك وتجربتك هنا بالتفصيل...',
+    ratingRequired: 'يرجى اختيار التقييم بالنجوم',
+    commentRequired: 'يرجى كتابة نص المراجعة',
+    reviewSubmittedSuccess: 'تم إرسال تقييمك بنجاح!',
+    editReview: 'تعديل التقييم',
+    retry: 'إعادة المحاولة',
+    loginRequiredToReview: 'يرجى تسجيل الدخول أولاً لتتمكن من كتابة تقييم',
   };
 
   // ==========================================
@@ -235,6 +385,77 @@ mixin AppLocale {
     paymentFailedError: 'Payment failed, please try again or choose another method',
     walletValidationError: 'Please enter a valid wallet number (11 digits starting with 01)',
     loginRequiredError: 'Please login first to complete your booking',
+
+    // Personalization EN
+    step2Of3: 'Step 2 of 3',
+    whatDoYouLikeTitle: 'What do you like?',
+    whatDoYouLikeSubtitle: 'Your choices will help us recommend suitable places for you.',
+    continueBtn: 'Continue  ←',
+
+    whyGoingOutTitle: 'Why are you going out today?',
+    whyGoingOutSubtitle: 'Choose what suits you and we will recommend the place.',
+    showSuitablePlaces: 'Show Suitable Places',
+
+    specialtyCoffee: 'Specialty Coffee',
+    study: 'Study',
+    work: 'Work',
+    quietChill: 'Quiet Chill',
+    birthday: 'Birthday',
+    romanticDate: 'Date',
+    withFriends: 'With Friends',
+    friendsOuting: 'Friends Outing',
+    nileView: 'Nile View',
+    chillSitting: 'Chill Sitting',
+    quickCoffee: 'Quick Coffee',
+    placeWithView: 'Place with a View',
+
+    navHome: 'Home',
+    navMap: 'Map',
+    navMyLists: 'My Lists',
+    navMyAccount: 'My Account',
+
+    loadingPreferences: 'Loading your preferences...',
+    preferencesSavedSuccess: 'Your preferences have been saved successfully!',
+    selectAtLeastOneInterest: 'Please select at least one interest to continue',
+    selectFavoriteInterests: 'Please select your favorite interests',
+    selectGoingOutReason: 'Please select the reason for going out today',
+    toastSuccess: 'Success',
+    toastError: 'Error',
+
+    whatAreYourInterests: 'What are your interests?',
+    interestsSubtitle: 'You can choose more than one option for accurate recommendations',
+    multiSelect: 'Multiple Choice',
+    singleSelect: 'Single Choice',
+    whatsYourMoodToday: "What's your mood today?",
+    chooseGeneralVibe: 'Choose the general vibe you prefer',
+    whatIsYourOccasion: 'What is your occasion?',
+    selectOccasionType: 'Specify the current outing or occasion type',
+
+    // Favorites & Reviews EN
+    places: 'Places',
+    products: 'Products',
+    noFavoritesYet: 'No favorites yet',
+    reviewsAndRatings: 'Reviews & Ratings',
+    basedOn: 'Based on',
+    ratingsCountSuffix: 'reviews',
+    writeYourReview: 'Write your review',
+    coffee: 'Coffee',
+    atmosphere: 'Atmosphere',
+    service: 'Service',
+    all: 'All',
+    withPhotos: 'With photos',
+    highestRating: 'Highest rating',
+    helpful: 'Helpful',
+    noReviewsYet: 'No reviews yet',
+    submitReview: 'Submit Review',
+    yourRating: 'Your Rating',
+    writeReviewHint: 'Write your thoughts and experience here in detail...',
+    ratingRequired: 'Please select a star rating',
+    commentRequired: 'Please write your review comment',
+    reviewSubmittedSuccess: 'Your review has been submitted successfully!',
+    editReview: 'Edit Review',
+    retry: 'Retry',
+    loginRequiredToReview: 'Please login first to submit a review',
   };
 
   // ==========================================
@@ -313,6 +534,63 @@ mixin AppLocale {
     paymentFailedError: 'ការទូទាត់បានបរាជ័យ សូមព្យាយាមម្តងទៀត',
     walletValidationError: 'សូមបញ្ចូលលេខកាបូបឱ្យបានត្រឹមត្រូវ (11 ខ្ទង់ចាប់ផ្តើមដោយ 01)',
     loginRequiredError: 'សូមចូលគណនីជាមុនសិនដើម្បីបញ្ចប់ការកក់',
+
+    step2Of3: 'ជំហានទី ២ នៃ ៣',
+    whatDoYouLikeTitle: 'តើអ្នកចូលចិត្តអ្វី?',
+    whatDoYouLikeSubtitle: 'ជម្រើសរបស់អ្នកនឹងជួយយើងណែនាំកន្លែងសមរម្យសម្រាប់អ្នក។',
+    continueBtn: 'បន្ត  ←',
+    whyGoingOutTitle: 'ហេតុអ្វីអ្នកចេញទៅក្រៅថ្ងៃនេះ?',
+    whyGoingOutSubtitle: 'ជ្រើសរើសអ្វីដែលសាកសមនឹងអ្នក ហើយយើងនឹងណែនាំកន្លែង។',
+    showSuitablePlaces: 'បង្ហាញកន្លែងដែលសមរម្យ',
+    specialtyCoffee: 'កាហ្វេពិសេស',
+    study: 'រៀន',
+    work: 'ការងារ',
+    quietChill: 'កន្លែងស្ងប់ស្ងាត់',
+    birthday: 'ថ្ងៃកំណើត',
+    romanticDate: 'Date',
+    withFriends: 'ជាមួយមិត្តភក្តិ',
+    friendsOuting: 'ដើរលេងជាមួយមិត្តភក្តិ',
+    nileView: 'ទិដ្ឋភាពទន្លេ',
+    chillSitting: 'អង្គុយលេង',
+    quickCoffee: 'កាហ្វេរហ័ស',
+    placeWithView: 'កន្លែងមានទិដ្ឋភាព',
+    navHome: 'ទំព័រដើម',
+    navMap: 'ផែនទី',
+    navMyLists: 'បញ្ជីរបស់ខ្ញុំ',
+    navMyAccount: 'គណនីរបស់ខ្ញុំ',
+    loadingPreferences: 'កំពុងផ្ទុកចំណង់ចំណូលចិត្តរបស់អ្នក...',
+    preferencesSavedSuccess: 'ចំណង់ចំណូលចិត្តរបស់អ្នកត្រូវបានរក្សាទុកដោយជោគជ័យ!',
+    selectAtLeastOneInterest: 'សូមជ្រើសរើសចំណាប់អារម្មណ៍យ៉ាងហោចណាស់មួយដើម្បីបន្ត',
+    selectFavoriteInterests: 'សូមជ្រើសរើសចំណាប់អារម្មណ៍ដែលអ្នកចូលចិត្ត',
+    selectGoingOutReason: 'សូមជ្រើសរើសមូលហេតុនៃការចេញទៅក្រៅថ្ងៃនេះ',
+    toastSuccess: 'ជោគជ័យ',
+    toastError: 'កំហុស',
+
+    // Favorites & Reviews KM
+    places: 'ទីកន្លែង',
+    products: 'ផលិតផល',
+    noFavoritesYet: 'មិនទាន់មានចំណូលចិត្តនៅឡើយទេ',
+    reviewsAndRatings: 'ការវាយតម្លៃ និងការពិនិត្យ',
+    basedOn: 'ផ្អែកលើ',
+    ratingsCountSuffix: 'ការវាយតម្លៃ',
+    writeYourReview: 'សរសេរការវាយតម្លៃរបស់អ្នក',
+    coffee: 'កាហ្វេ',
+    atmosphere: 'បរិយាកាស',
+    service: 'សេវាកម្ម',
+    all: 'ទាំងអស់',
+    withPhotos: 'មានរូបថត',
+    highestRating: 'ការវាយតម្លៃខ្ពស់បំផុត',
+    helpful: 'មានប្រយោជន៍',
+    noReviewsYet: 'មិនទាន់មានការវាយតម្លៃនៅឡើយទេ',
+    submitReview: 'ផ្ញើការវាយតម្លៃ',
+    yourRating: 'ការវាយតម្លៃរបស់អ្នក',
+    writeReviewHint: 'សរសេរគំនិតនិងបទពិសោធន៍របស់អ្នកនៅទីនេះ...',
+    ratingRequired: 'សូមជ្រើសរើសការវាយតម្លៃផ្កាយ',
+    commentRequired: 'សូមសរសេរមតិយោបល់របស់អ្នក',
+    reviewSubmittedSuccess: 'ការវាយតម្លៃរបស់អ្នកត្រូវបានដាក់ស្នើដោយជោគជ័យ!',
+    editReview: 'កែសម្រួលការវាយតម្លៃ',
+    retry: 'ព្យាយាមម្តងទៀត',
+    loginRequiredToReview: 'សូមចូលគណនីជាមុនសិនដើម្បីសរសេរការវាយតម្លៃ',
   };
 
   // ==========================================
@@ -391,5 +669,62 @@ mixin AppLocale {
     paymentFailedError: '決済に失敗しました。もう一度お試しください',
     walletValidationError: '有効な電話番号を入力してください（01から始まる11桁）',
     loginRequiredError: '予約を完了するにはログインしてください',
+
+    step2Of3: 'ステップ 2 / 3',
+    whatDoYouLikeTitle: '何が好きですか？',
+    whatDoYouLikeSubtitle: 'あなたの選択がぴったりの場所を見つける手助けになります。',
+    continueBtn: '続ける  ←',
+    whyGoingOutTitle: '今日はどんなお出かけですか？',
+    whyGoingOutSubtitle: '目的に合わせておすすめの場所をご案内します。',
+    showSuitablePlaces: 'おすすめの場所を見る',
+    specialtyCoffee: 'スペシャルティコーヒー',
+    study: '勉強',
+    work: '仕事',
+    quietChill: '静かに過ごす',
+    birthday: '誕生日',
+    romanticDate: 'Date',
+    withFriends: '友達と',
+    friendsOuting: '友達とのお出かけ',
+    nileView: 'リバービュー',
+    chillSitting: 'のんびり',
+    quickCoffee: 'クイックコーヒー',
+    placeWithView: '景色の良い場所',
+    navHome: 'ホーム',
+    navMap: 'マップ',
+    navMyLists: 'マイリスト',
+    navMyAccount: 'マイアカウント',
+    loadingPreferences: '設定を読み込み中...',
+    preferencesSavedSuccess: '好みが正常に保存されました！',
+    selectAtLeastOneInterest: '続行するには少なくとも1つの項目を選択してください',
+    selectFavoriteInterests: 'お気に入りの項目を選択してください',
+    selectGoingOutReason: '本日のお出かけ理由を選択してください',
+    toastSuccess: '成功',
+    toastError: 'エラー',
+
+    // Favorites & Reviews JA
+    places: '場所',
+    products: '商品',
+    noFavoritesYet: 'お気に入りはまだありません',
+    reviewsAndRatings: '評価とレビュー',
+    basedOn: 'に基づく',
+    ratingsCountSuffix: '件の評価',
+    writeYourReview: 'レビューを書く',
+    coffee: 'コーヒー',
+    atmosphere: '雰囲気',
+    service: 'サービス',
+    all: 'すべて',
+    withPhotos: '写真付き',
+    highestRating: '最高評価',
+    helpful: '役に立った',
+    noReviewsYet: 'レビューはまだありません',
+    submitReview: 'レビューを送信',
+    yourRating: 'あなたの評価',
+    writeReviewHint: 'ここに感想や体験を入力してください...',
+    ratingRequired: '星の評価を選択してください',
+    commentRequired: 'レビューコメントを入力してください',
+    reviewSubmittedSuccess: 'レビューが正常に送信されました！',
+    editReview: 'レビューを編集',
+    retry: '再試行',
+    loginRequiredToReview: 'レビューを書くにはログインしてください',
   };
 }

@@ -1,12 +1,24 @@
+import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/firebase_options.dart';
+
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
 import 'core/services/firebase_service.dart';
+import 'core/theme/app_theme.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   await FirebaseService.init();
 
+  configureDependencies();
 
   runApp(const MyApp());
 }
@@ -64,24 +76,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
     final isArabic = _localization.currentLocale?.languageCode == 'ar';
 
     return MaterialApp(
-
-
       title: 'Madinaty',
       debugShowCheckedModeBanner: false,
       supportedLocales: _localization.supportedLocales,
       localizationsDelegates: _localization.localizationsDelegates,
-
-
-
-
       initialRoute: AppRoutes.initial,
       onGenerateRoute: AppRoutes.onGenerateRoute,
-      theme: ThemeData(
-        fontFamily: _localization.fontFamily ?? 'Cairo',
+      theme: AppTheme.lightTheme.copyWith(
         scaffoldBackgroundColor: const Color(0xFFF9F6F0),
       ),
       builder: (context, child) {
@@ -91,8 +95,5 @@ class _MyAppState extends State<MyApp> {
         );
       },
     );
-
   }
 }
-
-

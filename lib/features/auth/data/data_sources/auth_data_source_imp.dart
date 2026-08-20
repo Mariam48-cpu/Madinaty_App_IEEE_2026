@@ -33,6 +33,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     );
 
     final user = userCredential.user!;
+    if (name.isNotEmpty) {
+      await user.updateDisplayName(name);
+    }
     final userModel = UserModel(
       uid: user.uid,
       name: name,

@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view_model/checkout_state.dart';
 import '../../../booking/data/models/booking_model.dart';
 import '../../../booking/domain/entities/booking_entity.dart';
-import '../../../cart/domain/entities/cart_item_entity.dart';
 import '../../domain/entities/payment_method_entity.dart';
 import '../../domain/use_cases/confirm_booking_usecase.dart';
 import '../../domain/use_cases/get_paymob_url_usecase.dart';
@@ -26,45 +25,21 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     required GetPaymobUrlUseCase getPaymobUrlUseCase,
     required GetPaymobWalletUrlUseCase getPaymobWalletUrlUseCase,
     required BookingEntity initialBooking,
-  }) : _confirmBookingUseCase = confirmBookingUseCase,
-       _getPaymobUrlUseCase = getPaymobUrlUseCase,
-       _getPaymobWalletUrlUseCase = getPaymobWalletUrlUseCase,
-       super(
-         CheckoutLoadingState(
-           booking: initialBooking,
-           selectedPaymentMethod: const PaymentMethodEntity(
-             id: 'card',
-             title: 'بطاقة ائتمان / خصم مباشر',
-             type: PaymentType.card,
-             isSelected: true,
-           ),
-         ),
-       ) {
+  })  : _confirmBookingUseCase = confirmBookingUseCase,
+        _getPaymobUrlUseCase = getPaymobUrlUseCase,
+        _getPaymobWalletUrlUseCase = getPaymobWalletUrlUseCase,
+        super(
+        CheckoutLoadingState(
+          booking: initialBooking,
+          selectedPaymentMethod: const PaymentMethodEntity(
+            id: 'card',
+            title: 'بطاقة ائتمان / خصم مباشر',
+            type: PaymentType.card,
+            isSelected: true,
+          ),
+        ),
+      ) {
     _currentBooking = initialBooking;
-  }
-
-  void updateItemQuantity(String itemId, int newQuantity) {
-    final updatedItems = <CartItemEntity>[];
-
-    for (var item in _currentBooking.preOrderItems) {
-      if (item.id == itemId) {
-        if (newQuantity > 0) {
-          updatedItems.add(item.copyWith(quantity: newQuantity));
-        }
-      } else {
-        updatedItems.add(item);
-      }
-    }
-
-    _currentBooking = _currentBooking.copyWith(preOrderItems: updatedItems);
-
-    emit(
-      CheckoutLoadingState(
-        booking: _currentBooking,
-        selectedPaymentMethod: _selectedMethod,
-        isSubmitting: false,
-      ),
-    );
   }
 
   void selectPaymentMethod(PaymentMethodEntity method) {
@@ -80,17 +55,17 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
   Future<void> confirmAndPay({
     WalletPaymentDetails? walletDetails,
-    double totalAmount = 0.0,
+    double totalAmount = 50.0,
     String userEmail = '',
     String userPhone = '',
     String userName = '',
   }) async {
     final isCard =
         _selectedMethod.type == PaymentType.card ||
-        _selectedMethod.id == 'card';
+            _selectedMethod.id == 'card';
     final isWallet =
         _selectedMethod.id == 'wallet' ||
-        _selectedMethod.type == PaymentType.wallet;
+            _selectedMethod.type == PaymentType.wallet;
 
     if (isWallet) {
       if (walletDetails == null ||
@@ -116,7 +91,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     try {
       if (isCard) {
         final paymentUrl = await _getPaymobUrlUseCase(
-          amount: totalAmount > 0 ? totalAmount : 100.0,
+          amount: totalAmount > 0 ? totalAmount : 50.0,
           userEmail: userEmail,
           userPhone: userPhone,
           userName: userName,
@@ -141,7 +116,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
       if (isWallet) {
         final walletNumber = walletDetails?.phoneNumber.trim() ?? '';
         final redirectUrl = await _getPaymobWalletUrlUseCase(
-          amount: totalAmount > 0 ? totalAmount : 100.0,
+          amount: totalAmount > 0 ? totalAmount : 50.0,
           userEmail: userEmail,
           userPhone: userPhone,
           userName: userName,

@@ -10,6 +10,11 @@ class ReservationDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String bookingDateStr = booking.date != null
+        ? '${booking.date!.day}/${booking.date!.month}/${booking.date!.year}'
+        : 'غير محدد';
+    final String bookingTimeStr = booking.time ?? 'غير محدد';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -36,36 +41,29 @@ class ReservationDetailsCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(14),
-                    child:
-                        booking.cafeImageUrl != null &&
-                            booking.cafeImageUrl!.isNotEmpty
-                        ? Image.network(
-                            booking.cafeImageUrl!,
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => _buildPlaceholderImage(),
-                          )
-                        : _buildPlaceholderImage(),
+                    child: _buildPlaceholderImage(),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(booking.cafeName, style: AppTypography.titleLarge),
+                        Text(
+                          booking.cafeId.replaceAll('cafe_', '').toUpperCase(),
+                          style: AppTypography.titleLarge,
+                        ),
                         const SizedBox(height: 4),
-                        Row(
+                        const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.location_on_outlined,
                               size: 14,
                               color: AppColors.textSecondary,
                             ),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                booking.cafeAddress,
+                                'مدينتي، القاهرة',
                                 style: AppTypography.bodySmall,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -90,16 +88,14 @@ class ReservationDetailsCard extends StatelessWidget {
                     child: _buildInfoItem(
                       icon: Icons.calendar_today_outlined,
                       title: 'التاريخ',
-                      value:
-                          '${booking.bookingDateTime.day}/${booking.bookingDateTime.month}/${booking.bookingDateTime.year}',
+                      value: bookingDateStr,
                     ),
                   ),
                   Expanded(
                     child: _buildInfoItem(
                       icon: Icons.access_time_rounded,
                       title: 'الوقت',
-                      value:
-                          '${booking.bookingDateTime.hour}:${booking.bookingDateTime.minute.toString().padLeft(2, '0')}',
+                      value: bookingTimeStr,
                     ),
                   ),
                 ],
@@ -111,14 +107,14 @@ class ReservationDetailsCard extends StatelessWidget {
                     child: _buildInfoItem(
                       icon: Icons.people_outline_rounded,
                       title: 'الضيوف',
-                      value: '${booking.guestsCount} أشخاص',
+                      value: '${booking.guests} أشخاص',
                     ),
                   ),
                   Expanded(
                     child: _buildInfoItem(
                       icon: Icons.chair_outlined,
                       title: 'الجلوس',
-                      value: booking.seatingPreference,
+                      value: booking.seatingPreference ?? 'صالة داخلية',
                     ),
                   ),
                 ],

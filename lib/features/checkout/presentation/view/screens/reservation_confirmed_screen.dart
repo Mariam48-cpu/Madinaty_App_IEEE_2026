@@ -11,6 +11,11 @@ class ReservationConfirmedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String bookingDateStr = booking.date != null
+        ? '${booking.date!.day}/${booking.date!.month}/${booking.date!.year}'
+        : 'اليوم';
+    final String bookingTimeStr = booking.time ?? '';
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -77,8 +82,8 @@ class ReservationConfirmedScreen extends StatelessWidget {
                             style: AppTypography.bodySmall,
                           ),
                           Text(
-                            booking.id != null && booking.id!.length >= 8
-                                ? '#${booking.id!.substring(0, 8).toUpperCase()}'
+                            booking.id.isNotEmpty && booking.id.length >= 8
+                                ? '#${booking.id.substring(0, 8).toUpperCase()}'
                                 : '#MD-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
                             style: AppTypography.titleMedium.copyWith(
                               color: AppColors.primary,
@@ -95,15 +100,14 @@ class ReservationConfirmedScreen extends StatelessWidget {
 
                       _buildTicketRow(
                         label: 'الكافيه',
-                        value: booking.cafeName,
+                        value: booking.cafeId,
                         icon: Icons.storefront_rounded,
                       ),
                       const SizedBox(height: 12),
 
                       _buildTicketRow(
                         label: 'الموعد',
-                        value:
-                            '${booking.bookingDateTime.day}/${booking.bookingDateTime.month} - ${booking.bookingDateTime.hour}:${booking.bookingDateTime.minute.toString().padLeft(2, '0')}',
+                        value: '$bookingDateStr ${bookingTimeStr.isNotEmpty ? "• $bookingTimeStr" : ""}',
                         icon: Icons.calendar_month_outlined,
                       ),
                       const SizedBox(height: 12),
@@ -111,14 +115,14 @@ class ReservationConfirmedScreen extends StatelessWidget {
                       _buildTicketRow(
                         label: 'التفاصيل',
                         value:
-                            '${booking.guestsCount} أشخاص • ${booking.seatingPreference}',
+                        '${booking.guests} أشخاص • ${booking.seatingPreference ?? "صالة داخلية"}',
                         icon: Icons.people_outline_rounded,
                       ),
                       const SizedBox(height: 12),
 
                       _buildTicketRow(
                         label: 'المبلغ المدفوع',
-                        value: '${booking.totalAmount.toStringAsFixed(1)} ج.م',
+                        value: '50.0 ج.م',
                         icon: Icons.receipt_long_outlined,
                         isHighlight: true,
                       ),
@@ -134,7 +138,7 @@ class ReservationConfirmedScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pushNamedAndRemoveUntil(
                         AppRoutes.home,
-                        (route) => false,
+                            (route) => false,
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -160,7 +164,7 @@ class ReservationConfirmedScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRoutes.orders,
-                      (route) => false,
+                          (route) => false,
                     );
                   },
                   icon: const Icon(

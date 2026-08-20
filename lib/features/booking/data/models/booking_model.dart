@@ -1,24 +1,18 @@
-import '../../../cart/data/models/cart_item_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/booking_entity.dart';
 
 class BookingModel extends BookingEntity {
   const BookingModel({
     super.id,
-    required super.userId,
+    super.userId,
     required super.cafeId,
-    required super.cafeName,
-    required super.cafeAddress,
-    super.cafeImageUrl,
-    required super.bookingDateTime,
-    required super.guestsCount,
-    required super.seatingPreference,
+    super.date,
+    super.time,
+    super.guests,
     super.occasion,
-    super.preOrderItems = const [],
-    super.tableReservationFee = 50.0,
-    super.taxRate = 0.14,
-    super.status = 'pending',
-    super.paymentMethodId,
-    super.idempotencyKey,
+    super.seatingPreference,
+    super.status,
+    super.createdAt,
   });
 
   factory BookingModel.fromEntity(BookingEntity entity) {
@@ -26,20 +20,19 @@ class BookingModel extends BookingEntity {
       id: entity.id,
       userId: entity.userId,
       cafeId: entity.cafeId,
-      cafeName: entity.cafeName,
-      cafeAddress: entity.cafeAddress,
-      cafeImageUrl: entity.cafeImageUrl,
-      bookingDateTime: entity.bookingDateTime,
-      guestsCount: entity.guestsCount,
-      seatingPreference: entity.seatingPreference,
+      date: entity.date,
+      time: entity.time,
+      guests: entity.guests,
       occasion: entity.occasion,
-      preOrderItems: entity.preOrderItems,
-      tableReservationFee: entity.tableReservationFee,
-      taxRate: entity.taxRate,
+      seatingPreference: entity.seatingPreference,
       status: entity.status,
-      paymentMethodId: entity.paymentMethodId,
-      idempotencyKey: entity.idempotencyKey,
+      createdAt: entity.createdAt,
     );
+  }
+
+  factory BookingModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final map = doc.data() ?? {};
+    return BookingModel.fromMap(map, doc.id);
   }
 
   factory BookingModel.fromMap(Map<String, dynamic> map, String docId) {
@@ -47,23 +40,24 @@ class BookingModel extends BookingEntity {
       id: docId,
       userId: map['userId'] ?? '',
       cafeId: map['cafeId'] ?? '',
-      cafeName: map['cafeName'] ?? '',
-      cafeAddress: map['cafeAddress'] ?? '',
-      cafeImageUrl: map['cafeImageUrl'],
-      bookingDateTime: map['bookingDateTime'] != null
-          ? DateTime.parse(map['bookingDateTime'])
-          : DateTime.now(),
-      guestsCount: (map['guestsCount'] ?? 1).toInt(),
-      seatingPreference: map['seatingPreference'] ?? '',
+      date: map['date'] != null
+          ? (map['date'] is Timestamp
+          ? (map['date'] as Timestamp).toDate()
+          : DateTime.tryParse(map['date'].toString()))
+          : null,
+      time: map['time'],
+      guests: (map['guests'] ?? 1).toInt(),
       occasion: map['occasion'],
-      preOrderItems: (map['preOrderItems'] as List<dynamic>? ?? [])
-          .map((item) => CartItemModel.fromMap(item as Map<String, dynamic>, item['id'] ?? ''))
-          .toList(),
-      tableReservationFee: (map['tableReservationFee'] ?? 50.0).toDouble(),
-      taxRate: (map['taxRate'] ?? 0.14).toDouble(),
-      status: map['status'] ?? 'pending',
-      paymentMethodId: map['paymentMethodId'],
-      idempotencyKey: map['idempotencyKey'],
+      seatingPreference: map['seatingPreference'],
+      status: BookingStatus.values.firstWhere(
+            (e) => e.name == (map['status'] ?? 'pending'),
+        orElse: () => BookingStatus.pending,
+      ),
+      createdAt: map['createdAt'] != null
+          ? (map['createdAt'] is Timestamp
+          ? (map['createdAt'] as Timestamp).toDate()
+          : DateTime.tryParse(map['createdAt'].toString()))
+          : null,
     );
   }
 
@@ -71,34 +65,29 @@ class BookingModel extends BookingEntity {
     return {
       'userId': userId,
       'cafeId': cafeId,
-      'cafeName': cafeName,
-      'cafeAddress': cafeAddress,
-      'cafeImageUrl': cafeImageUrl,
-      'bookingDateTime': bookingDateTime.toIso8601String(),
-      'guestsCount': guestsCount,
-      'seatingPreference': seatingPreference,
+      'date': date?.toIso8601String(),
+      'time': time,
+      'guests': guests,
       'occasion': occasion,
-      'preOrderItems': preOrderItems.map((item) {
-        if (item is CartItemModel) {
-          return item.toMap();
-        }
-        return CartItemModel(
-          id: item.id,
-          title: item.title,
-          customOptions: item.customOptions,
-          price: item.price,
-          quantity: item.quantity,
-          imageUrl: item.imageUrl,
-        ).toMap();
-      }).toList(),
-      'tableReservationFee': tableReservationFee,
-      'preOrdersSubtotal': preOrdersSubtotal,
-      'taxAmount': taxAmount,
-      'totalAmount': totalAmount,
-      'status': status,
-      'paymentMethodId': paymentMethodId,
-      'idempotencyKey': idempotencyKey,
-      'createdAt': DateTime.now().toIso8601String(),
+      'seatingPreference': seatingPreference,
+      'status': status.name,
+      'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
     };
   }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'cafeId': cafeId,
+      'date': date != null ? Timestamp.fromDate(date!) : null,
+      'time': time,
+      'guests': guests,
+      'occasion': occasion,
+      'seatingPreference': seatingPreference,
+      'status': status.name,
+      'createdAt': Timestamp.fromDate(createdAt ?? DateTime.now()),
+    };
+  }
+
+  BookingEntity toEntity() => this;
 }

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
 import '../../../../../core/localization/app_locale.dart';
-import '../../../../booking/domain/entities/booking_entity.dart';
-import '../../../../cart/domain/entities/cart_item_entity.dart';
-import '../../../../checkout/presentation/view/screens/checkout_screen.dart';
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
 import '../../../domain/use_cases/google_signin_usecase.dart';
@@ -118,12 +116,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               backgroundColor: Colors.green.shade700,
             ),
           );
-          // TODO: Navigation to Home Screen
-          //test checkout Task
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) =>  CheckoutScreen(booking: dummyBooking,),
-            ),
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
           );
         }
       },
@@ -163,10 +158,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           ),
                           label: Text(
                             FlutterLocalization
-                                        .instance
-                                        .currentLocale
-                                        ?.languageCode ==
-                                    'ar'
+                                .instance
+                                .currentLocale
+                                ?.languageCode ==
+                                'ar'
                                 ? 'English'
                                 : 'العربية',
                             style: const TextStyle(
@@ -307,10 +302,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 hint: AppLocale.nameHint.getString(context),
                                 suffixIcon: Icons.person_outline,
                                 validator: (v) =>
-                                    (v == null || v.trim().isEmpty)
+                                (v == null || v.trim().isEmpty)
                                     ? AppLocale.enterEmailError.getString(
-                                        context,
-                                      )
+                                  context,
+                                )
                                     : null,
                               ),
                               const SizedBox(height: 14),
@@ -416,10 +411,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               onPressed: isLoading
                                   ? null
                                   : () {
-                                      context.read<AuthCubit>().processIntent(
-                                        GoogleSignInIntent(),
-                                      );
-                                    },
+                                context.read<AuthCubit>().processIntent(
+                                  GoogleSignInIntent(),
+                                );
+                              },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 48),
                                 shape: RoundedRectangleBorder(
@@ -476,26 +471,3 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
     );
   }
 }
-
-
-final dummyBooking = BookingEntity(
-  userId: 'user_123',
-  cafeId: 'cafe_tbs',
-  cafeName: 'The Bakery Shop (TBS)',
-  cafeAddress: 'أوبن إير مول، مدينتي',
-  cafeImageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24',
-  bookingDateTime: DateTime.now().add(const Duration(days: 2, hours: 4)),
-  guestsCount: 4,
-  seatingPreference: 'صالة داخلية',
-  occasion: 'جلسة عمل',
-  tableReservationFee: 50.0,
-  preOrderItems: const [
-    CartItemEntity(
-      id: '1',
-      title: 'Spanish Latte',
-      price: 70.0,
-      quantity: 2,
-      imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772',
-    ),
-  ],
-);
