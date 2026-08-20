@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 
-import 'firebase_options.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
+import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 
 import 'core/di/injection.dart';
 import 'core/di/injection_container.dart';
@@ -111,7 +114,7 @@ class _MyAppState extends State<MyApp> {
 
       home: const SplashScreen(),
 
-      onGenerateRoute: AppRoutes.onGenerateRoute,
+      home: const AuthScreen(),
     );
   }
 }

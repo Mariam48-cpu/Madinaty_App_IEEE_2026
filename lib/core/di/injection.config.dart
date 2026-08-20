@@ -13,6 +13,18 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart'
     as _i162;
+import 'package:madinaty_app_ieee_2026/features/booking/data/repositories/booking_repository_impl.dart'
+    as _i498;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/booking_repository_interface.dart'
+    as _i1025;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/create_booking_usecase.dart'
+    as _i102;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/get_booking_usecase.dart'
+    as _i749;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/update_booking_status_usecase.dart'
+    as _i266;
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/view_model/cubit/booking_cubit.dart'
+    as _i437;
 import 'package:madinaty_app_ieee_2026/features/cafe/data/data_sources/cafe_firestore_data_source.dart'
     as _i793;
 import 'package:madinaty_app_ieee_2026/features/cafe/data/repositories/cafe_repository_firebase.dart'
@@ -52,9 +64,23 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1013.GooglePlacesDataSource>(
       () => _i1013.GooglePlacesDataSource(),
     );
+    gh.lazySingleton<_i1025.BookingRepositoryInterface>(
+      () => _i498.BookingRepositoryImpl(),
+    );
     gh.factory<_i297.CafeeRepositoryInterface>(
       () => _i920.CafeRepositoryFirebase(
         dataSource: gh<_i793.CafeFirestoreDataSource>(),
+      ),
+    );
+    gh.factory<_i102.CreateBookingUseCase>(
+      () => _i102.CreateBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
+    );
+    gh.factory<_i749.GetBookingUseCase>(
+      () => _i749.GetBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
+    );
+    gh.factory<_i266.UpdateBookingStatusUseCase>(
+      () => _i266.UpdateBookingStatusUseCase(
+        gh<_i1025.BookingRepositoryInterface>(),
       ),
     );
     gh.factory<_i1020.CafeRepositoryInterface>(
@@ -71,6 +97,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i297.GetCafeMenuUseCase>(
       () => _i297.GetCafeMenuUseCase(
         repository: gh<_i297.CafeeRepositoryInterface>(),
+      ),
+    );
+    gh.factory<_i437.BookingCubit>(
+      () => _i437.BookingCubit(
+        gh<_i102.CreateBookingUseCase>(),
+        gh<_i749.GetBookingUseCase>(),
+        gh<_i266.UpdateBookingStatusUseCase>(),
       ),
     );
     gh.factory<_i784.GetNearbyCafes>(

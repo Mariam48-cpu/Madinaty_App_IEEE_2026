@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
-class CafeBottomButtons extends StatelessWidget {
+class CafeBottomButtons extends StatefulWidget {
   final VoidCallback? onDirections;
   final VoidCallback? onCall;
 
   const CafeBottomButtons({super.key, this.onDirections, this.onCall});
 
+  @override
+  State<CafeBottomButtons> createState() => _CafeBottomButtonsState();
+}
+
+class _CafeBottomButtonsState extends State<CafeBottomButtons> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,7 +31,7 @@ class CafeBottomButtons extends StatelessWidget {
             child: SizedBox(
               height: 48,
               child: OutlinedButton(
-                onPressed: onCall,
+                onPressed: widget.onCall,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Color(0xFF8D6654),
                   backgroundColor: Colors.white,
@@ -49,7 +54,7 @@ class CafeBottomButtons extends StatelessWidget {
             child: SizedBox(
               height: 48,
               child: ElevatedButton(
-                onPressed: onDirections,
+                onPressed: widget.onDirections,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF17120F),
                   foregroundColor: Colors.white,
