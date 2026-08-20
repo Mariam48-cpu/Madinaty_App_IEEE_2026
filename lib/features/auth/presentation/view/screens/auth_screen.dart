@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import '../../../../../core/localization/app_locale.dart';
+import '../../../../booking/domain/entities/booking_entity.dart';
+import '../../../../cart/domain/entities/cart_item_entity.dart';
+import '../../../../checkout/presentation/view/screens/checkout_screen.dart';
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
 import '../../../domain/use_cases/google_signin_usecase.dart';
@@ -116,6 +119,12 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
             ),
           );
           // TODO: Navigation to Home Screen
+          //test checkout Task
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) =>  CheckoutScreen(booking: dummyBooking,),
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -134,7 +143,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // زر تبديل اللغة
                       Align(
                         alignment: Alignment.topRight,
                         child: TextButton.icon(
@@ -468,3 +476,26 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
     );
   }
 }
+
+
+final dummyBooking = BookingEntity(
+  userId: 'user_123',
+  cafeId: 'cafe_tbs',
+  cafeName: 'The Bakery Shop (TBS)',
+  cafeAddress: 'أوبن إير مول، مدينتي',
+  cafeImageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24',
+  bookingDateTime: DateTime.now().add(const Duration(days: 2, hours: 4)),
+  guestsCount: 4,
+  seatingPreference: 'صالة داخلية',
+  occasion: 'جلسة عمل',
+  tableReservationFee: 50.0,
+  preOrderItems: const [
+    CartItemEntity(
+      id: '1',
+      title: 'Spanish Latte',
+      price: 70.0,
+      quantity: 2,
+      imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772',
+    ),
+  ],
+);

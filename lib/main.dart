@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
 import 'core/localization/app_locale.dart';
-import 'core/services/firebase_service.dart';
 import 'core/routes/app_routes.dart';
-import 'core/theme/app_theme.dart';
-
+import 'core/services/firebase_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseService.init();
@@ -67,13 +64,22 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
     final isArabic = _localization.currentLocale?.languageCode == 'ar';
 
     return MaterialApp(
+
+
       title: 'Madinaty',
       debugShowCheckedModeBanner: false,
       supportedLocales: _localization.supportedLocales,
       localizationsDelegates: _localization.localizationsDelegates,
+
+
+
+
+      initialRoute: AppRoutes.initial,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
       theme: ThemeData(
         fontFamily: _localization.fontFamily ?? 'Cairo',
         scaffoldBackgroundColor: const Color(0xFFF9F6F0),
@@ -84,18 +90,9 @@ class _MyAppState extends State<MyApp> {
           child: child!,
         );
       },
-      home: const AuthScreen(),
     );
+
   }
-}
-Widget build(BuildContext context) {
-  return MaterialApp(
-    title: 'Madinaty',
-    debugShowCheckedModeBanner: false,
-    theme: AppTheme.lightTheme,
-    initialRoute: AppRoutes.initial,
-    onGenerateRoute: AppRoutes.onGenerateRoute,
-  );
 }
 
 
