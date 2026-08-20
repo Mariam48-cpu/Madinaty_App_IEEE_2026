@@ -4,12 +4,14 @@ class CafeHeader extends StatelessWidget {
   final String name;
   final double rating;
   final int reviewsCount;
+  final VoidCallback? onReviewsTap;
 
   const CafeHeader({
     super.key,
     required this.name,
     required this.rating,
     required this.reviewsCount,
+    this.onReviewsTap,
   });
 
   @override
@@ -20,26 +22,30 @@ class CafeHeader extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-              decoration: BoxDecoration(
-                color: Color(0xFFFFE4D0),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.star, color: Color(0xFFE69A35), size: 14),
-                  SizedBox(width: 3),
-                  Text(
-                    rating.toStringAsFixed(1),
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                ],
+            InkWell(
+              onTap: onReviewsTap,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFE4D0),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star, color: Color(0xFFE69A35), size: 14),
+                    const SizedBox(width: 3),
+                    Text(
+                      rating.toStringAsFixed(1),
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            Spacer(),
+            const Spacer(),
 
             Expanded(
               flex: 3,
@@ -48,7 +54,7 @@ class CafeHeader extends StatelessWidget {
                 textAlign: TextAlign.right,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 21,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2D2521),
@@ -58,23 +64,28 @@ class CafeHeader extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              '($reviewsCount تقييم)',
-              style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-            ),
-            SizedBox(width: 4),
-            Icon(Icons.star, color: Colors.amber, size: 14),
-            SizedBox(width: 3),
-            Text(
-              rating.toStringAsFixed(1),
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-            ),
-          ],
+        InkWell(
+          onTap: onReviewsTap,
+          borderRadius: BorderRadius.circular(6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                '($reviewsCount تقييم)',
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.star, color: Colors.amber, size: 14),
+              const SizedBox(width: 3),
+              Text(
+                rating.toStringAsFixed(1),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
       ],
     );

@@ -6,6 +6,7 @@ import 'package:madinaty_app_ieee_2026/features/home/presentation/view/screens/h
 import 'package:madinaty_app_ieee_2026/features/home/presentation/view_model/home_cubit.dart';
 
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
+import '../../features/discovery/presentation/view/screens/main_navigation_screen.dart';
 import '../../features/personalization/presentation/view/screens/personalization_screen.dart';
 
 abstract class AppRoutes {
@@ -57,12 +58,7 @@ abstract class AppRoutes {
         }
 
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<HomeCubit>(
-              param1: user.uid,
-            )..fetchHomeData(),
-            child: const HomeScreen(),
-          ),
+          builder: (_) => const MainNavigationScreen(),
           settings: settings,
         );
 

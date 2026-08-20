@@ -14,8 +14,14 @@ import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/c
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_menu_section.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view_model/cubit/cafe_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view_model/cubit/cafe_state.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/entities/favorite_item_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/is_favorite_use_case.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
+import 'package:madinaty_app_ieee_2026/features/reviews/presentation/view/screens/reviews_screen.dart';
 
 class CafeDetailsScreen extends StatefulWidget {
   final CafeEntity cafe;
@@ -28,6 +34,32 @@ class CafeDetailsScreen extends StatefulWidget {
 }
 
 class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavorite();
+  }
+
+  Future<void> _checkFavorite() async {
+    final isFav = await getIt<IsFavoriteUseCase>()(
+      targetId: widget.cafe.id,
+      type: FavoriteTargetType.cafe,
+    );
+    if (mounted) {
+      setState(() => _isFavorite = isFav);
+    }
+  }
+
+  Future<void> _toggleFavorite(CafeEntity cafe) async {
+    final item = FavoriteItemEntity.fromCafe(cafe);
+    await getIt<ToggleFavoriteUseCase>()(item);
+    if (mounted) {
+      setState(() => _isFavorite = !_isFavorite);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -105,7 +137,8 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                               children: [
                                 CafeImage(
                                   photos: cafe.photos,
-                                  onFavorite: () {},
+                                  isFavorite: _isFavorite,
+                                  onFavorite: () => _toggleFavorite(cafe),
                                   onShare: () {},
                                   onBack: () => Navigator.pop(context),
                                 ),
@@ -146,8 +179,20 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                   rating: cafe.rating,
                                                   reviewsCount:
                                                       cafe.reviewsCount,
+                                                  onReviewsTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            ReviewsScreen(
+                                                          cafeId: cafe.id,
+                                                          cafeName: cafe.name,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
-                                                SizedBox(height: 12),
+                                                const SizedBox(height: 12),
                                                 CafeInfoSection(cafe: cafe),
                                               ],
                                             ),
@@ -155,17 +200,17 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                         ),
                                       ),
 
-                                      SizedBox(height: 24),
+                                      const SizedBox(height: 24),
                                       if (cafe.description.isNotEmpty) ...[
                                         Padding(
-                                          padding: EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                             horizontal: 20,
                                           ),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.end,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'عن الكافيه',
                                                 style: TextStyle(
                                                   fontSize: 18,
@@ -173,7 +218,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                   color: Color(0xFF2D2521),
                                                 ),
                                               ),
-                                              SizedBox(height: 8),
+                                              const SizedBox(height: 8),
                                               Text(
                                                 cafe.description,
                                                 textAlign: TextAlign.right,
@@ -186,10 +231,10 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                             ],
                                           ),
                                         ),
-                                        SizedBox(height: 24),
+                                        const SizedBox(height: 24),
                                       ],
                                       Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
                                         ),
                                         child: CafeMenuSection(
@@ -200,9 +245,9 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                         ),
                                       ),
 
-                                      SizedBox(height: 24),
+                                      const SizedBox(height: 24),
                                       Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
                                         ),
                                         child: CafeFeatures(
@@ -210,6 +255,106 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                         ),
                                       ),
 
+                                      const SizedBox(height: 24),
+                                      // --- Reviews & Ratings Quick Access Card ---
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ReviewsScreen(
+                                                  cafeId: cafe.id,
+                                                  cafeName: cafe.name,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 14,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              border: Border.all(
+                                                color: const Color(0xFFF0E5DA),
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.03),
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.arrow_back_ios_new,
+                                                  size: 14,
+                                                  color: Color(0xFF8D6654),
+                                                ),
+                                                const Spacer(),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      AppLocale
+                                                          .reviewsAndRatings
+                                                          .getString(context),
+                                                      style: const TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF2D2521),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      '${cafe.rating.toStringAsFixed(1)} ★  (${cafe.reviewsCount} ${AppLocale.ratingsCountSuffix.getString(context)})',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        color:
+                                                            Color(0xFF8A5A36),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                        0xFFFFF3EB),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.rate_review_outlined,
+                                                    color: Color(0xFF8A5A36),
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                       SizedBox(height: 20),
                                     ],
                                   ),
