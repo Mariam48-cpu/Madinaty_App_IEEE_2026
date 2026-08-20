@@ -12,7 +12,6 @@ class CafeInfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Address
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
