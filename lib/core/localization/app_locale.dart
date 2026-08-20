@@ -76,6 +76,34 @@ mixin AppLocale {
   static const String whatIsYourOccasion = 'whatIsYourOccasion';
   static const String selectOccasionType = 'selectOccasionType';
 
+  // 🔑 Favorites & My Lists
+  static const String places = 'places';
+  static const String products = 'products';
+  static const String noFavoritesYet = 'noFavoritesYet';
+
+  // 🔑 Reviews & Ratings
+  static const String reviewsAndRatings = 'reviewsAndRatings';
+  static const String basedOn = 'basedOn';
+  static const String ratingsCountSuffix = 'ratingsCountSuffix';
+  static const String writeYourReview = 'writeYourReview';
+  static const String coffee = 'coffee';
+  static const String atmosphere = 'atmosphere';
+  static const String service = 'service';
+  static const String all = 'all';
+  static const String withPhotos = 'withPhotos';
+  static const String highestRating = 'highestRating';
+  static const String helpful = 'helpful';
+  static const String noReviewsYet = 'noReviewsYet';
+  static const String submitReview = 'submitReview';
+  static const String yourRating = 'yourRating';
+  static const String writeReviewHint = 'writeReviewHint';
+  static const String ratingRequired = 'ratingRequired';
+  static const String commentRequired = 'commentRequired';
+  static const String reviewSubmittedSuccess = 'reviewSubmittedSuccess';
+  static const String editReview = 'editReview';
+  static const String retry = 'retry';
+  static const String loginRequiredToReview = 'loginRequiredToReview';
+
   // 🇪🇬 نصوص اللغة العربية
   static const Map<String, dynamic> AR = {
     appTitle: 'مدينتي',
@@ -145,6 +173,32 @@ mixin AppLocale {
     chooseGeneralVibe: 'اختر الجو العام اللي بتفضله',
     whatIsYourOccasion: 'ما هي مناسبتك؟',
     selectOccasionType: 'حدد نوع الخروجة أو المناسبة الحالية',
+
+    // Favorites & Reviews AR
+    places: 'الأماكن',
+    products: 'المنتجات',
+    noFavoritesYet: 'لا توجد عناصر في المفضلة حتى الآن',
+    reviewsAndRatings: 'التقييمات والمراجعات',
+    basedOn: 'بناءً على',
+    ratingsCountSuffix: 'تقييم',
+    writeYourReview: 'اكتب تقييمك',
+    coffee: 'القهوة',
+    atmosphere: 'الجو العام',
+    service: 'الخدمة',
+    all: 'الكل',
+    withPhotos: 'لديها صور',
+    highestRating: 'أعلى تقييم',
+    helpful: 'مفيد',
+    noReviewsYet: 'لا توجد تقييمات حتى الآن',
+    submitReview: 'إرسال التقييم',
+    yourRating: 'تقييمك',
+    writeReviewHint: 'اكتب رأيك وتجربتك هنا بالتفصيل...',
+    ratingRequired: 'يرجى اختيار التقييم بالنجوم',
+    commentRequired: 'يرجى كتابة نص المراجعة',
+    reviewSubmittedSuccess: 'تم إرسال تقييمك بنجاح!',
+    editReview: 'تعديل التقييم',
+    retry: 'إعادة المحاولة',
+    loginRequiredToReview: 'يرجى تسجيل الدخول أولاً لتتمكن من كتابة تقييم',
   };
 
   // 🇺🇸 نصوص اللغة الإنجليزية
@@ -216,6 +270,32 @@ mixin AppLocale {
     chooseGeneralVibe: 'Choose the general vibe you prefer',
     whatIsYourOccasion: 'What is your occasion?',
     selectOccasionType: 'Specify the current outing or occasion type',
+
+    // Favorites & Reviews EN
+    places: 'Places',
+    products: 'Products',
+    noFavoritesYet: 'No favorites yet',
+    reviewsAndRatings: 'Reviews & Ratings',
+    basedOn: 'Based on',
+    ratingsCountSuffix: 'reviews',
+    writeYourReview: 'Write your review',
+    coffee: 'Coffee',
+    atmosphere: 'Atmosphere',
+    service: 'Service',
+    all: 'All',
+    withPhotos: 'With photos',
+    highestRating: 'Highest rating',
+    helpful: 'Helpful',
+    noReviewsYet: 'No reviews yet',
+    submitReview: 'Submit Review',
+    yourRating: 'Your Rating',
+    writeReviewHint: 'Write your thoughts and experience here in detail...',
+    ratingRequired: 'Please select a star rating',
+    commentRequired: 'Please write your review comment',
+    reviewSubmittedSuccess: 'Your review has been submitted successfully!',
+    editReview: 'Edit Review',
+    retry: 'Retry',
+    loginRequiredToReview: 'Please login first to submit a review',
   };
 
   // 🇰🇭 نصوص اللغة الخميرية (Khmer - KM)
@@ -273,6 +353,32 @@ mixin AppLocale {
     selectGoingOutReason: 'សូមជ្រើសរើសមូលហេតុនៃការចេញទៅក្រៅថ្ងៃនេះ',
     toastSuccess: 'ជោគជ័យ',
     toastError: 'កំហុស',
+
+    // Favorites & Reviews KM
+    places: 'ទីកន្លែង',
+    products: 'ផលិតផល',
+    noFavoritesYet: 'មិនទាន់មានចំណូលចិត្តនៅឡើយទេ',
+    reviewsAndRatings: 'ការវាយតម្លៃ និងការពិនិត្យ',
+    basedOn: 'ផ្អែកលើ',
+    ratingsCountSuffix: 'ការវាយតម្លៃ',
+    writeYourReview: 'សរសេរការវាយតម្លៃរបស់អ្នក',
+    coffee: 'កាហ្វេ',
+    atmosphere: 'បរិយាកាស',
+    service: 'សេវាកម្ម',
+    all: 'ទាំងអស់',
+    withPhotos: 'មានរូបថត',
+    highestRating: 'ការវាយតម្លៃខ្ពស់បំផុត',
+    helpful: 'មានប្រយោជន៍',
+    noReviewsYet: 'មិនទាន់មានការវាយតម្លៃនៅឡើយទេ',
+    submitReview: 'ផ្ញើការវាយតម្លៃ',
+    yourRating: 'ការវាយតម្លៃរបស់អ្នក',
+    writeReviewHint: 'សរសេរគំនិតនិងបទពិសោធន៍របស់អ្នកនៅទីនេះ...',
+    ratingRequired: 'សូមជ្រើសរើសការវាយតម្លៃផ្កាយ',
+    commentRequired: 'សូមសរសេរមតិយោបល់របស់អ្នក',
+    reviewSubmittedSuccess: 'ការវាយតម្លៃរបស់អ្នកត្រូវបានដាក់ស្នើដោយជោគជ័យ!',
+    editReview: 'កែសម្រួលការវាយតម្លៃ',
+    retry: 'ព្យាយាមម្តងទៀត',
+    loginRequiredToReview: 'សូមចូលគណនីជាមុនសិនដើម្បីសរសេរការវាយតម្លៃ',
   };
 
   // 🇯🇵 نصوص اللغة اليابانية (Japanese - JA)
@@ -330,5 +436,31 @@ mixin AppLocale {
     selectGoingOutReason: '本日のお出かけ理由を選択してください',
     toastSuccess: '成功',
     toastError: 'エラー',
+
+    // Favorites & Reviews JA
+    places: '場所',
+    products: '商品',
+    noFavoritesYet: 'お気に入りはまだありません',
+    reviewsAndRatings: '評価とレビュー',
+    basedOn: 'に基づく',
+    ratingsCountSuffix: '件の評価',
+    writeYourReview: 'レビューを書く',
+    coffee: 'コーヒー',
+    atmosphere: '雰囲気',
+    service: 'サービス',
+    all: 'すべて',
+    withPhotos: '写真付き',
+    highestRating: '最高評価',
+    helpful: '役に立った',
+    noReviewsYet: 'レビューはまだありません',
+    submitReview: 'レビューを送信',
+    yourRating: 'あなたの評価',
+    writeReviewHint: 'ここに感想や体験を入力してください...',
+    ratingRequired: '星の評価を選択してください',
+    commentRequired: 'レビューコメントを入力してください',
+    reviewSubmittedSuccess: 'レビューが正常に送信されました！',
+    editReview: 'レビューを編集',
+    retry: '再試行',
+    loginRequiredToReview: 'レビューを書くにはログインしてください',
   };
 }

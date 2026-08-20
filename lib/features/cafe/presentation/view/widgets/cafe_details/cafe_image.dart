@@ -7,6 +7,7 @@ class CafeImage extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onFavorite;
   final VoidCallback? onShare;
+  final bool isFavorite;
 
   const CafeImage({
     super.key,
@@ -14,6 +15,7 @@ class CafeImage extends StatelessWidget {
     this.onBack,
     this.onFavorite,
     this.onShare,
+    this.isFavorite = false,
   });
 
   @override
@@ -74,7 +76,10 @@ class CafeImage extends StatelessWidget {
             child: Row(
               children: [
                 CircleButton(
-                  icon: Icons.favorite_border,
+                  icon: isFavorite
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_border_rounded,
+                  iconColor: isFavorite ? const Color(0xFF8D6654) : null,
                   onTap: onFavorite ?? () {},
                 ),
                 const SizedBox(width: 8),
