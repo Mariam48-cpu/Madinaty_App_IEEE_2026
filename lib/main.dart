@@ -1,12 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localization/flutter_localization.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
-import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
-import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
-import 'package:madinaty_app_ieee_2026/core/theme/app_theme.dart';
+import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
+
+import 'core/routes/app_routes.dart';
+import 'core/services/firebase_service.dart';
+import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/view/screens/auth_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,32 +22,8 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final FlutterLocalization _localization = FlutterLocalization.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    _localization.init(
-      mapLocales: [
-        const MapLocale('ar', AppLocale.AR),
-        const MapLocale('en', AppLocale.EN),
-        const MapLocale('km', AppLocale.KM),
-        const MapLocale('ja', AppLocale.JA),
-      ],
-      initLanguageCode: 'ar',
-    );
-    _localization.onTranslatedLanguage = (locale) {
-      setState(() {});
-    };
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +31,21 @@ class _MyAppState extends State<MyApp> {
       title: 'Madinaty',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      locale: const Locale('ar'),
-      supportedLocales: _localization.supportedLocales,
-      localizationsDelegates: _localization.localizationsDelegates,
-      // Temporarily set to start from Auth/Login for testing multiple accounts
-      initialRoute: AppRoutes.auth,
-      routes: AppRoutes.routes,
+
+      initialRoute: AppRoutes.initial,
       onGenerateRoute: AppRoutes.onGenerateRoute,
+
+      locale: Locale('ar'),
+
+      supportedLocales: [Locale('ar'), Locale('en')],
+
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      home: const AuthScreen(),
     );
   }
 }

@@ -13,6 +13,18 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart'
     as _i162;
+import 'package:madinaty_app_ieee_2026/features/booking/data/repositories/booking_repository_impl.dart'
+    as _i498;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/booking_repository_interface.dart'
+    as _i1025;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/create_booking_usecase.dart'
+    as _i102;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/get_booking_usecase.dart'
+    as _i749;
+import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/update_booking_status_usecase.dart'
+    as _i266;
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/view_model/cubit/booking_cubit.dart'
+    as _i437;
 import 'package:madinaty_app_ieee_2026/features/cafe/data/data_sources/cafe_firestore_data_source.dart'
     as _i793;
 import 'package:madinaty_app_ieee_2026/features/cafe/data/repositories/cafe_repository_firebase.dart'
@@ -37,46 +49,6 @@ import 'package:madinaty_app_ieee_2026/features/discovery/domain/use_cases/searc
     as _i616;
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart'
     as _i708;
-import 'package:madinaty_app_ieee_2026/features/favorites/data/data_sources/favorites_remote_data_source_impl.dart'
-    as _i472;
-import 'package:madinaty_app_ieee_2026/features/favorites/data/data_sources/favorites_remote_data_source_interface.dart'
-    as _i46;
-import 'package:madinaty_app_ieee_2026/features/favorites/data/repositories/favorites_repository_impl.dart'
-    as _i166;
-import 'package:madinaty_app_ieee_2026/features/favorites/domain/repositories/favorites_repository_interface.dart'
-    as _i954;
-import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/add_favorite_use_case.dart'
-    as _i968;
-import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/get_favorites_use_case.dart'
-    as _i453;
-import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/is_favorite_use_case.dart'
-    as _i917;
-import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/remove_favorite_use_case.dart'
-    as _i237;
-import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/toggle_favorite_use_case.dart'
-    as _i289;
-import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/watch_favorites_use_case.dart'
-    as _i860;
-import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view_model/cubit/favorites_cubit.dart'
-    as _i1042;
-import 'package:madinaty_app_ieee_2026/features/reviews/data/data_sources/reviews_remote_data_source_impl.dart'
-    as _i451;
-import 'package:madinaty_app_ieee_2026/features/reviews/data/data_sources/reviews_remote_data_source_interface.dart'
-    as _i762;
-import 'package:madinaty_app_ieee_2026/features/reviews/data/repositories/reviews_repository_impl.dart'
-    as _i73;
-import 'package:madinaty_app_ieee_2026/features/reviews/domain/repositories/reviews_repository_interface.dart'
-    as _i361;
-import 'package:madinaty_app_ieee_2026/features/reviews/domain/use_cases/get_cafe_reviews_use_case.dart'
-    as _i914;
-import 'package:madinaty_app_ieee_2026/features/reviews/domain/use_cases/get_user_review_use_case.dart'
-    as _i866;
-import 'package:madinaty_app_ieee_2026/features/reviews/domain/use_cases/submit_review_use_case.dart'
-    as _i868;
-import 'package:madinaty_app_ieee_2026/features/reviews/domain/use_cases/watch_cafe_reviews_use_case.dart'
-    as _i302;
-import 'package:madinaty_app_ieee_2026/features/reviews/presentation/view_model/cubit/reviews_cubit.dart'
-    as _i79;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -92,31 +64,29 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1013.GooglePlacesDataSource>(
       () => _i1013.GooglePlacesDataSource(),
     );
-    gh.factory<_i46.FavoritesRemoteDataSourceInterface>(
-      () => _i472.FavoritesRemoteDataSourceImpl(),
+    gh.lazySingleton<_i1025.BookingRepositoryInterface>(
+      () => _i498.BookingRepositoryImpl(),
     );
     gh.factory<_i297.CafeeRepositoryInterface>(
       () => _i920.CafeRepositoryFirebase(
         dataSource: gh<_i793.CafeFirestoreDataSource>(),
       ),
     );
-    gh.factory<_i762.ReviewsRemoteDataSourceInterface>(
-      () => _i451.ReviewsRemoteDataSourceImpl(),
+    gh.factory<_i102.CreateBookingUseCase>(
+      () => _i102.CreateBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
+    );
+    gh.factory<_i749.GetBookingUseCase>(
+      () => _i749.GetBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
+    );
+    gh.factory<_i266.UpdateBookingStatusUseCase>(
+      () => _i266.UpdateBookingStatusUseCase(
+        gh<_i1025.BookingRepositoryInterface>(),
+      ),
     );
     gh.factory<_i1020.CafeRepositoryInterface>(
       () => _i525.CafeRepositoryImpl(
         googlePlacesDataSource: gh<_i1013.GooglePlacesDataSource>(),
         firebaseDataSource: gh<_i793.CafeFirestoreDataSource>(),
-      ),
-    );
-    gh.factory<_i361.ReviewsRepositoryInterface>(
-      () => _i73.ReviewsRepositoryImpl(
-        dataSource: gh<_i762.ReviewsRemoteDataSourceInterface>(),
-      ),
-    );
-    gh.factory<_i954.FavoritesRepositoryInterface>(
-      () => _i166.FavoritesRepositoryImpl(
-        dataSource: gh<_i46.FavoritesRemoteDataSourceInterface>(),
       ),
     );
     gh.factory<_i473.GetCafeExperienceUseCase>(
@@ -127,6 +97,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i297.GetCafeMenuUseCase>(
       () => _i297.GetCafeMenuUseCase(
         repository: gh<_i297.CafeeRepositoryInterface>(),
+      ),
+    );
+    gh.factory<_i437.BookingCubit>(
+      () => _i437.BookingCubit(
+        gh<_i102.CreateBookingUseCase>(),
+        gh<_i749.GetBookingUseCase>(),
+        gh<_i266.UpdateBookingStatusUseCase>(),
       ),
     );
     gh.factory<_i784.GetNearbyCafes>(
@@ -141,76 +118,10 @@ extension GetItInjectableX on _i174.GetIt {
         locationService: gh<_i162.LocationService>(),
       ),
     );
-    gh.factory<_i968.AddFavoriteUseCase>(
-      () => _i968.AddFavoriteUseCase(
-        repository: gh<_i954.FavoritesRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i453.GetFavoritesUseCase>(
-      () => _i453.GetFavoritesUseCase(
-        repository: gh<_i954.FavoritesRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i917.IsFavoriteUseCase>(
-      () => _i917.IsFavoriteUseCase(
-        repository: gh<_i954.FavoritesRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i237.RemoveFavoriteUseCase>(
-      () => _i237.RemoveFavoriteUseCase(
-        repository: gh<_i954.FavoritesRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i289.ToggleFavoriteUseCase>(
-      () => _i289.ToggleFavoriteUseCase(
-        repository: gh<_i954.FavoritesRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i860.WatchFavoritesUseCase>(
-      () => _i860.WatchFavoritesUseCase(
-        repository: gh<_i954.FavoritesRepositoryInterface>(),
-      ),
-    );
     gh.factory<_i1062.CafeCubit>(
       () => _i1062.CafeCubit(
         getCafeExperienceUseCase: gh<_i473.GetCafeExperienceUseCase>(),
         getCafeMenuUseCase: gh<_i297.GetCafeMenuUseCase>(),
-      ),
-    );
-    gh.factory<_i914.GetCafeReviewsUseCase>(
-      () => _i914.GetCafeReviewsUseCase(
-        repository: gh<_i361.ReviewsRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i866.GetUserReviewUseCase>(
-      () => _i866.GetUserReviewUseCase(
-        repository: gh<_i361.ReviewsRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i868.SubmitReviewUseCase>(
-      () => _i868.SubmitReviewUseCase(
-        repository: gh<_i361.ReviewsRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i302.WatchCafeReviewsUseCase>(
-      () => _i302.WatchCafeReviewsUseCase(
-        repository: gh<_i361.ReviewsRepositoryInterface>(),
-      ),
-    );
-    gh.factory<_i1042.FavoritesCubit>(
-      () => _i1042.FavoritesCubit(
-        watchFavoritesUseCase: gh<_i860.WatchFavoritesUseCase>(),
-        toggleFavoriteUseCase: gh<_i289.ToggleFavoriteUseCase>(),
-        removeFavoriteUseCase: gh<_i237.RemoveFavoriteUseCase>(),
-        getFavoritesUseCase: gh<_i453.GetFavoritesUseCase>(),
-      ),
-    );
-    gh.factory<_i79.ReviewsCubit>(
-      () => _i79.ReviewsCubit(
-        getCafeReviewsUseCase: gh<_i914.GetCafeReviewsUseCase>(),
-        watchCafeReviewsUseCase: gh<_i302.WatchCafeReviewsUseCase>(),
-        submitReviewUseCase: gh<_i868.SubmitReviewUseCase>(),
-        getUserReviewUseCase: gh<_i866.GetUserReviewUseCase>(),
       ),
     );
     return this;
