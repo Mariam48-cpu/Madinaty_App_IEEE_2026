@@ -57,20 +57,31 @@ class DefaultFirebaseOptions {
     projectId: 'madinaty-bb278',
     storageBucket: 'madinaty-bb278.firebasestorage.app',
   );
+
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyD0iLK7vMLBCn7nm1T2mTNwJbLwGhlC4F4',
     appId: '1:514367928999:ios:c2b8f5cf50291e564af982',
     messagingSenderId: '514367928999',
     projectId: 'madinaty-bb278',
     storageBucket: 'madinaty-bb278.firebasestorage.app',
+    androidClientId: '514367928999-ikrik9hi016j2236uq11hkcg4mu4dkp4.apps.googleusercontent.com',
+    iosClientId: '514367928999-t46a1eipgdgoj45nr3adig1b7immoafo.apps.googleusercontent.com',
     iosBundleId: 'com.example.madinatyAppIeee2026',
   );
+
+
+    iosBundleId: 'com.example.madinatyAppIeee2026',
+  );
+ 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyD0iLK7vMLBCn7nm1T2mTNwJbLwGhlC4F4',
     appId: '1:514367928999:ios:c2b8f5cf50291e564af982',
     messagingSenderId: '514367928999',
     projectId: 'madinaty-bb278',
     storageBucket: 'madinaty-bb278.firebasestorage.app',
+    androidClientId: '514367928999-ikrik9hi016j2236uq11hkcg4mu4dkp4.apps.googleusercontent.com',
+    iosClientId: '514367928999-t46a1eipgdgoj45nr3adig1b7immoafo.apps.googleusercontent.com',
+
     iosBundleId: 'com.example.madinatyAppIeee2026',
   );
 
