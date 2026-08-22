@@ -129,16 +129,17 @@ class ReservationConfirmedScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
+                // زر عرض التذكرة الرقمية (الأساسي)
                 SizedBox(
                   width: double.infinity,
                   height: 52,
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.home,
-                            (route) => false,
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.digitalPass,
+                        arguments: booking,
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -149,8 +150,9 @@ class ReservationConfirmedScreen extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    child: Text(
-                      'العودة للرئيسية',
+                    icon: const Icon(Icons.qr_code_rounded, size: 20),
+                    label: Text(
+                      'عرض التذكرة الرقمية (QR Pass)',
                       style: AppTypography.labelLarge.copyWith(
                         color: AppColors.onDarkButton,
                         fontWeight: FontWeight.bold,
@@ -159,6 +161,33 @@ class ReservationConfirmedScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.home,
+                            (route) => false,
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.border, width: 1.2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      'العودة للرئيسية',
+                      style: AppTypography.labelLarge.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
 
                 TextButton.icon(
                   onPressed: () {
