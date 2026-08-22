@@ -1,38 +1,26 @@
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
-import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 
-import 'core/di/injection.dart';
-import 'core/di/injection_container.dart';
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
 import 'core/services/firebase_service.dart';
 import 'core/theme/app_theme.dart';
-import 'features/onboarding/presentation/view/screens/splash_screen.dart';
-import 'features/onboarding/presentation/view_model/onboarding_bloc.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   await FirebaseService.init();
-  configureDependencies();
-  await initDependencies();
 
-  runApp(
-    BlocProvider(
-      create: (_) => sl<OnboardingBloc>(),
-      child: const MyApp(),
-    ),
-  );
+  configureDependencies();
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -43,16 +31,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final FlutterLocalization _localization =
-      FlutterLocalization.instance;
+  final FlutterLocalization _localization = FlutterLocalization.instance;
 
   @override
   void initState() {
-    super.initState();
-
     _localization.onTranslatedLanguage = _onTranslatedLanguage;
-
     _initializeLocalization();
+    super.initState();
   }
 
   void _initializeLocalization() {
@@ -91,30 +76,24 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final isArabic =
-        _localization.currentLocale?.languageCode == 'ar';
+    final isArabic = _localization.currentLocale?.languageCode == 'ar';
 
     return MaterialApp(
       title: 'Madinaty',
       debugShowCheckedModeBanner: false,
-
       supportedLocales: _localization.supportedLocales,
-      localizationsDelegates:
-          _localization.localizationsDelegates,
-
-      theme: AppTheme.lightTheme,
-
+      localizationsDelegates: _localization.localizationsDelegates,
+      initialRoute: AppRoutes.initial,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
+      theme: AppTheme.lightTheme.copyWith(
+        scaffoldBackgroundColor: const Color(0xFFF9F6F0),
+      ),
       builder: (context, child) {
         return Directionality(
-          textDirection:
-              isArabic ? TextDirection.rtl : TextDirection.ltr,
-          child: child ?? const SizedBox.shrink(),
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          child: child!,
         );
       },
-
-      home: const SplashScreen(),
-
-      home: const AuthScreen(),
     );
   }
 }
