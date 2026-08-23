@@ -43,13 +43,15 @@ dependencies:
   shared_preferences: ^2.5.3
   dartz: ^0.10.1
 
+  # Notifications
+  flutter_local_notifications: ^19.4.2
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
   flutter_bloc: ^9.1.1
   dio: ^5.11.0
-
   get_it: ^9.2.1
   injectable: ^3.0.0
 
@@ -63,21 +65,22 @@ dependencies:
   http: ^1.6.0
   flutter_dotenv: ^6.0.1
   flutter_map: ^8.3.1
-  flutter_svg: ^2.2.3
+  flutter_svg: ^2.3.0
   latlong2: ^0.10.1
   geocoding: ^3.0.0
   location: ^10.0.2
   flutter_polyline_points: ^3.1.0
-
   provider: ^6.0.5
 
   google_sign_in: ^7.2.0
-
   flutter_localization: 0.2.2
+
   google_fonts: ^8.2.1
   toastification: ^3.2.0
   webview_flutter: ^4.14.1
   localization: ^2.1.1
+  image_picker: ^1.2.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -89,21 +92,19 @@ dev_dependencies:
   # rules and activating additional ones.
 
   flutter_lints: ^6.0.0
-
   build_runner: ^2.15.1
   injectable_generator: ^3.0.2
   flutter_launcher_icons: ^0.14.4
 
-# For information on the generic Dart part of this file, see the
+# For information about the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
 # The following section is specific to Flutter packages.
 
 flutter:
-
   # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
-
+  # included with your application, so that you can use the
+  # Material Icons font in your application.
   uses-material-design: true
 
   assets:
@@ -114,7 +115,6 @@ flutter:
     - assets/images/onboarding/
 
   # Custom font family definition for Cairo (Arabic UI)
-
   fonts:
     - family: Cairo
       fonts:

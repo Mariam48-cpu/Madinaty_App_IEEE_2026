@@ -25,21 +25,14 @@ class HomeCubit extends Cubit<HomeState> {
     required this.searchCafesUseCase,
     @factoryParam required this.currentUserId,
   }) : super(const HomeInitial());
-  Future<void> fetchHomeData({
-    String? categoryFilter,
-  }) async {
+  Future<void> fetchHomeData({String? categoryFilter}) async {
     emit(const HomeLoading());
 
     try {
-      final preferences = await getUserPreferencesUseCase(
-        currentUserId,
-      );
+      final preferences = await getUserPreferencesUseCase(currentUserId);
 
-      final interests = preferences?.interests ??
-          [
-            'قهوة مختصة',
-            'أماكن للمذاكرة',
-          ];
+      final interests =
+          preferences?.interests ?? ['قهوة مختصة', 'أماكن للمذاكرة'];
 
       final mood = preferences?.selectedMood;
 
@@ -61,10 +54,7 @@ class HomeCubit extends Cubit<HomeState> {
 
       final selectedCategory = categoryFilter ?? 'الكل';
 
-      final filtered = _filterCafes(
-        cafes,
-        selectedCategory,
-      );
+      final filtered = _filterCafes(cafes, selectedCategory);
 
       emit(
         HomeLoaded(
@@ -76,16 +66,10 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     } catch (e) {
-      emit(
-        HomeError(
-          e.toString().replaceAll(
-                'Exception: ',
-                '',
-              ),
-        ),
-      );
+      emit(HomeError(e.toString().replaceAll('Exception: ', '')));
     }
   }
+
   List<CafeRecommendationEntity> _filterCafes(
     List<CafeRecommendationEntity> cafes,
     String category,
@@ -96,10 +80,8 @@ class HomeCubit extends Cubit<HomeState> {
     String normalize(String value) {
       return value.trim().toLowerCase();
     }
-    bool containsAny(
-      List<String> list,
-      List<String> targets,
-    ) {
+
+    bool containsAny(List<String> list, List<String> targets) {
       for (final item in list) {
         final normalizedItem = normalize(item);
 
@@ -116,87 +98,65 @@ class HomeCubit extends Cubit<HomeState> {
 
       return false;
     }
+
     return cafes.where((cafe) {
       if (category == 'للعمل') {
-        return containsAny(
-              cafe.interests,
-              [
-                'للعمل',
-                'أماكن للمذاكرة',
-                'مذاكرة',
-                'study',
-                'work',
-                'workspace',
-                'working',
-              ],
-            ) ||
-            containsAny(
-              cafe.moods,
-              [
-                'جلسة هادئة',
-                'هادئ',
-                'هدوء',
-                'quiet',
-                'calm',
-                'peaceful',
-                'study',
-                'work',
-              ],
-            ) ||
-            containsAny(
-              cafe.occasions,
-              [
-                'للعمل',
-                'work',
-                'study',
-              ],
-            );
+        return containsAny(cafe.interests, [
+              'للعمل',
+              'أماكن للمذاكرة',
+              'مذاكرة',
+              'study',
+              'work',
+              'workspace',
+              'working',
+            ]) ||
+            containsAny(cafe.moods, [
+              'جلسة هادئة',
+              'هادئ',
+              'هدوء',
+              'quiet',
+              'calm',
+              'peaceful',
+              'study',
+              'work',
+            ]) ||
+            containsAny(cafe.occasions, ['للعمل', 'work', 'study']);
       }
       if (category == 'قهوة') {
-        return containsAny(
-              cafe.interests,
-              [
-                'قهوة',
-                'قهوة مختصة',
-                'coffee',
-                'specialty coffee',
-              ],
-            ) ||
-            containsAny(
-              cafe.moods,
-              [
-                'قهوة',
-                'coffee',
-              ],
-            );
+        return containsAny(cafe.interests, [
+              'قهوة',
+              'قهوة مختصة',
+              'coffee',
+              'specialty coffee',
+            ]) ||
+            containsAny(cafe.moods, ['قهوة', 'coffee']);
       }
 
       return false;
     }).toList();
   }
-void filterByCategory(String category) {
-  final currentState = state;
 
-  if (currentState is! HomeLoaded) {
-    return;
+  void filterByCategory(String category) {
+    final currentState = state;
+
+    if (currentState is! HomeLoaded) {
+      return;
+    }
+
+    final filtered = List<CafeRecommendationEntity>.from(
+      _filterCafes(currentState.recommendations, category),
+    );
+
+    filtered.shuffle();
+
+    emit(
+      currentState.copyWith(
+        filteredCafes: filtered,
+        selectedCategory: category,
+      ),
+    );
   }
 
-  final filtered = List<CafeRecommendationEntity>.from(
-    _filterCafes(
-      currentState.recommendations,
-      category,
-    ),
-  );
-
-  filtered.shuffle();
-
-  emit(
-    currentState.copyWith(
-      filteredCafes: filtered,
-      selectedCategory: category,
-    ),
-  );
-}
   void searchCafes(String query) {
     final searchQuery = query.trim();
 
@@ -212,16 +172,12 @@ void filterByCategory(String category) {
       return;
     }
 
-    _searchDebounce = Timer(
-      const Duration(milliseconds: 800),
-      () async {
-        await _performSearch(searchQuery);
-      },
-    );
+    _searchDebounce = Timer(const Duration(milliseconds: 800), () async {
+      await _performSearch(searchQuery);
+    });
   }
-  Future<void> _performSearch(
-    String query,
-  ) async {
+
+  Future<void> _performSearch(String query) async {
     final currentState = state;
 
     if (currentState is! HomeLoaded) {
@@ -268,10 +224,7 @@ void filterByCategory(String category) {
             'تم الوصول للحد اليومي للبحث. '
             'جرب مرة أخرى لاحقًا.';
       } else {
-        message = message.replaceAll(
-          'Exception: ',
-          '',
-        );
+        message = message.replaceAll('Exception: ', '');
       }
 
       emit(
@@ -284,6 +237,7 @@ void filterByCategory(String category) {
       );
     }
   }
+
   void clearSearch() {
     _searchDebounce?.cancel();
     _clearSearch();
@@ -303,6 +257,7 @@ void filterByCategory(String category) {
       );
     }
   }
+
   @override
   Future<void> close() {
     _searchDebounce?.cancel();

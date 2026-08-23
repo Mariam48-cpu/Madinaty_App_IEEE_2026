@@ -12,16 +12,11 @@ class MoodCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 12,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: const Color(0xFFF5EBDD),
         borderRadius: BorderRadius.circular(17),
-        border: Border.all(
-          color: const Color(0xFFEADBC9),
-        ),
+        border: Border.all(color: const Color(0xFFEADBC9)),
       ),
       child: Row(
         children: [
@@ -58,19 +53,13 @@ class MoodCard extends StatelessWidget {
                   'بانتظار تأكيد الكافيه • رحل هادي',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFF81766C),
-                  ),
+                  style: TextStyle(fontSize: 10, color: Color(0xFF81766C)),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(
-            Icons.chevron_left_rounded,
-            color: Color(0xFF806C59),
-          ),
+          const Icon(Icons.chevron_left_rounded, color: Color(0xFF806C59)),
         ],
       ),
     );
@@ -82,11 +71,7 @@ class HomeFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filters = [
-      'الكل',
-      'للعمل',
-      'قهوة',
-    ];
+    final filters = ['الكل', 'للعمل', 'قهوة'];
 
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
@@ -100,19 +85,15 @@ class HomeFilters extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             itemCount: filters.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(width: 8),
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final filter = filters[index];
 
-              final isSelected =
-                  state.selectedCategory == filter;
+              final isSelected = state.selectedCategory == filter;
 
               return GestureDetector(
                 onTap: () {
-                  context.read<HomeCubit>().filterByCategory(
-                    filter,
-                  );
+                  context.read<HomeCubit>().filterByCategory(filter);
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -120,9 +101,7 @@ class HomeFilters extends StatelessWidget {
                     vertical: 9,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFFE9D7C2)
-                        : Colors.white,
+                    color: isSelected ? const Color(0xFFE9D7C2) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
@@ -157,17 +136,14 @@ class CafeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String imageUrl =
-        cafe.imageUrl.toString().trim();
+    final String imageUrl = cafe.imageUrl.toString().trim();
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFE9E1D8),
-        ),
+        border: Border.all(color: const Color(0xFFE9E1D8)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -189,8 +165,7 @@ class CafeCard extends StatelessWidget {
                     ? Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
-                        loadingBuilder:
-                            (context, child, loadingProgress) {
+                        loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) {
                             return child;
                           }
@@ -205,8 +180,7 @@ class CafeCard extends StatelessWidget {
                             ),
                           );
                         },
-                        errorBuilder:
-                            (context, error, stackTrace) {
+                        errorBuilder: (context, error, stackTrace) {
                           return const CafeImagePlaceholder();
                         },
                       )
@@ -265,12 +239,7 @@ class CafeCard extends StatelessWidget {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              14,
-              12,
-              14,
-              14,
-            ),
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -337,20 +306,11 @@ class CafeCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 const Row(
                   children: [
-                    SmallTag(
-                      icon: Icons.wifi_rounded,
-                      text: 'Wi-Fi',
-                    ),
+                    SmallTag(icon: Icons.wifi_rounded, text: 'Wi-Fi'),
                     SizedBox(width: 6),
-                    SmallTag(
-                      icon: Icons.groups_outlined,
-                      text: 'مناسب',
-                    ),
+                    SmallTag(icon: Icons.groups_outlined, text: 'مناسب'),
                     SizedBox(width: 6),
-                    SmallTag(
-                      icon: Icons.coffee_rounded,
-                      text: 'قهوة',
-                    ),
+                    SmallTag(icon: Icons.coffee_rounded, text: 'قهوة'),
                   ],
                 ),
               ],
@@ -384,19 +344,12 @@ class SmallTag extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const SmallTag({
-    super.key,
-    required this.icon,
-    required this.text,
-  });
+  const SmallTag({super.key, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: const Color(0xFFF6F1EB),
         borderRadius: BorderRadius.circular(10),
@@ -404,18 +357,11 @@ class SmallTag extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: const Color(0xFF806C59),
-          ),
+          Icon(icon, size: 12, color: const Color(0xFF806C59)),
           const SizedBox(width: 3),
           Text(
             text,
-            style: const TextStyle(
-              fontSize: 9,
-              color: Color(0xFF76695E),
-            ),
+            style: const TextStyle(fontSize: 9, color: Color(0xFF76695E)),
           ),
         ],
       ),
@@ -515,11 +461,7 @@ class CategoryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  Icon(
-                    icon,
-                    size: 19,
-                    color: const Color(0xFFB09A84),
-                  ),
+                  Icon(icon, size: 19, color: const Color(0xFFB09A84)),
                 ],
               ),
             ],
@@ -540,18 +482,11 @@ class NoFilteredResults extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: const Column(
         children: [
-          Icon(
-            Icons.local_cafe_outlined,
-            size: 45,
-            color: Color(0xFFC9B9A7),
-          ),
+          Icon(Icons.local_cafe_outlined, size: 45, color: Color(0xFFC9B9A7)),
           SizedBox(height: 8),
           Text(
             'لا توجد مقاهي مناسبة',
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF756A61),
-            ),
+            style: TextStyle(fontSize: 14, color: Color(0xFF756A61)),
           ),
         ],
       ),
@@ -562,10 +497,7 @@ class NoFilteredResults extends StatelessWidget {
 class ErrorStateWidget extends StatelessWidget {
   final HomeError state;
 
-  const ErrorStateWidget({
-    super.key,
-    required this.state,
-  });
+  const ErrorStateWidget({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -593,9 +525,7 @@ class ErrorStateWidget extends StatelessWidget {
             Text(
               state.message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Color(0xFF81766D),
-              ),
+              style: const TextStyle(color: Color(0xFF81766D)),
             ),
             const SizedBox(height: 18),
             ElevatedButton(
@@ -628,10 +558,7 @@ class EmptyStateWidget extends StatelessWidget {
           const SizedBox(height: 12),
           const Text(
             'لا توجد نتائج مطابقة',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
           ElevatedButton(
@@ -649,10 +576,7 @@ class EmptyStateWidget extends StatelessWidget {
 class SearchErrorWidget extends StatelessWidget {
   final String message;
 
-  const SearchErrorWidget({
-    super.key,
-    required this.message,
-  });
+  const SearchErrorWidget({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -679,10 +603,7 @@ class SearchErrorWidget extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 11,
-              color: Color(0xFF81766D),
-            ),
+            style: const TextStyle(fontSize: 11, color: Color(0xFF81766D)),
           ),
         ],
       ),
@@ -700,11 +621,7 @@ class NoSearchResults extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: const Column(
         children: [
-          Icon(
-            Icons.search_off_rounded,
-            size: 45,
-            color: Color(0xFFC9B9A7),
-          ),
+          Icon(Icons.search_off_rounded, size: 45, color: Color(0xFFC9B9A7)),
           SizedBox(height: 10),
           Text(
             'لا توجد نتائج',
@@ -717,10 +634,7 @@ class NoSearchResults extends StatelessWidget {
           SizedBox(height: 5),
           Text(
             'جرب البحث باسم كافيه أو منطقة أخرى',
-            style: TextStyle(
-              fontSize: 11,
-              color: Color(0xFF81766D),
-            ),
+            style: TextStyle(fontSize: 11, color: Color(0xFF81766D)),
           ),
         ],
       ),

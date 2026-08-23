@@ -1,26 +1,31 @@
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/features/onboarding/presentation/view_model/onboarding_bloc.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
 import 'core/services/firebase_service.dart';
+import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseService.init();
 
-  configureDependencies();
+  await NotificationService.instance.initialize();
 
-  runApp(const MyApp());
+  await initDependencies();
+
+  runApp(
+    BlocProvider(create: (_) => sl<OnboardingBloc>(), child: const MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -36,7 +41,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     _localization.onTranslatedLanguage = _onTranslatedLanguage;
+
     _initializeLocalization();
+
     super.initState();
   }
 
@@ -56,16 +63,8 @@ class _MyAppState extends State<MyApp> {
           countryCode: 'US',
           fontFamily: 'Cairo',
         ),
-        const MapLocale(
-          'km',
-          AppLocale.KM,
-          countryCode: 'KH',
-        ),
-        const MapLocale(
-          'ja',
-          AppLocale.JA,
-          countryCode: 'JP',
-        ),
+        const MapLocale('km', AppLocale.KM, countryCode: 'KH'),
+        const MapLocale('ja', AppLocale.JA, countryCode: 'JP'),
       ],
     );
   }
@@ -81,17 +80,23 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Madinaty',
       debugShowCheckedModeBanner: false,
+
       supportedLocales: _localization.supportedLocales,
+
       localizationsDelegates: _localization.localizationsDelegates,
+
       initialRoute: AppRoutes.initial,
+
       onGenerateRoute: AppRoutes.onGenerateRoute,
+
       theme: AppTheme.lightTheme.copyWith(
         scaffoldBackgroundColor: const Color(0xFFF9F6F0),
       ),
+
       builder: (context, child) {
         return Directionality(
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-          child: child!,
+          child: child ?? const SizedBox.shrink(),
         );
       },
     );
