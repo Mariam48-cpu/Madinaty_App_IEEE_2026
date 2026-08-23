@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSourceInterface {
@@ -20,8 +21,10 @@ abstract class AuthRemoteDataSourceInterface {
     required String phoneNumber,
     required Function(String verificationId, int? resendToken) onCodeSent,
     required Function(FirebaseAuthException error) onVerificationFailed,
-    required Function(PhoneAuthCredential credential) onVerificationCompleted,
-    required Function(String verificationId) onCodeAutoRetrievalTimeout,
+    required Function(PhoneAuthCredential credential)
+        onVerificationCompleted,
+    required Function(String verificationId)
+        onCodeAutoRetrievalTimeout,
   });
 
   Future<UserModel> verifyOtpAndSignIn({
@@ -31,6 +34,9 @@ abstract class AuthRemoteDataSourceInterface {
 
   Future<void> signOut();
 
+  Future<void> deleteAccount();
+
   User? get currentUser;
+
   Future<UserModel> signInWithGoogle();
 }
