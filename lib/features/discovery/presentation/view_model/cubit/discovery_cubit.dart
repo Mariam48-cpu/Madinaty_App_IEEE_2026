@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:latlong2/latlong.dart';
@@ -16,7 +14,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
 
   DiscoveryCubit({required this.repository, required this.locationService})
     : super(DiscoveryInitial());
-
   List<CafeEntity> allCafes = [];
   bool isManualLocation = false;
   LatLng? currentLocation;
@@ -28,21 +25,41 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       return permission;
     } catch (e) {
       emit(DiscoveryError(e.toString()));
+
       return false;
     }
   }
 
   Future<void> loadNearbyCafes() async {
-    if (isManualLocation && currentLocation != null) {
-      return;
-    }
     emit(DiscoveryLoading());
 
     try {
+      if (isManualLocation && currentLocation != null) {
+        final cafes = await repository.getNearbyCafes(
+          latitude: currentLocation!.latitude,
+          longitude: currentLocation!.longitude,
+        );
+        allCafes = List<CafeEntity>.from(cafes);
+        if (allCafes.isEmpty) {
+          emit(DiscoveryEmpty());
+          return;
+        }
+
+        emit(
+          DiscoverySuccess(
+            cafes: List<CafeEntity>.from(allCafes),
+            currentLocation: currentLocation,
+          ),
+        );
+
+        return;
+      }
+
       final position = await locationService.getCurrentLocation();
 
       if (position == null) {
         emit(DiscoveryError('Unable to get your current location'));
+
         return;
       }
 
@@ -53,119 +70,138 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         longitude: position.longitude,
       );
 
-      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
+      allCafes = List<CafeEntity>.from(cafes);
 
-      allCafes = cafesWithPhotos;
-
-      if (cafesWithPhotos.isEmpty) {
+      if (allCafes.isEmpty) {
         emit(DiscoveryEmpty());
         return;
       }
 
       emit(
         DiscoverySuccess(
-          cafes: cafesWithPhotos,
+          cafes: List<CafeEntity>.from(allCafes),
           currentLocation: currentLocation,
         ),
       );
     } catch (e) {
       emit(DiscoveryError(e.toString()));
     }
+  }
+
+  Future<void> showAllCafes() async {
+    if (allCafes.isNotEmpty) {
+      emit(
+        DiscoverySuccess(
+          cafes: List<CafeEntity>.from(allCafes),
+          currentLocation: currentLocation,
+        ),
+      );
+
+      return;
+    }
+    await loadNearbyCafes();
   }
 
   Future<void> searchCafes({required String query}) async {
     final trueQuery = query.trim();
 
     if (trueQuery.isEmpty) {
-      await loadNearbyCafes();
+      await showAllCafes();
       return;
     }
 
     emit(DiscoveryLoading());
 
     try {
-      final cafes = await repository.searchCafes(query: trueQuery);
+      final cafes = await repository.searchCafes(
+        query: trueQuery,
+        latitude: currentLocation?.latitude,
+        longitude: currentLocation?.longitude,
+      );
 
-      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
-
-      allCafes = cafesWithPhotos;
-
-      if (cafesWithPhotos.isEmpty) {
+      if (cafes.isEmpty) {
         emit(DiscoveryEmpty());
         return;
       }
 
-      emit(
-        DiscoverySuccess(
-          cafes: cafesWithPhotos,
-          currentLocation: currentLocation,
-        ),
-      );
+      emit(DiscoverySuccess(cafes: cafes, currentLocation: currentLocation));
     } catch (e) {
       emit(DiscoveryError(e.toString()));
     }
   }
 
   Future<void> getCafesByCategory({required String category}) async {
-    final categories = category.trim();
+    final normalized = category.trim().toLowerCase();
 
-    if (categories.isEmpty) {
+    if (normalized.isEmpty) {
+      await showAllCafes();
       return;
+    }
+
+    if (isAllCategory(normalized)) {
+      await showAllCafes();
+      return;
+    }
+    if (allCafes.isEmpty) {
+      await loadNearbyCafes();
+
+      if (allCafes.isEmpty) {
+        return;
+      }
     }
 
     emit(DiscoveryLoading());
 
     try {
-      final cafes = await repository.getCafesByCategory(category: categories);
+      final filtered = allCafes.where((cafe) {
+        if (isOpenCategory(normalized)) {
+          return cafe.isOpen;
+        }
 
-      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
+        if (isWifiCategory(normalized)) {
+          return containsAttribute(cafe, [
+            'wifi',
+            'wi-fi',
+            'wi fi',
+            'واي فاي',
+            'واى فاى',
+            'واي فاي مجاني',
+          ]);
+        }
 
-      allCafes = cafesWithPhotos;
+        if (isQuietCategory(normalized)) {
+          return containsAttribute(cafe, [
+            'quiet',
+            'study',
+            'studying',
+            'هادئ',
+            'مذاكرة',
+            'للمذاكرة',
+            'هادي',
+          ]);
+        }
 
-      if (cafesWithPhotos.isEmpty) {
+        if (isSpecialtyCategory(normalized)) {
+          return containsAttribute(cafe, [
+            'specialty',
+            'specialty coffee',
+            'قهوة مختصة',
+            'مختصة',
+          ]);
+        }
+
+        return containsAttribute(cafe, [normalized]);
+      }).toList();
+
+      if (filtered.isEmpty) {
         emit(DiscoveryEmpty());
         return;
       }
 
-      emit(
-        DiscoverySuccess(
-          cafes: cafesWithPhotos,
-          currentLocation: currentLocation,
-        ),
-      );
+      emit(DiscoverySuccess(cafes: filtered, currentLocation: currentLocation));
     } catch (e) {
       emit(DiscoveryError(e.toString()));
     }
-  }
-
-  Future<List<CafeEntity>> addRandomPhotosToCafes(
-    List<CafeEntity> cafes,
-  ) async {
-    final photos = await repository.getRandomCafePhotos();
-
-    if (photos.isEmpty) {
-      return cafes;
-    }
-
-    final random = Random();
-
-    return cafes.map((cafe) {
-      final randomPhoto = photos[random.nextInt(photos.length)];
-
-      return CafeEntity(
-        id: cafe.id,
-        name: cafe.name,
-        location: cafe.location,
-        rating: cafe.rating,
-        photos: [randomPhoto],
-        address: cafe.address,
-        isOpen: cafe.isOpen,
-        description: cafe.description,
-        reviewsCount: cafe.reviewsCount,
-        openingHours: cafe.openingHours,
-        attributes: cafe.attributes,
-      );
-    }).toList();
   }
 
   Future<void> loadCafesByManualLocation({
@@ -176,6 +212,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
 
     try {
       isManualLocation = true;
+
       currentLocation = LatLng(latitude, longitude);
 
       final cafes = await repository.getNearbyCafes(
@@ -183,22 +220,71 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         longitude: longitude,
       );
 
-      final cafesWithPhotos = await addRandomPhotosToCafes(cafes);
-      allCafes = cafesWithPhotos;
+      allCafes = List<CafeEntity>.from(cafes);
 
-      if (cafesWithPhotos.isEmpty) {
+      if (allCafes.isEmpty) {
         emit(DiscoveryEmpty());
         return;
       }
 
       emit(
         DiscoverySuccess(
-          cafes: cafesWithPhotos,
+          cafes: List<CafeEntity>.from(allCafes),
           currentLocation: currentLocation,
         ),
       );
     } catch (e) {
       emit(DiscoveryError(e.toString()));
     }
+  }
+
+  bool isAllCategory(String category) {
+    return category == 'الكل' ||
+        category == 'all' ||
+        category == 'كل الكافيهات';
+  }
+
+  bool isOpenCategory(String category) {
+    return category == 'مفتوح الآن' ||
+        category == 'open now' ||
+        category == 'cafes open now';
+  }
+
+  bool isWifiCategory(String category) {
+    return category == 'wi-fi' ||
+        category == 'wifi' ||
+        category == 'wi fi' ||
+        category == 'واي فاي';
+  }
+
+  bool isQuietCategory(String category) {
+    return category == 'هادئ للمذاكرة' ||
+        category == 'quiet cafes for studying' ||
+        category == 'quiet' ||
+        category == 'study';
+  }
+
+  bool isSpecialtyCategory(String category) {
+    return category == 'قهوة مختصة' ||
+        category == 'specialty coffee' ||
+        category == 'specialty';
+  }
+
+  bool containsAttribute(CafeEntity cafe, List<String> keywords) {
+    final values =
+        <String>[...cafe.attributes, cafe.name, cafe.description, cafe.address]
+            .map((value) => value.toLowerCase().trim())
+            .where((value) => value.isNotEmpty)
+            .toList();
+
+    for (final value in values) {
+      for (final keyword in keywords) {
+        if (value.contains(keyword.toLowerCase())) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }

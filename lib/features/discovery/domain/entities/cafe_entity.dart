@@ -8,8 +8,6 @@ class CafeEntity {
   final List<String> photos;
   final String address;
   final bool isOpen;
-
-  // Task 9
   final String description;
   final int reviewsCount;
   final String openingHours;
@@ -23,11 +21,37 @@ class CafeEntity {
     this.photos = const [],
     this.address = '',
     this.isOpen = false,
-
-    // Task 9
     this.description = '',
     this.reviewsCount = 0,
     this.openingHours = '',
     this.attributes = const [],
   });
+
+  CafeEntity copyWith({
+    String? id,
+    String? name,
+    LatLng? location,
+    double? rating,
+    List<String>? photos,
+    String? address,
+    bool? isOpen,
+    String? description,
+    int? reviewsCount,
+    String? openingHours,
+    List<String>? attributes,
+  }) {
+    return CafeEntity(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      location: location ?? this.location,
+      rating: rating ?? this.rating,
+      photos: photos ?? this.photos,
+      address: address ?? this.address,
+      isOpen: isOpen ?? this.isOpen,
+      description: description ?? this.description,
+      reviewsCount: reviewsCount ?? this.reviewsCount,
+      openingHours: openingHours ?? this.openingHours,
+      attributes: attributes ?? this.attributes,
+    );
+  }
 }

@@ -5,10 +5,15 @@ import 'package:madinaty_app_ieee_2026/features/discovery/domain/repositories/ca
 @injectable
 class SearchCafes {
   final CafeRepositoryInterface repository;
-
   SearchCafes(this.repository);
 
-  Future<List<CafeEntity>> call({required String query}) {
-    return repository.searchCafes(query: query);
-  }
+  Future<List<CafeEntity>> call({
+    required String query,
+    double? latitude,
+    double? longitude,
+  }) => repository.searchCafes(
+        query: query,
+        latitude: latitude,
+        longitude: longitude,
+      );
 }

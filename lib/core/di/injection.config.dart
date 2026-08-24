@@ -9,6 +9,7 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart'
@@ -39,6 +40,8 @@ import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view_model/cub
     as _i1062;
 import 'package:madinaty_app_ieee_2026/features/discovery/data/data_sources/google_places_datasource.dart'
     as _i1013;
+import 'package:madinaty_app_ieee_2026/features/discovery/data/data_sources/initial_location_seeder.dart'
+    as _i628;
 import 'package:madinaty_app_ieee_2026/features/discovery/data/repositories/cafe_repository_impl.dart'
     as _i525;
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/repositories/cafe_repository_interface.dart'
@@ -58,19 +61,11 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i162.LocationService>(() => _i162.LocationService());
-    gh.factory<_i793.CafeFirestoreDataSource>(
-      () => _i793.CafeFirestoreDataSource(),
-    );
     gh.factory<_i1013.GooglePlacesDataSource>(
       () => _i1013.GooglePlacesDataSource(),
     );
     gh.lazySingleton<_i1025.BookingRepositoryInterface>(
       () => _i498.BookingRepositoryImpl(),
-    );
-    gh.factory<_i297.CafeeRepositoryInterface>(
-      () => _i920.CafeRepositoryFirebase(
-        dataSource: gh<_i793.CafeFirestoreDataSource>(),
-      ),
     );
     gh.factory<_i102.CreateBookingUseCase>(
       () => _i102.CreateBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
@@ -83,6 +78,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1025.BookingRepositoryInterface>(),
       ),
     );
+    gh.factory<_i793.CafeFirestoreDataSource>(
+      () => _i793.CafeFirestoreDataSource(
+        googlePlaces: gh<_i1013.GooglePlacesDataSource>(),
+      ),
+    );
+    gh.factory<_i628.InitialLocationSeeder>(
+      () =>
+          _i628.InitialLocationSeeder(firestore: gh<_i974.FirebaseFirestore>()),
+    );
     gh.factory<_i1020.CafeRepositoryInterface>(
       () => _i525.CafeRepositoryImpl(
         googlePlacesDataSource: gh<_i1013.GooglePlacesDataSource>(),
@@ -91,12 +95,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i473.GetCafeExperienceUseCase>(
       () => _i473.GetCafeExperienceUseCase(
-        repository: gh<_i297.CafeeRepositoryInterface>(),
+        repository: gh<_i1020.CafeRepositoryInterface>(),
       ),
     );
     gh.factory<_i297.GetCafeMenuUseCase>(
       () => _i297.GetCafeMenuUseCase(
-        repository: gh<_i297.CafeeRepositoryInterface>(),
+        repository: gh<_i1020.CafeRepositoryInterface>(),
       ),
     );
     gh.factory<_i437.BookingCubit>(
@@ -111,6 +115,11 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i616.SearchCafes>(
       () => _i616.SearchCafes(gh<_i1020.CafeRepositoryInterface>()),
+    );
+    gh.factory<_i297.CafeeRepositoryInterface>(
+      () => _i920.CafeRepositoryFirebase(
+        dataSource: gh<_i793.CafeFirestoreDataSource>(),
+      ),
     );
     gh.factory<_i708.DiscoveryCubit>(
       () => _i708.DiscoveryCubit(

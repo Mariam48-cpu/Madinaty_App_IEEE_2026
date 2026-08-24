@@ -8,12 +8,21 @@ abstract class CafeRepositoryInterface {
     required double longitude,
   });
 
-  Future<List<CafeEntity>> searchCafes({required String query});
+  Future<List<CafeEntity>> searchCafes({
+    required String query,
+    double? latitude,
+    double? longitude,
+  });
 
-  Future<List<CafeEntity>> getCafesByCategory({required String category});
+  Future<List<CafeEntity>> getCafesByCategory({
+    required String category,
+    double? latitude,
+    double? longitude,
+  });
 
   Future<List<String>> getRandomCafePhotos();
+
   Future<CafeExperienceEntity> getCafeExperience(CafeEntity cafe);
 
-  Future<List<MenuCategoryEntity>> getCafeMenu(String firebaseCafeId);
+  Future<List<MenuCategoryEntity>> getCafeMenu(String cafeId);
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_filter_chips.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_results_header.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/cafe_search_delegate.dart';
@@ -26,6 +27,7 @@ class _CategoryResultsScreenState extends State<CategoryResultsScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadCategory();
     });
@@ -34,17 +36,25 @@ class _CategoryResultsScreenState extends State<CategoryResultsScreen> {
   void loadCategory() {
     switch (widget.category) {
       case 'الكل':
-        widget.cubit.loadNearbyCafes();
+        widget.cubit.showAllCafes();
         break;
+
       case 'مفتوح الآن':
-        widget.cubit.getCafesByCategory(category: 'cafes open now');
+        widget.cubit.getCafesByCategory(category: 'مفتوح الآن');
         break;
+
+      case 'Wi-Fi':
+        widget.cubit.getCafesByCategory(category: 'Wi-Fi');
+        break;
+
       case 'هادئ للمذاكرة':
-        widget.cubit.getCafesByCategory(category: 'quiet cafes for studying');
+        widget.cubit.getCafesByCategory(category: 'هادئ للمذاكرة');
         break;
+
       case 'قهوة مختصة':
-        widget.cubit.getCafesByCategory(category: 'specialty coffee');
+        widget.cubit.getCafesByCategory(category: 'قهوة مختصة');
         break;
+
       default:
         widget.cubit.getCafesByCategory(category: widget.category);
     }
@@ -54,12 +64,19 @@ class _CategoryResultsScreenState extends State<CategoryResultsScreen> {
     switch (widget.category) {
       case 'هادئ للمذاكرة':
         return 'أماكن هادئة للمذاكرة';
+
       case 'مفتوح الآن':
         return 'أماكن مفتوحة الآن';
+
       case 'قهوة مختصة':
         return 'قهوة مختصة';
+
+      case 'Wi-Fi':
+        return 'أماكن بها Wi-Fi';
+
       case 'الكل':
         return 'كل الكافيهات';
+
       default:
         return widget.category;
     }
@@ -77,7 +94,7 @@ class _CategoryResultsScreenState extends State<CategoryResultsScreen> {
     return BlocProvider.value(
       value: widget.cubit,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF9F5F2),
+        backgroundColor: Color(0xFFF9F5F2),
         body: SafeArea(
           child: Column(
             children: [
@@ -86,13 +103,20 @@ class _CategoryResultsScreenState extends State<CategoryResultsScreen> {
                 onBack: () => Navigator.pop(context),
                 onSearch: openSearch,
               ),
-              const SizedBox(height: 8),
+
+              SizedBox(height: 8),
+
               CategoryFilterChips(
                 selectedIndex: selectedFilterIndex,
-                onSelected: (index) =>
-                    setState(() => selectedFilterIndex = index),
+                onSelected: (index) {
+                  setState(() {
+                    selectedFilterIndex = index;
+                  });
+                },
               ),
-              const SizedBox(height: 12),
+
+              SizedBox(height: 12),
+
               Expanded(
                 child: CategoryResultsContent(
                   selectedFilterIndex: selectedFilterIndex,
