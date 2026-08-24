@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -37,7 +38,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 6),
@@ -46,9 +47,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
           obscureText: widget.isPassword ? _obscureText : false,
           keyboardType: widget.keyboardType,
           validator: widget.validator,
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 14,
+          ),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+            hintStyle: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13,
+            ),
             filled: true,
             fillColor: const Color(0xFFF5F1EC),
             contentPadding: const EdgeInsets.symmetric(
@@ -61,21 +69,21 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             suffixIcon: widget.isPassword
                 ? IconButton(
-                    icon: Icon(
-                      _obscureText
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  )
+              icon: Icon(
+                _obscureText
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: AppColors.textSecondary,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+            )
                 : (widget.suffixIcon != null
-                      ? Icon(widget.suffixIcon, color: Colors.grey)
-                      : null),
+                ? Icon(widget.suffixIcon, color: AppColors.textSecondary)
+                : null),
           ),
         ),
       ],

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
-import '../../../../../core/routes/app_routes.dart';
-import '../../../../../core/localization/app_locale.dart';
+import 'package:toastification/toastification.dart';
+
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
 import '../../../domain/use_cases/google_signin_usecase.dart';
@@ -80,11 +83,11 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
       );
     } else {
       if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('كلمتا المرور غير متطابقتين'),
-            backgroundColor: Colors.red,
-          ),
+        AppToast.showToast(
+          context: context,
+          title: AppLocale.toastError.getString(context),
+          description: AppLocale.passwordMismatchError.getString(context),
+          type: ToastificationType.error,
         );
         return;
       }
@@ -104,31 +107,31 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthErrorState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-              backgroundColor: Colors.red.shade700,
-            ),
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastError.getString(context),
+            description: state.errorMessage,
+            type: ToastificationType.error,
           );
         } else if (state is AuthSuccessState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('مرحباً بك ${state.user.name ?? ""}'),
-              backgroundColor: Colors.green.shade700,
-            ),
+          final userName = state.user.name ?? '';
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastSuccess.getString(context),
+            description: '${AppLocale.welcomeUserPrefix.getString(context)} $userName',
+            type: ToastificationType.success,
           );
-          if (!isLogin) {
-            Navigator.pushReplacementNamed(context, AppRoutes.personalization);
-          } else {
-            Navigator.pushReplacementNamed(context, AppRoutes.home);
-          }
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
+          );
         }
       },
       builder: (context, state) {
         final isLoading = state is AuthLoadingState;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF9F6F0),
+          backgroundColor: AppColors.background,
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -141,7 +144,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                   child: Column(
                     children: [
                       Align(
-                        alignment: Alignment.topRight,
+                        alignment: AlignmentDirectional.topEnd,
                         child: TextButton.icon(
                           style: TextButton.styleFrom(
                             backgroundColor: const Color(0xFFEBE3D8),
@@ -156,26 +159,25 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           icon: const Icon(
                             Icons.language,
                             size: 18,
-                            color: Colors.black87,
+                            color: AppColors.textPrimary,
                           ),
                           label: Text(
                             FlutterLocalization
-                                        .instance
-                                        .currentLocale
-                                        ?.languageCode ==
-                                    'ar'
+                                .instance
+                                .currentLocale
+                                ?.languageCode ==
+                                'ar'
                                 ? 'English'
                                 : 'العربية',
                             style: const TextStyle(
-                              color: Colors.black87,
+                              color: AppColors.textPrimary,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           onPressed: () {
                             final localization = FlutterLocalization.instance;
-                            if (localization.currentLocale?.languageCode ==
-                                'ar') {
+                            if (localization.currentLocale?.languageCode == 'ar') {
                               localization.translate('en');
                             } else {
                               localization.translate('ar');
@@ -185,7 +187,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                         ),
                       ),
                       const SizedBox(height: 10),
-
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: const BoxDecoration(
@@ -194,7 +195,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                         ),
                         child: const Icon(
                           Icons.local_cafe,
-                          color: Colors.black87,
+                          color: AppColors.textPrimary,
                           size: 28,
                         ),
                       ),
@@ -207,13 +208,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         AppLocale.subtitle.getString(context),
                         style: const TextStyle(
-                          color: Colors.grey,
+                          color: AppColors.textSecondary,
                           fontSize: 13,
                         ),
                       ),
@@ -221,7 +223,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
@@ -236,19 +238,16 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () =>
-                                          setState(() => isLogin = false),
+                                      onTap: () => setState(() => isLogin = false),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 8,
                                         ),
                                         decoration: BoxDecoration(
                                           color: !isLogin
-                                              ? Colors.black
+                                              ? AppColors.textPrimary
                                               : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           AppLocale.register.getString(context),
@@ -256,7 +255,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                           style: TextStyle(
                                             color: !isLogin
                                                 ? Colors.white
-                                                : Colors.grey,
+                                                : AppColors.textSecondary,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -265,19 +264,16 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ),
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () =>
-                                          setState(() => isLogin = true),
+                                      onTap: () => setState(() => isLogin = true),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 8,
                                         ),
                                         decoration: BoxDecoration(
                                           color: isLogin
-                                              ? Colors.black
+                                              ? AppColors.textPrimary
                                               : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           AppLocale.login.getString(context),
@@ -285,7 +281,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                           style: TextStyle(
                                             color: isLogin
                                                 ? Colors.white
-                                                : Colors.grey,
+                                                : AppColors.textSecondary,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -296,23 +292,18 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               ),
                             ),
                             const SizedBox(height: 20),
-
                             if (!isLogin) ...[
                               CustomTextField(
                                 controller: _nameController,
                                 label: AppLocale.name.getString(context),
                                 hint: AppLocale.nameHint.getString(context),
                                 suffixIcon: Icons.person_outline,
-                                validator: (v) =>
-                                    (v == null || v.trim().isEmpty)
-                                    ? AppLocale.enterEmailError.getString(
-                                        context,
-                                      )
+                                validator: (v) => (v == null || v.trim().isEmpty)
+                                    ? AppLocale.enterNameError.getString(context)
                                     : null,
                               ),
                               const SizedBox(height: 14),
                             ],
-
                             CustomTextField(
                               controller: _emailOrPhoneController,
                               label: AppLocale.emailOrPhone.getString(context),
@@ -326,37 +317,30 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   : null,
                             ),
                             const SizedBox(height: 14),
-
                             CustomTextField(
                               controller: _passwordController,
                               label: AppLocale.password.getString(context),
                               hint: AppLocale.passwordHint.getString(context),
                               isPassword: true,
                               validator: (v) => (v == null || v.length < 6)
-                                  ? 'كلمة المرور يجب أن لا تقل عن 6 أحرف'
+                                  ? AppLocale.passwordMinLengthError.getString(context)
                                   : null,
                             ),
-
                             if (!isLogin) ...[
                               const SizedBox(height: 14),
                               CustomTextField(
                                 controller: _confirmPasswordController,
-                                label: AppLocale.confirmPassword.getString(
-                                  context,
-                                ),
-                                hint: AppLocale.confirmPasswordHint.getString(
-                                  context,
-                                ),
+                                label: AppLocale.confirmPassword.getString(context),
+                                hint: AppLocale.confirmPasswordHint.getString(context),
                                 isPassword: true,
                                 validator: (v) => (v == null || v.isEmpty)
-                                    ? 'يرجى تأكيد كلمة المرور'
+                                    ? AppLocale.confirmPasswordRequiredError.getString(context)
                                     : null,
                               ),
                             ],
-
                             if (isLogin)
                               Align(
-                                alignment: Alignment.centerLeft,
+                                alignment: AlignmentDirectional.centerStart,
                                 child: TextButton(
                                   onPressed: () {
                                     Navigator.push(
@@ -372,14 +356,13 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   child: Text(
                                     AppLocale.forgotPassword.getString(context),
                                     style: const TextStyle(
-                                      color: Colors.grey,
+                                      color: AppColors.textSecondary,
                                       fontSize: 12,
                                     ),
                                   ),
                                 ),
                               ),
                             const SizedBox(height: 16),
-
                             CustomAuthButton(
                               text: isLogin
                                   ? AppLocale.login.getString(context)
@@ -388,18 +371,15 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               onPressed: _submit,
                             ),
                             const SizedBox(height: 16),
-
                             Row(
                               children: [
                                 const Expanded(child: Divider()),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                   child: Text(
                                     AppLocale.or.getString(context),
                                     style: const TextStyle(
-                                      color: Colors.grey,
+                                      color: AppColors.textSecondary,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -408,15 +388,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               ],
                             ),
                             const SizedBox(height: 16),
-
                             OutlinedButton(
                               onPressed: isLoading
                                   ? null
                                   : () {
-                                      context.read<AuthCubit>().processIntent(
-                                        GoogleSignInIntent(),
-                                      );
-                                    },
+                                context.read<AuthCubit>().processIntent(
+                                  GoogleSignInIntent(),
+                                );
+                              },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 48),
                                 shape: RoundedRectangleBorder(
@@ -429,15 +408,13 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   const Icon(
                                     Icons.g_mobiledata,
                                     size: 24,
-                                    color: Colors.black87,
+                                    color: AppColors.textPrimary,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    AppLocale.continueWithGoogle.getString(
-                                      context,
-                                    ),
+                                    AppLocale.continueWithGoogle.getString(context),
                                     style: const TextStyle(
-                                      color: Colors.black87,
+                                      color: AppColors.textPrimary,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -445,16 +422,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               ),
                             ),
                             const SizedBox(height: 12),
-
                             TextButton(
-                              onPressed: () =>
-                                  setState(() => isLogin = !isLogin),
+                              onPressed: () => setState(() => isLogin = !isLogin),
                               child: Text(
                                 isLogin
                                     ? AppLocale.noAccount.getString(context)
                                     : AppLocale.haveAccount.getString(context),
                                 style: const TextStyle(
-                                  color: Colors.grey,
+                                  color: AppColors.textSecondary,
                                   fontSize: 12,
                                 ),
                               ),

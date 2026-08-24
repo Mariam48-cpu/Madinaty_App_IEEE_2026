@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../core/localization/app_locale.dart';
 import '../../domain/use_cases/google_signin_usecase.dart';
 import '../../domain/use_cases/login_usecase.dart';
 import '../../domain/use_cases/logout_usecase.dart';
@@ -30,13 +31,13 @@ class AuthCubit extends Cubit<AuthState> {
     required LogoutUseCase logoutUseCase,
     required GoogleSignInUseCase googleSignInUseCase,
   }) : _loginUseCase = loginUseCase,
-       _registerUseCase = registerUseCase,
-       _resetPasswordUseCase = resetPasswordUseCase,
-       _sendOtpUseCase = sendOtpUseCase,
-       _verifyOtpUseCase = verifyOtpUseCase,
-       _logoutUseCase = logoutUseCase,
-       _googleSignInUseCase = googleSignInUseCase,
-       super(const AuthInitialState());
+        _registerUseCase = registerUseCase,
+        _resetPasswordUseCase = resetPasswordUseCase,
+        _sendOtpUseCase = sendOtpUseCase,
+        _verifyOtpUseCase = verifyOtpUseCase,
+        _logoutUseCase = logoutUseCase,
+        _googleSignInUseCase = googleSignInUseCase,
+        super(const AuthInitialState());
 
   void processIntent(AuthIntent intent) {
     if (intent is LoginIntent) {
@@ -118,7 +119,7 @@ class AuthCubit extends Cubit<AuthState> {
     if (currentVerificationId == null) {
       emit(
         const AuthErrorState(
-          'لم يتم العثور على رمز التحقق، يرجى إعادة الإرسال',
+          AppLocale.verificationCodeNotFound,
         ),
       );
       return;

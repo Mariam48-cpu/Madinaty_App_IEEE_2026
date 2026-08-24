@@ -1,3 +1,4 @@
+import '../../../../../core/localization/app_locale.dart';
 import '../../domain/entities/user_entity.dart';
 
 abstract class AuthState {
@@ -25,10 +26,10 @@ class OtpSentState extends AuthState {
 }
 
 class ResetPasswordEmailSentState extends AuthState {
-  final String message;
+  final String messageKey;
 
   const ResetPasswordEmailSentState([
-    this.message = 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني',
+    this.messageKey = AppLocale.resetPasswordEmailSentDefault,
   ]);
 }
 

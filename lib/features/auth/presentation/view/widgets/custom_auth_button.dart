@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class CustomAuthButton extends StatelessWidget {
   final String text;
@@ -17,7 +18,7 @@ class CustomAuthButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF14120E),
+        backgroundColor: AppColors.textPrimary,
         foregroundColor: Colors.white,
         elevation: 0,
         minimumSize: const Size(double.infinity, 54),
@@ -25,21 +26,21 @@ class CustomAuthButton extends StatelessWidget {
       ),
       child: isLoading
           ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2.5,
-              ),
-            )
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(
+          color: Colors.white,
+          strokeWidth: 2.5,
+        ),
+      )
           : Text(
-              text,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-            ),
+        text,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
+      ),
     );
   }
 }
