@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
+import '../../../../../core/routes/app_routes.dart';
 import '../../../../../core/localization/app_locale.dart';
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
@@ -116,10 +117,11 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               backgroundColor: Colors.green.shade700,
             ),
           );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
-          );
+          if (!isLogin) {
+            Navigator.pushReplacementNamed(context, AppRoutes.personalization);
+          } else {
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
+          }
         }
       },
       builder: (context, state) {
@@ -158,10 +160,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           ),
                           label: Text(
                             FlutterLocalization
-                                .instance
-                                .currentLocale
-                                ?.languageCode ==
-                                'ar'
+                                        .instance
+                                        .currentLocale
+                                        ?.languageCode ==
+                                    'ar'
                                 ? 'English'
                                 : 'العربية',
                             style: const TextStyle(
@@ -302,10 +304,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 hint: AppLocale.nameHint.getString(context),
                                 suffixIcon: Icons.person_outline,
                                 validator: (v) =>
-                                (v == null || v.trim().isEmpty)
+                                    (v == null || v.trim().isEmpty)
                                     ? AppLocale.enterEmailError.getString(
-                                  context,
-                                )
+                                        context,
+                                      )
                                     : null,
                               ),
                               const SizedBox(height: 14),
@@ -411,10 +413,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               onPressed: isLoading
                                   ? null
                                   : () {
-                                context.read<AuthCubit>().processIntent(
-                                  GoogleSignInIntent(),
-                                );
-                              },
+                                      context.read<AuthCubit>().processIntent(
+                                        GoogleSignInIntent(),
+                                      );
+                                    },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 48),
                                 shape: RoundedRectangleBorder(

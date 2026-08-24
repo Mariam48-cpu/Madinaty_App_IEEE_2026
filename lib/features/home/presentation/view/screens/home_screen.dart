@@ -3,8 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../profile/presentation/view/screens/profile_screen.dart';
-import '../../../../profile/presentation/view_model/profile_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view/screens/favorites_screen.dart';
+import '../../../../../features/favorites/presentation/view_model/cubit/favorites_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/profile_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view_model/profile_cubit.dart';
 
 import '../../view_model/home_cubit.dart';
 import '../../view_model/home_state.dart';
@@ -94,7 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -111,65 +113,55 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (_selectedNavIndex) {
       case 0:
         return _buildHomePage();
-
       case 1:
-        return _buildPlaceholderPage(
-          icon: Icons.explore_outlined,
-          title: 'استكشف',
-          subtitle: 'استكشف المقاهي والأماكن القريبة منك',
-        );
-
+        return const LocationPermissionGate();
       case 2:
-        return _buildPlaceholderPage(
-          icon: Icons.favorite_border_rounded,
-          title: 'المفضلة',
-          subtitle: 'هنا هتظهر الأماكن والمقاهي المفضلة لديك',
-        );
-
+        return const FavoritesScreen();
       case 3:
         return _buildProfilePage();
-
       default:
         return _buildHomePage();
     }
   }
 
   Widget _buildHomePage() {
-    return BlocBuilder<HomeCubit, HomeState>(
-      builder: (context, state) {
-        if (state is HomeLoading || state is HomeInitial) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF8B6B4A)),
-          );
-        }
+    return BlocProvider<FavoritesCubit>(
+      create: (_) => sl<FavoritesCubit>()..initFavoritesWatcher(),
+      child: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          if (state is HomeLoading || state is HomeInitial) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF8B6B4A)),
+            );
+          }
 
-        if (state is HomeError) {
-          return ErrorStateWidget(state: state);
-        }
+          if (state is HomeError) {
+            return ErrorStateWidget(state: state);
+          }
 
-        if (state is HomeEmpty) {
-          return const EmptyStateWidget();
-        }
+          if (state is HomeEmpty) {
+            return const EmptyStateWidget();
+          }
 
-        if (state is HomeLoaded) {
-          return RefreshIndicator(
-            color: const Color(0xFF8B6B4A),
-            onRefresh: () async {
-              _searchController.clear();
+          if (state is HomeLoaded) {
+            return RefreshIndicator(
+              color: const Color(0xFF8B6B4A),
+              onRefresh: () async {
+                _searchController.clear();
 
-              await context.read<HomeCubit>().fetchHomeData();
+                await context.read<HomeCubit>().fetchHomeData();
 
-              await _loadUserName();
-            },
-            child: _buildHomeContent(context, state),
-          );
-        }
+                await _loadUserName();
+              },
+              child: _buildHomeContent(context, state),
+            );
+          }
 
-        return const SizedBox.shrink();
-      },
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
-
   Widget _buildProfilePage() {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -180,47 +172,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return BlocProvider(
       create: (_) => sl<ProfileCubit>()..fetchUserProfile(user.uid),
       child: ProfileScreen(uid: user.uid),
-    );
-  }
-
-  Widget _buildPlaceholderPage({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF0D9BC),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 40, color: const Color(0xFF8B6545)),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF3F3934),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF81776E)),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -237,23 +188,18 @@ class _HomeScreenState extends State<HomeScreen> {
               BlocProvider(
                 create: (_) {
                   final cubit = sl<NotificationCubit>();
-
                   final user = FirebaseAuth.instance.currentUser;
-
                   if (user != null) {
                     cubit.watchNotifications(user.uid);
                   }
-
                   return cubit;
                 },
                 child: BlocBuilder<NotificationCubit, NotificationState>(
                   builder: (context, notificationState) {
                     int unreadCount = 0;
-
                     if (notificationState is NotificationLoaded) {
                       unreadCount = notificationState.unreadCount;
                     }
-
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -275,8 +221,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () {
                               final user = FirebaseAuth.instance.currentUser;
 
-                              if (user == null) return;
-
+                              if (user == null) {
+                                return;
+                              }
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -295,6 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                         ),
+
                         if (unreadCount > 0)
                           Positioned(
                             top: -5,
@@ -377,7 +325,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           const SizedBox(height: 18),
-
           Container(
             height: 52,
             decoration: BoxDecoration(
@@ -425,7 +372,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           if (state.isSearchActive) ...[
             const SizedBox(height: 18),
 
@@ -458,7 +404,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: CafeCard(cafe: cafe),
                 ),
               ),
-          ] else ...[
+          ]
+          else ...[
             const SizedBox(height: 16),
 
             if (state.activeMoodOrOccasion != null) MoodCard(state: state),
@@ -530,18 +477,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 activeIcon: Icons.home_rounded,
                 label: 'الرئيسية',
               ),
+
               _buildNavItem(
                 index: 1,
                 icon: Icons.explore_outlined,
                 activeIcon: Icons.explore,
                 label: 'استكشف',
               ),
+
               _buildNavItem(
                 index: 2,
                 icon: Icons.favorite_border_rounded,
                 activeIcon: Icons.favorite_rounded,
                 label: 'المفضلة',
               ),
+
               _buildNavItem(
                 index: 3,
                 icon: Icons.person_outline_rounded,

@@ -14,13 +14,11 @@ import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await FlutterLocalization.instance.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseService.init();
-
   await NotificationService.instance.initialize();
-
   await initDependencies();
 
   runApp(
@@ -40,14 +38,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    super.initState();
+
     _localization.onTranslatedLanguage = _onTranslatedLanguage;
 
     _initializeLocalization();
-
-    super.initState();
   }
 
-  void _initializeLocalization() {
+  Future<void> _initializeLocalization() async {
     _localization.init(
       initLanguageCode: 'ar',
       mapLocales: [
@@ -85,7 +83,7 @@ class _MyAppState extends State<MyApp> {
 
       localizationsDelegates: _localization.localizationsDelegates,
 
-      initialRoute: AppRoutes.initial,
+      initialRoute: AppRoutes.splash,
 
       onGenerateRoute: AppRoutes.onGenerateRoute,
 
