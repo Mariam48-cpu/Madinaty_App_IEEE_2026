@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:toastification/toastification.dart';
 import '../../../../../core/localization/app_locale.dart';
 import '../../view_model/auth_cubit.dart';
 import '../../view_model/auth_intent.dart';
@@ -37,18 +40,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthErrorState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-              backgroundColor: Colors.red.shade700,
-            ),
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastError.getString(context),
+            description: state.errorMessage,
+            type: ToastificationType.error,
           );
         } else if (state is ResetPasswordEmailSentState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم إرسال رابط إعادة التعيين بنجاح'),
-              backgroundColor: Colors.green,
-            ),
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastSuccess.getString(context),
+            description: AppLocale.resetLinkSentSuccess.getString(context),
+            type: ToastificationType.success,
           );
           Navigator.pop(context);
         }
@@ -57,7 +60,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         final isLoading = state is AuthLoadingState;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF9F6F0),
+          backgroundColor: AppColors.background,
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -70,7 +73,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(24.0),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
@@ -85,37 +88,34 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                           child: const Icon(
                             Icons.rotate_left_rounded,
-                            color: Colors.black87,
+                            color: AppColors.textPrimary,
                             size: 28,
                           ),
                         ),
                         const SizedBox(height: 16),
-
                         Text(
                           AppLocale.forgotPassword.getString(context),
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
-
                         Text(
                           AppLocale.forgotPasswordDesc.getString(context),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            color: Colors.grey,
+                            color: AppColors.textSecondary,
                             fontSize: 12,
                             height: 1.4,
                           ),
                         ),
                         const SizedBox(height: 24),
-
                         CustomTextField(
                           controller: _emailController,
                           label: AppLocale.emailOrPhone.getString(context),
-                          hint: 'example@domain.com',
+                          hint: AppLocale.emailHint.getString(context),
                           keyboardType: TextInputType.emailAddress,
                           suffixIcon: Icons.email_outlined,
                           validator: (value) {
@@ -128,20 +128,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           },
                         ),
                         const SizedBox(height: 24),
-
                         CustomAuthButton(
                           text: AppLocale.sendResetLink.getString(context),
                           isLoading: isLoading,
                           onPressed: _onResetPressed,
                         ),
                         const SizedBox(height: 16),
-
                         TextButton(
                           onPressed: () => Navigator.pop(context),
                           child: Text(
                             AppLocale.backToLogin.getString(context),
                             style: const TextStyle(
-                              color: Colors.grey,
+                              color: AppColors.textSecondary,
                               fontSize: 12,
                             ),
                           ),

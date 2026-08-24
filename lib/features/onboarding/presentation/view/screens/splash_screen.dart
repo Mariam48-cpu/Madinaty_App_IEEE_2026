@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import '../../../domain/use_cases/is_onboarding_seen.dart';
 import '../../../../auth/presentation/view/screens/auth_screen.dart';
 import 'onboarding_screen.dart';
@@ -69,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (currentUser != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const PersonalizationScreen()),
+        MaterialPageRoute(builder: (_) =>  PersonalizationScreen(userLocation: context.read<DiscoveryCubit>().currentLocation,)),
       );
     } else {
       Navigator.pushReplacement(

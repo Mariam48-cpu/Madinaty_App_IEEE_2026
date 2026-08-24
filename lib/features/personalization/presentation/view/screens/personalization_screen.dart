@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../../../core/constants/app_assets.dart';
@@ -24,11 +25,13 @@ import '../../widgets/personalization_grid_card.dart';
 class PersonalizationScreen extends StatelessWidget {
   final VoidCallback? onSaved;
   final int initialStep;
+  final LatLng? userLocation;
 
   const PersonalizationScreen({
     super.key,
     this.onSaved,
     this.initialStep = 0,
+    this.userLocation,
   });
 
   @override

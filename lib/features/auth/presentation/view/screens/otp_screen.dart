@@ -1,6 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
+import 'package:toastification/toastification.dart';
+
 import '../../view_model/auth_cubit.dart';
 import '../../view_model/auth_intent.dart';
 import '../../view_model/auth_state.dart';
@@ -19,11 +26,11 @@ class _OTPScreenState extends State<OTPScreen> {
   static const int _otpLength = 6;
   final List<TextEditingController> _controllers = List.generate(
     _otpLength,
-    (_) => TextEditingController(),
+        (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(
     _otpLength,
-    (_) => FocusNode(),
+        (_) => FocusNode(),
   );
 
   int _resendCountdown = 30;
@@ -65,11 +72,11 @@ class _OTPScreenState extends State<OTPScreen> {
     if (_otpCode.length == _otpLength) {
       context.read<AuthCubit>().processIntent(VerifyOtpIntent(_otpCode));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('يرجى إدخال الرمز كاملاً ($_otpLength أرقام)'),
-          backgroundColor: Colors.orange.shade800,
-        ),
+      AppToast.showToast(
+        context: context,
+        title: AppLocale.toastError.getString(context),
+        description: AppLocale.enterCompleteOtpError.getString(context),
+        type: ToastificationType.warning,
       );
     }
   }
@@ -88,32 +95,36 @@ class _OTPScreenState extends State<OTPScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthErrorState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-              backgroundColor: Colors.red.shade700,
-            ),
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastError.getString(context),
+            description: state.errorMessage,
+            type: ToastificationType.error,
           );
         } else if (state is AuthSuccessState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('مرحباً بك ${state.user.name ?? ""}'),
-              backgroundColor: Colors.green.shade700,
-            ),
+          final userName = state.user.name ?? '';
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastSuccess.getString(context),
+            description: '${AppLocale.welcomeUserPrefix.getString(context)} $userName',
+            type: ToastificationType.success,
           );
-          // TODO: Navigate to Home Screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
+          );
         }
       },
       builder: (context, state) {
         final isLoading = state is AuthLoadingState;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF9F6F0),
+          backgroundColor: AppColors.background,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -132,26 +143,30 @@ class _OTPScreenState extends State<OTPScreen> {
                     child: const Icon(
                       Icons.chat_bubble_outline,
                       size: 32,
-                      color: Colors.black87,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  const Text(
-                    'تأكيد رقم الموبايل',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocale.verifyPhoneTitle.getString(context),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 6),
-
                   Text(
                     widget.phoneNumber != null && widget.phoneNumber!.isNotEmpty
-                        ? 'أدخل الكود المرسل إلى ${widget.phoneNumber}'
-                        : 'أدخل الكود المرسل إلى رقمك.',
+                        ? '${AppLocale.otpSentToPhonePrefix.getString(context)} ${widget.phoneNumber}'
+                        : AppLocale.otpSentToDefault.getString(context),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: 32),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(_otpLength, (index) {
@@ -172,6 +187,7 @@ class _OTPScreenState extends State<OTPScreen> {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                           decoration: const InputDecoration(
                             counterText: '',
@@ -192,29 +208,29 @@ class _OTPScreenState extends State<OTPScreen> {
                     }),
                   ),
                   const SizedBox(height: 20),
-
                   if (_resendCountdown > 0)
                     Text(
-                      'إعادة إرسال الكود خلال 00:${_resendCountdown.toString().padLeft(2, '0')}',
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      '${AppLocale.resendOtpInPrefix.getString(context)} 00:${_resendCountdown.toString().padLeft(2, '0')}',
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
                     )
                   else
                     TextButton(
                       onPressed: isLoading ? null : _onResendOtp,
-                      child: const Text(
-                        'إعادة إرسال الكود',
-                        style: TextStyle(
-                          color: Colors.black87,
+                      child: Text(
+                        AppLocale.resendOtpButton.getString(context),
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
                       ),
                     ),
-
                   const Spacer(),
-
                   CustomAuthButton(
-                    text: 'تأكيد',
+                    text: AppLocale.confirmButton.getString(context),
                     isLoading: isLoading,
                     onPressed: _onVerifyPressed,
                   ),

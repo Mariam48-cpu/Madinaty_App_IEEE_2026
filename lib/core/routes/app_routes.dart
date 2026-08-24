@@ -5,6 +5,7 @@ import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/digital_pass_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
 
@@ -52,7 +53,7 @@ abstract class AppRoutes {
 
       case personalization:
         return MaterialPageRoute(
-          builder: (_) => const PersonalizationScreen(),
+          builder: (context) => PersonalizationScreen(userLocation: context.read<DiscoveryCubit>().currentLocation,),
           settings: settings,
         );
 
