@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/cafe_details_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/product_datails_screen.dart';
+
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
+
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/entities/favorite_item_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view_model/cubit/favorites_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view_model/cubit/favorites_state.dart';
- 
- 
+
 import '../widgets/favorite_place_card.dart';
 import '../widgets/favorite_product_card.dart';
 import '../widgets/favorites_empty_view.dart';
@@ -23,8 +26,8 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<FavoritesCubit>()..initFavoritesWatcher(),
+    return BlocProvider<FavoritesCubit>(
+      create: (_) => sl<FavoritesCubit>()..initFavoritesWatcher(),
       child: const _FavoritesScreenContent(),
     );
   }
@@ -42,15 +45,25 @@ class _FavoritesScreenContent extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // --- Top App Bar ---
+            // ==================================================
+            // APP BAR
+            // ==================================================
+
             _buildAppBar(context),
 
-            // --- Tabs Section ---
+            // ==================================================
+            // TABS
+            // ==================================================
+
             BlocBuilder<FavoritesCubit, FavoritesState>(
-              buildWhen: (previous, current) =>
-                  previous is! FavoritesLoaded ||
-                  current is! FavoritesLoaded ||
-                  (previous).selectedTab != (current).selectedTab,
+              buildWhen: (previous, current) {
+                if (previous is FavoritesLoaded &&
+                    current is FavoritesLoaded) {
+                  return previous.selectedTab != current.selectedTab;
+                }
+
+                return previous.runtimeType != current.runtimeType;
+              },
               builder: (context, state) {
                 final selectedTab = state is FavoritesLoaded
                     ? state.selectedTab
@@ -63,10 +76,17 @@ class _FavoritesScreenContent extends StatelessWidget {
               },
             ),
 
-            // --- Main Content List ---
+            // ==================================================
+            // CONTENT
+            // ==================================================
+
             Expanded(
               child: BlocBuilder<FavoritesCubit, FavoritesState>(
                 builder: (context, state) {
+                  // --------------------------------------------------
+                  // LOADING
+                  // --------------------------------------------------
+
                   if (state is FavoritesLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
@@ -74,6 +94,10 @@ class _FavoritesScreenContent extends StatelessWidget {
                       ),
                     );
                   }
+
+                  // --------------------------------------------------
+                  // ERROR
+                  // --------------------------------------------------
 
                   if (state is FavoritesError) {
                     return Center(
@@ -87,7 +111,9 @@ class _FavoritesScreenContent extends StatelessWidget {
                               size: 48,
                               color: Colors.redAccent,
                             ),
+
                             const SizedBox(height: 12),
+
                             Text(
                               state.message,
                               textAlign: TextAlign.center,
@@ -96,7 +122,9 @@ class _FavoritesScreenContent extends StatelessWidget {
                                 color: Color(0xFF7D726D),
                               ),
                             ),
+
                             const SizedBox(height: 16),
+
                             ElevatedButton(
                               onPressed: cubit.initFavoritesWatcher,
                               style: ElevatedButton.styleFrom(
@@ -114,12 +142,24 @@ class _FavoritesScreenContent extends StatelessWidget {
                     );
                   }
 
+                  // --------------------------------------------------
+                  // LOADED
+                  // --------------------------------------------------
+
                   if (state is FavoritesLoaded) {
                     final items = state.currentTabItems;
+
+                    // --------------------------------------------------
+                    // EMPTY
+                    // --------------------------------------------------
 
                     if (items.isEmpty) {
                       return const FavoritesEmptyView();
                     }
+
+                    // --------------------------------------------------
+                    // FAVORITES LIST
+                    // --------------------------------------------------
 
                     return ListView.separated(
                       padding: const EdgeInsets.symmetric(
@@ -128,26 +168,54 @@ class _FavoritesScreenContent extends StatelessWidget {
                       ),
                       physics: const BouncingScrollPhysics(),
                       itemCount: items.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 16),
+                      separatorBuilder: (_, __) {
+                        return const SizedBox(height: 16);
+                      },
                       itemBuilder: (context, index) {
                         final item = items[index];
+
+                        // --------------------------------------------------
+                        // CAFE FAVORITE
+                        // --------------------------------------------------
 
                         if (item.isCafe) {
                           return FavoritePlaceCard(
                             item: item,
-                            onFavoriteToggle: () => cubit.toggleFavorite(item),
-                            onTap: () => _navigateToCafeDetails(context, item),
-                          );
-                        } else {
-                          return FavoriteProductCard(
-                            item: item,
-                            onFavoriteToggle: () => cubit.toggleFavorite(item),
-                            onTap: () => _navigateToProductDetails(context, item),
+                            onFavoriteToggle: () {
+                              cubit.toggleFavorite(item);
+                            },
+                            onTap: () {
+                              _navigateToCafeDetails(
+                                context,
+                                item,
+                              );
+                            },
                           );
                         }
+
+                        // --------------------------------------------------
+                        // PRODUCT FAVORITE
+                        // --------------------------------------------------
+
+                        return FavoriteProductCard(
+                          item: item,
+                          onFavoriteToggle: () {
+                            cubit.toggleFavorite(item);
+                          },
+                          onTap: () {
+                            _navigateToProductDetails(
+                              context,
+                              item,
+                            );
+                          },
+                        );
                       },
                     );
                   }
+
+                  // --------------------------------------------------
+                  // INITIAL
+                  // --------------------------------------------------
 
                   return const SizedBox.shrink();
                 },
@@ -159,13 +227,23 @@ class _FavoritesScreenContent extends StatelessWidget {
     );
   }
 
+  // ==================================================
+  // APP BAR
+  // ==================================================
+
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 10.0,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Notification Icon
+          // --------------------------------------------------
+          // NOTIFICATION
+          // --------------------------------------------------
+
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -184,11 +262,16 @@ class _FavoritesScreenContent extends StatelessWidget {
                 color: Color(0xFF2D2521),
                 size: 22,
               ),
-              onPressed: () {},
+              onPressed: () {
+                // TODO: Navigate to notifications screen
+              },
             ),
           ),
 
-          // Title
+          // --------------------------------------------------
+          // TITLE
+          // --------------------------------------------------
+
           Text(
             AppLocale.navMyLists.getString(context),
             style: const TextStyle(
@@ -198,7 +281,10 @@ class _FavoritesScreenContent extends StatelessWidget {
             ),
           ),
 
-          // Location Icon
+          // --------------------------------------------------
+          // LOCATION
+          // --------------------------------------------------
+
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -217,7 +303,9 @@ class _FavoritesScreenContent extends StatelessWidget {
                 color: Color(0xFF2D2521),
                 size: 22,
               ),
-              onPressed: () {},
+              onPressed: () {
+                // TODO: Location action
+              },
             ),
           ),
         ],
@@ -225,11 +313,21 @@ class _FavoritesScreenContent extends StatelessWidget {
     );
   }
 
-  void _navigateToCafeDetails(BuildContext context, FavoriteItemEntity item) {
+  // ==================================================
+  // CAFE DETAILS
+  // ==================================================
+
+  void _navigateToCafeDetails(
+    BuildContext context,
+    FavoriteItemEntity item,
+  ) {
     final cafe = CafeEntity(
       id: item.targetId,
       name: item.title,
-      location: LatLng(item.latitude ?? 0.0, item.longitude ?? 0.0),
+      location: LatLng(
+        item.latitude ?? 0.0,
+        item.longitude ?? 0.0,
+      ),
       rating: item.rating ?? 0.0,
       photos: item.imageUrl != null && item.imageUrl!.isNotEmpty
           ? [item.imageUrl!]
@@ -243,12 +341,21 @@ class _FavoritesScreenContent extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CafeDetailsScreen(cafe: cafe),
+        builder: (_) => CafeDetailsScreen(
+          cafe: cafe,
+        ),
       ),
     );
   }
 
-  void _navigateToProductDetails(BuildContext context, FavoriteItemEntity item) {
+  // ==================================================
+  // PRODUCT DETAILS
+  // ==================================================
+
+  void _navigateToProductDetails(
+    BuildContext context,
+    FavoriteItemEntity item,
+  ) {
     final product = ProductEntity(
       id: item.targetId,
       cafeId: item.cafeId ?? '',
@@ -262,7 +369,9 @@ class _FavoritesScreenContent extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ProductDetailsScreen(product: product),
+        builder: (_) => ProductDetailsScreen(
+          product: product,
+        ),
       ),
     );
   }

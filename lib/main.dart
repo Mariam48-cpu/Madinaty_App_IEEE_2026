@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/features/onboarding/presentation/view_model/onboarding_bloc.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
@@ -15,15 +14,11 @@ import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await FlutterLocalization.instance.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseService.init();
-
   await NotificationService.instance.initialize();
-
-  configureDependencies();
-
   await initDependencies();
 
   runApp(
@@ -43,14 +38,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    super.initState();
+
     _localization.onTranslatedLanguage = _onTranslatedLanguage;
 
     _initializeLocalization();
-
-    super.initState();
   }
 
-  void _initializeLocalization() {
+  Future<void> _initializeLocalization() async {
     _localization.init(
       initLanguageCode: 'ar',
       mapLocales: [
@@ -88,7 +83,7 @@ class _MyAppState extends State<MyApp> {
 
       localizationsDelegates: _localization.localizationsDelegates,
 
-      initialRoute: AppRoutes.initial,
+      initialRoute: AppRoutes.splash,
 
       onGenerateRoute: AppRoutes.onGenerateRoute,
 

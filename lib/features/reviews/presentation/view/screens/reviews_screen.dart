@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
 import 'package:toastification/toastification.dart';
@@ -26,7 +26,7 @@ class ReviewsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<ReviewsCubit>()..initReviewsWatcher(cafeId),
+      create: (_) => sl<ReviewsCubit>()..initReviewsWatcher(cafeId),
       child: _ReviewsScreenContent(cafeId: cafeId, cafeName: cafeName),
     );
   }

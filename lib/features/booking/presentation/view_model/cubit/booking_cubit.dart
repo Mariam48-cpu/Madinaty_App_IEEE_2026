@@ -5,6 +5,7 @@ import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_
 import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/create_booking_usecase.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/get_booking_usecase.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/update_booking_status_usecase.dart';
+
 import 'booking_state.dart';
 
 @injectable
@@ -28,25 +29,35 @@ class BookingCubit extends Cubit<BookingState> {
 
   String? bookingId;
 
+  // =========================================================
+  // Booking Data
+  // =========================================================
+
   void setCafeId(String id) {
     cafeId = id;
     emit(BookingInitial());
   }
+
   void selectDate(DateTime selectedDate) {
-    date = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    date = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
 
     emit(BookingInitial());
   }
+
   void selectTime(String selectedTime) {
     time = selectedTime;
 
     emit(BookingInitial());
   }
+
   void incrementGuests() {
     if (guests >= 10) return;
 
     guests++;
-
     emit(BookingInitial());
   }
 
@@ -54,7 +65,6 @@ class BookingCubit extends Cubit<BookingState> {
     if (guests <= 1) return;
 
     guests--;
-
     emit(BookingInitial());
   }
 
@@ -67,8 +77,13 @@ class BookingCubit extends Cubit<BookingState> {
   void selectSeatingPreference(String preference) {
     seatingPreference = preference;
 
-    emit(BookingInitial());
+    // No emit here because createBooking()
+    // is called immediately after selecting the table.
   }
+
+  // =========================================================
+  // Validation
+  // =========================================================
 
   bool validateDateTime() {
     return date != null && time != null && guests > 0;
@@ -76,23 +91,39 @@ class BookingCubit extends Cubit<BookingState> {
 
   bool validateBooking() {
     return cafeId != null &&
+        cafeId!.isNotEmpty &&
         date != null &&
         time != null &&
+        time!.isNotEmpty &&
         guests > 0 &&
         occasion != null &&
-        seatingPreference != null;
+        occasion!.isNotEmpty &&
+        seatingPreference != null &&
+        seatingPreference!.isNotEmpty;
   }
+
+  // =========================================================
+  // Create Booking
+  // =========================================================
 
   Future<void> createBooking() async {
     if (!validateBooking()) {
-      emit(BookingFailure('من فضلك كملي كل بيانات الحجز'));
+      emit(
+        BookingFailure(
+          'من فضلك كملي كل بيانات الحجز',
+        ),
+      );
       return;
     }
 
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      emit(BookingFailure('يجب تسجيل الدخول أولاً لإتمام الحجز'));
+      emit(
+        BookingFailure(
+          'يجب تسجيل الدخول أولاً لإتمام الحجز',
+        ),
+      );
       return;
     }
 
@@ -114,21 +145,45 @@ class BookingCubit extends Cubit<BookingState> {
 
       bookingId = await createBookingUseCase(booking);
 
-      emit(BookingSuccess(bookingId!));
+      emit(
+        BookingSuccess(bookingId!),
+      );
     } catch (e) {
-      emit(BookingFailure(e.toString().replaceFirst('Exception: ', '')));
+      emit(
+        BookingFailure(
+          e.toString().replaceFirst(
+            'Exception: ',
+            '',
+          ),
+        ),
+      );
     }
   }
+
+  // =========================================================
+  // Get Booking
+  // =========================================================
 
   Future<BookingEntity?> getBooking(String id) async {
     try {
       return await getBookingUseCase(id);
     } catch (e) {
-      emit(BookingFailure(e.toString().replaceFirst('Exception: ', '')));
+      emit(
+        BookingFailure(
+          e.toString().replaceFirst(
+            'Exception: ',
+            '',
+          ),
+        ),
+      );
 
       return null;
     }
   }
+
+  // =========================================================
+  // Update Booking Status
+  // =========================================================
 
   Future<void> updateBookingStatus({
     required String id,
@@ -137,11 +192,23 @@ class BookingCubit extends Cubit<BookingState> {
     emit(BookingLoading());
 
     try {
-      await updateBookingStatusUseCase(bookingId: id, status: status);
+      await updateBookingStatusUseCase(
+        bookingId: id,
+        status: status,
+      );
 
-      emit(BookingSuccess(id));
+      emit(
+        BookingSuccess(id),
+      );
     } catch (e) {
-      emit(BookingFailure(e.toString().replaceFirst('Exception: ', '')));
+      emit(
+        BookingFailure(
+          e.toString().replaceFirst(
+            'Exception: ',
+            '',
+          ),
+        ),
+      );
     }
   }
 }

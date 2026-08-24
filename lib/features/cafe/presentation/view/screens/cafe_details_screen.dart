@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
-import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/book_table_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/booking_date_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view_model/cubit/booking_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_bottom_buttons.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_features.dart';
@@ -45,7 +43,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
   }
 
   Future<void> _checkFavorite() async {
-    final isFav = await getIt<IsFavoriteUseCase>()(
+    final isFav = await sl<IsFavoriteUseCase>()(
       targetId: widget.cafe.id,
       type: FavoriteTargetType.cafe,
     );
@@ -56,7 +54,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
 
   Future<void> _toggleFavorite(CafeEntity cafe) async {
     final item = FavoriteItemEntity.fromCafe(cafe);
-    await getIt<ToggleFavoriteUseCase>()(item);
+    await sl<ToggleFavoriteUseCase>()(item);
     if (mounted) {
       setState(() => _isFavorite = !_isFavorite);
     }
@@ -65,7 +63,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<CafeCubit>()..getCafeExperience(widget.cafe),
+      create: (_) => sl<CafeCubit>()..getCafeExperience(widget.cafe),
       child: Scaffold(
         backgroundColor: Color(0xFFFFF9F6),
         body: BlocBuilder<CafeCubit, CafeState>(
@@ -161,14 +159,14 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                               24,
                                             ),
                                             boxShadow: [
-                                               BoxShadow(
-                                                 color: Colors.black.withValues(
-                                                   alpha: 0.08,
-                                                 ),
-                                                 blurRadius: 24,
-                                                 spreadRadius: 2,
-                                                 offset: const Offset(0, 10),
-                                               ),
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.08,
+                                                ),
+                                                blurRadius: 24,
+                                                spreadRadius: 2,
+                                                offset: Offset(0, 10),
+                                              ),
                                             ],
                                           ),
                                           child: CafeMainCard(
@@ -370,39 +368,14 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                   ),
 
                   CafeBottomButtons(
-                    onCall: () {
-                      // Pre-Order entry point: Opens PreOrderScreen with booking data
-                      final testBooking = BookingEntity(
-                        id: 'test_booking_temp',
-                        userId: FirebaseAuth.instance.currentUser?.uid ?? 'test_user',
-                        cafeId: cafe.id,
-                        date: DateTime.now().add(const Duration(days: 1)),
-                        time: '19:30',
-                        guests: 2,
-                        occasion: 'جلسة عمل',
-                        seatingPreference: 'ركن هادئ',
-                        status: BookingStatus.pending,
-                        createdAt: DateTime.now(),
-                      );
-
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.preOrder,
-                        arguments: {
-                          'booking': testBooking,
-                          'cafeId': cafe.id,
-                          'cafeName': cafe.name,
-                          'cafe': cafe,
-                        },
-                      );
-                    },
+                    onCall: () {},
                     onDirections: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => BlocProvider(
                             create: (_) =>
-                                getIt<BookingCubit>()..setCafeId(cafe.id),
+                                sl<BookingCubit>()..setCafeId(cafe.id),
                             child: BookTableScreen(cafe: cafe),
                           ),
                         ),

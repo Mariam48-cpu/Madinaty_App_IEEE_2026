@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../view_model/home_cubit.dart';
 import '../../view_model/home_state.dart';
+import '../../../../favorites/domain/entities/favorite_item_entity.dart';
+import '../../../../favorites/presentation/view_model/cubit/favorites_cubit.dart';
+import '../../../../favorites/presentation/view_model/cubit/favorites_state.dart';
 
 class MoodCard extends StatelessWidget {
   final HomeLoaded state;
@@ -138,186 +141,246 @@ class CafeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final String imageUrl = cafe.imageUrl.toString().trim();
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE9E1D8)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              SizedBox(
-                height: 175,
-                width: double.infinity,
-                child: imageUrl.isNotEmpty
-                    ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
+    return BlocBuilder<FavoritesCubit, FavoritesState>(
+      buildWhen: (previous, current) {
+        if (previous is FavoritesLoaded && current is FavoritesLoaded) {
+          return previous.favoriteIds != current.favoriteIds;
+        }
 
-                          return Container(
-                            color: const Color(0xFFF0ECE7),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Color(0xFF8B6B4A),
-                              ),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return const CafeImagePlaceholder();
-                        },
-                      )
-                    : const CafeImagePlaceholder(),
+        return previous.runtimeType != current.runtimeType;
+      },
+      builder: (context, favoriteState) {
+        bool isFavorite = false;
+
+        if (favoriteState is FavoritesLoaded) {
+          isFavorite = favoriteState.favoriteIds.contains(
+            FavoriteItemEntity.generateId(
+              FavoriteTargetType.cafe,
+              cafe.id.toString(),
+            ),
+          );
+        }
+
+        return Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFE9E1D8)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              Positioned(
-                top: 10,
-                left: 10,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.92),
-                    shape: BoxShape.circle,
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                children: [
+                  SizedBox(
+                    height: 175,
+                    width: double.infinity,
+                    child: imageUrl.isNotEmpty
+                        ? Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+
+                              return Container(
+                                color: const Color(0xFFF0ECE7),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Color(0xFF8B6B4A),
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return const CafeImagePlaceholder();
+                            },
+                          )
+                        : const CafeImagePlaceholder(),
                   ),
-                  child: const Icon(
-                    Icons.favorite_border_rounded,
-                    size: 19,
-                    color: Color(0xFF685A4D),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.94),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        size: 15,
-                        color: Color(0xFFB8884D),
-                      ),
-                      const SizedBox(width: 3),
-                      Text(
-                        cafe.rating.toStringAsFixed(1),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF5C5046),
+
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: GestureDetector(
+                      onTap: () async {
+                        final favoriteItem = FavoriteItemEntity(
+                          id: FavoriteItemEntity.generateId(
+                            FavoriteTargetType.cafe,
+                            cafe.id.toString(),
+                          ),
+                          targetId: cafe.id.toString(),
+                          targetType: FavoriteTargetType.cafe,
+                          title: cafe.name.toString(),
+                          imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
+                          rating: cafe.rating > 0 ? cafe.rating : null,
+                          address: cafe.location?.toString(),
+                          tagText: cafe.interests.isNotEmpty
+                              ? cafe.interests.first
+                              : null,
+                          createdAt: DateTime.now(),
+                        );
+
+                        await context.read<FavoritesCubit>().toggleFavorite(
+                          favoriteItem,
+                        );
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.94),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isFavorite
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          size: 20,
+                          color: isFavorite
+                              ? Colors.red
+                              : const Color(0xFF685A4D),
                         ),
                       ),
-                    ],
+                    ),
                   ),
+
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.94),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 15,
+                            color: Color(0xFFB8884D),
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            cafe.rating.toStringAsFixed(1),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF5C5046),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            cafe.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF403A35),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          '(${cafe.reviewsCount}) ⭐ ${cafe.rating.toStringAsFixed(1)}',
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF776D64),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 5),
+
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: Color(0xFF8B8178),
+                        ),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            '${cafe.location} • ${cafe.distanceKm} كم',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF857B72),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      cafe.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        height: 1.5,
+                        color: Color(0xFF665C54),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    const Row(
+                      children: [
+                        SmallTag(icon: Icons.wifi_rounded, text: 'Wi-Fi'),
+                        SizedBox(width: 6),
+                        SmallTag(icon: Icons.groups_outlined, text: 'مناسب'),
+                        SizedBox(width: 6),
+                        SmallTag(icon: Icons.coffee_rounded, text: 'قهوة'),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        cafe.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF403A35),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      '(${cafe.reviewsCount}) ⭐ ${cafe.rating.toStringAsFixed(1)}',
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF776D64),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 14,
-                      color: Color(0xFF8B8178),
-                    ),
-                    const SizedBox(width: 3),
-                    Expanded(
-                      child: Text(
-                        '${cafe.location} • ${cafe.distanceKm} كم',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF857B72),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  cafe.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    height: 1.5,
-                    color: Color(0xFF665C54),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    SmallTag(icon: Icons.wifi_rounded, text: 'Wi-Fi'),
-                    SizedBox(width: 6),
-                    SmallTag(icon: Icons.groups_outlined, text: 'مناسب'),
-                    SizedBox(width: 6),
-                    SmallTag(icon: Icons.coffee_rounded, text: 'قهوة'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -339,6 +402,7 @@ class CafeImagePlaceholder extends StatelessWidget {
     );
   }
 }
+
 
 class SmallTag extends StatelessWidget {
   final IconData icon;
@@ -540,6 +604,7 @@ class ErrorStateWidget extends StatelessWidget {
     );
   }
 }
+
 
 class EmptyStateWidget extends StatelessWidget {
   const EmptyStateWidget({super.key});
