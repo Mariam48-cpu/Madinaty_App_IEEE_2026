@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
 
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
 import '../../features/booking/domain/entities/booking_entity.dart';
@@ -23,10 +27,10 @@ abstract class AppRoutes {
   static const String checkout = '/checkout';
 
   static Map<String, WidgetBuilder> get routes => {
-    auth: (_) => const AuthScreen(),
-    personalization: (_) => const PersonalizationScreen(),
-    home: (_) => const MainNavigationScreen(),
-  };
+        auth: (_) => const AuthScreen(),
+        personalization: (_) => const PersonalizationScreen(),
+        home: (_) => const MainNavigationScreen(),
+      };
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -45,6 +49,7 @@ abstract class AppRoutes {
 
       case home:
         final user = FirebaseAuth.instance.currentUser;
+
         if (user == null) {
           return MaterialPageRoute(
             builder: (_) => const Scaffold(
@@ -55,6 +60,7 @@ abstract class AppRoutes {
             settings: settings,
           );
         }
+
         return MaterialPageRoute(
           builder: (_) => const MainNavigationScreen(),
           settings: settings,
@@ -62,8 +68,35 @@ abstract class AppRoutes {
 
       case checkout:
         final bookingArg = settings.arguments as BookingEntity?;
+
         return MaterialPageRoute(
-          builder: (_) => CheckoutScreen(booking: bookingArg ?? dummyBooking),
+          builder: (_) =>
+              CheckoutScreen(booking: bookingArg ?? dummyBooking),
+          settings: settings,
+        );
+
+      case notifications:
+        final user = FirebaseAuth.instance.currentUser;
+
+        if (user == null) {
+          return MaterialPageRoute(
+            builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('User is not logged in'),
+              ),
+            ),
+            settings: settings,
+          );
+        }
+
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<NotificationCubit>()
+              ..fetchNotifications(user.uid),
+            child: NotificationsScreen(
+              uid: user.uid,
+            ),
+          ),
           settings: settings,
         );
 

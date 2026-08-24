@@ -7,22 +7,17 @@ import '../data_sources/google_places_datasource.dart';
 import '../models/cafe_dto.dart';
 
 @LazySingleton(as: RecommendationRepository)
-class RecommendationRepositoryImpl
-    implements RecommendationRepository {
+class RecommendationRepositoryImpl implements RecommendationRepository {
   final GooglePlacesDataSource placesDataSource;
   final FirebaseFirestore firestore;
 
-  RecommendationRepositoryImpl(
-    this.placesDataSource,
-    this.firestore,
-  );
+  RecommendationRepositoryImpl(this.placesDataSource, this.firestore);
 
   Future<List<String>> _getFirebaseImages() async {
     final List<String> images = [];
 
     try {
-      final snapshot =
-          await firestore.collection('cafes').get();
+      final snapshot = await firestore.collection('cafes').get();
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
@@ -30,8 +25,7 @@ class RecommendationRepositoryImpl
 
         if (photos is List) {
           for (final photo in photos) {
-            if (photo is String &&
-                photo.trim().isNotEmpty) {
+            if (photo is String && photo.trim().isNotEmpty) {
               images.add(photo.trim());
             }
           }
@@ -45,8 +39,7 @@ class RecommendationRepositoryImpl
   String _getGoogleImageUrl(CafeDto dto) {
     final photoName = dto.firstPhotoName;
 
-    if (photoName == null ||
-        photoName.trim().isEmpty) {
+    if (photoName == null || photoName.trim().isEmpty) {
       return '';
     }
 
@@ -72,21 +65,14 @@ class RecommendationRepositoryImpl
       distanceKm: distanceKm,
       location: dto.formattedAddress ?? location,
       description: description ?? 'كافيه مناسب لك',
-      interests: interests?.isNotEmpty == true
-          ? interests!
-          : ['قهوة مختصة'],
-      moods: moods?.isNotEmpty == true
-          ? moods!
-          : ['جلسة هادئة'],
-      occasions: occasions?.isNotEmpty == true
-          ? occasions!
-          : ['عام'],
+      interests: interests?.isNotEmpty == true ? interests! : ['قهوة مختصة'],
+      moods: moods?.isNotEmpty == true ? moods! : ['جلسة هادئة'],
+      occasions: occasions?.isNotEmpty == true ? occasions! : ['عام'],
     );
   }
 
   @override
-  Future<List<CafeRecommendationEntity>>
-      getPersonalizedRecommendations({
+  Future<List<CafeRecommendationEntity>> getPersonalizedRecommendations({
     required List<String> interests,
     required String? mood,
     required String? occasion,
@@ -94,14 +80,12 @@ class RecommendationRepositoryImpl
   }) async {
     final List<CafeRecommendationEntity> allCafes = [];
 
-    final firebaseImages =
-        await _getFirebaseImages();
+    final firebaseImages = await _getFirebaseImages();
 
     if (interests.isNotEmpty) {
       for (final interest in interests) {
         try {
-          final List<CafeDto> dtos =
-              await placesDataSource.searchCafes(
+          final List<CafeDto> dtos = await placesDataSource.searchCafes(
             query: interest,
           );
 
@@ -111,9 +95,8 @@ class RecommendationRepositoryImpl
             String imageUrl = '';
 
             if (firebaseImages.isNotEmpty) {
-              imageUrl = firebaseImages[
-                allCafes.length % firebaseImages.length
-              ];
+              imageUrl =
+                  firebaseImages[allCafes.length % firebaseImages.length];
             }
 
             if (imageUrl.isEmpty) {
@@ -127,15 +110,13 @@ class RecommendationRepositoryImpl
                 location: location,
                 interests: [interest],
                 moods: [
-                  if (mood != null &&
-                      mood.trim().isNotEmpty)
+                  if (mood != null && mood.trim().isNotEmpty)
                     mood
                   else
                     'جلسة هادئة',
                 ],
                 occasions: [
-                  if (occasion != null &&
-                      occasion.trim().isNotEmpty)
+                  if (occasion != null && occasion.trim().isNotEmpty)
                     occasion
                   else
                     'عام',
@@ -151,8 +132,7 @@ class RecommendationRepositoryImpl
 
     if (allCafes.isEmpty) {
       try {
-        final List<CafeDto> defaultDtos =
-            await placesDataSource.getNearbyCafes(
+        final List<CafeDto> defaultDtos = await placesDataSource.getNearbyCafes(
           latitude: 30.0444,
           longitude: 31.2357,
         );
@@ -163,8 +143,7 @@ class RecommendationRepositoryImpl
           String imageUrl = '';
 
           if (firebaseImages.isNotEmpty) {
-            imageUrl =
-                firebaseImages[i % firebaseImages.length];
+            imageUrl = firebaseImages[i % firebaseImages.length];
           }
 
           if (imageUrl.isEmpty) {
@@ -185,14 +164,11 @@ class RecommendationRepositoryImpl
           );
         }
       } catch (e) {
-        throw Exception(
-          'فشل في تحميل الكافيهات: $e',
-        );
+        throw Exception('فشل في تحميل الكافيهات: $e');
       }
     }
 
-    final uniqueCafes =
-        <String, CafeRecommendationEntity>{};
+    final uniqueCafes = <String, CafeRecommendationEntity>{};
 
     for (final cafe in allCafes) {
       if (cafe.id.isEmpty) {
@@ -211,26 +187,20 @@ class RecommendationRepositoryImpl
         ...cafe.interests,
       ].toSet().toList();
 
-      final mergedMoods = [
-        ...existing.moods,
-        ...cafe.moods,
-      ].toSet().toList();
+      final mergedMoods = [...existing.moods, ...cafe.moods].toSet().toList();
 
       final mergedOccasions = [
         ...existing.occasions,
         ...cafe.occasions,
       ].toSet().toList();
 
-      uniqueCafes[cafe.id] =
-          CafeRecommendationEntity(
+      uniqueCafes[cafe.id] = CafeRecommendationEntity(
         id: existing.id,
         name: existing.name,
         imageUrl: existing.imageUrl.isNotEmpty
             ? existing.imageUrl
             : cafe.imageUrl,
-        rating: existing.rating > 0
-            ? existing.rating
-            : cafe.rating,
+        rating: existing.rating > 0 ? existing.rating : cafe.rating,
         reviewsCount: existing.reviewsCount > 0
             ? existing.reviewsCount
             : cafe.reviewsCount,
@@ -249,8 +219,7 @@ class RecommendationRepositoryImpl
   }
 
   @override
-  Future<List<CafeRecommendationEntity>>
-      searchCafes(String query) async {
+  Future<List<CafeRecommendationEntity>> searchCafes(String query) async {
     final searchQuery = query.trim();
 
     if (searchQuery.isEmpty) {
@@ -258,13 +227,11 @@ class RecommendationRepositoryImpl
     }
 
     try {
-      final List<CafeDto> dtos =
-          await placesDataSource.searchCafes(
+      final List<CafeDto> dtos = await placesDataSource.searchCafes(
         query: searchQuery,
       );
 
-      final firebaseImages =
-          await _getFirebaseImages();
+      final firebaseImages = await _getFirebaseImages();
 
       final List<CafeRecommendationEntity> results = [];
 
@@ -274,8 +241,7 @@ class RecommendationRepositoryImpl
         String imageUrl = '';
 
         if (firebaseImages.isNotEmpty) {
-          imageUrl =
-              firebaseImages[i % firebaseImages.length];
+          imageUrl = firebaseImages[i % firebaseImages.length];
         }
 
         if (imageUrl.isEmpty) {
@@ -286,27 +252,16 @@ class RecommendationRepositoryImpl
           _createCafeEntity(
             dto: dto,
             imageUrl: imageUrl,
-            location:
-                dto.formattedAddress ??
-                'الموقع غير متوفر',
-            interests: [
-              'قهوة',
-              'قهوة مختصة',
-            ],
-            moods: [
-              'جلسة هادئة',
-            ],
-            occasions: [
-              'عام',
-            ],
-            description:
-                'نتيجة بحث عن "$searchQuery"',
+            location: dto.formattedAddress ?? 'الموقع غير متوفر',
+            interests: ['قهوة', 'قهوة مختصة'],
+            moods: ['جلسة هادئة'],
+            occasions: ['عام'],
+            description: 'نتيجة بحث عن "$searchQuery"',
           ),
         );
       }
 
-      final Map<String, CafeRecommendationEntity>
-          uniqueResults = {};
+      final Map<String, CafeRecommendationEntity> uniqueResults = {};
 
       for (final cafe in results) {
         if (cafe.id.isNotEmpty) {
@@ -316,9 +271,7 @@ class RecommendationRepositoryImpl
 
       return uniqueResults.values.toList();
     } catch (e) {
-      throw Exception(
-        'فشل في البحث عن الكافيهات: $e',
-      );
+      throw Exception('فشل في البحث عن الكافيهات: $e');
     }
   }
 }

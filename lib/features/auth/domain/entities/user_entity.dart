@@ -3,6 +3,15 @@ class UserEntity {
   final String? name;
   final String? email;
   final String? phone;
+  final String? profileImageUrl;
+  final DateTime? birthDate;
 
-  const UserEntity({required this.uid, this.name, this.email, this.phone});
+  const UserEntity({
+    required this.uid,
+    this.name,
+    this.email,
+    this.phone,
+    this.profileImageUrl,
+    this.birthDate,
+  });
 }

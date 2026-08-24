@@ -1,7 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+// ==================================================
+// AUTH
+// ==================================================
+
+import '../../features/auth/data/data_sources/auth_data_source_interface.dart';
+import '../../features/auth/data/data_sources/auth_data_source_imp.dart';
+import '../../features/auth/data/repositories/auth_repo_imp.dart';
+import '../../features/auth/domain/repositories/auth_repo_interface.dart';
+
+// ==================================================
+// ONBOARDING
+// ==================================================
 
 import '../../features/onboarding/data/data_sources/onboarding_local_data_source.dart';
 import '../../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -11,12 +25,20 @@ import '../../features/onboarding/domain/use_cases/is_onboarding_seen.dart';
 import '../../features/onboarding/domain/use_cases/set_onboarding_seen.dart';
 import '../../features/onboarding/presentation/view_model/onboarding_bloc.dart';
 
+// ==================================================
+// PERSONALIZATION
+// ==================================================
+
 import '../../features/personalization/data/data_sources/personalization_remote_data_source_imp.dart';
 import '../../features/personalization/data/data_sources/personalization_remote_data_source_interface.dart';
 import '../../features/personalization/data/repositories/personalization_repo_imp.dart';
 import '../../features/personalization/domain/repositories/personalization_repository_interface.dart';
 import '../../features/personalization/domain/use_cases/get_user_preferences_usecase.dart';
 import '../../features/personalization/domain/use_cases/save_user_preferences_usecase.dart';
+
+// ==================================================
+// HOME
+// ==================================================
 
 import '../../features/home/data/data_sources/google_places_datasource.dart';
 import '../../features/home/data/repositories/recommendation_repository_impl.dart';
@@ -25,93 +47,123 @@ import '../../features/home/domain/use_cases/get_recommendations_use_case.dart';
 import '../../features/home/domain/use_cases/search_cafes_use_case.dart';
 import '../../features/home/presentation/view_model/home_cubit.dart';
 
+// ==================================================
+// PROFILE
+// ==================================================
+
+import '../../features/profile/data/data_sources/profile_remote_data_source.dart';
+import '../../features/profile/data/repositories/profile_repo_imp.dart';
+import '../../features/profile/domain/repositories/profile_repo_interface.dart';
+import '../../features/profile/domain/use_cases/get_profile_use_case.dart';
+import '../../features/profile/domain/use_cases/update_profile_use_case.dart';
+import '../../features/profile/presentation/view_model/profile_cubit.dart';
+
+// ==================================================
+// NOTIFICATIONS
+// ==================================================
+
+import '../../features/notifications/data/data_sources/notification_remote_data_source.dart';
+import '../../features/notifications/data/repositories/notification_repo_imp.dart';
+import '../../features/notifications/domain/repositories/notification_repo_interface.dart';
+import '../../features/notifications/domain/use_cases/get_notifications_use_case.dart';
+import '../../features/notifications/domain/use_cases/create_notification_use_case.dart';
+import '../../features/notifications/domain/use_cases/mark_notification_read_use_case.dart';
+import '../../features/notifications/domain/use_cases/mark_all_notifications_as_read_use_case.dart';
+import '../../features/notifications/domain/use_cases/delete_notification_use_case.dart';
+import '../../features/notifications/presentation/view_model/notification_cubit.dart';
+
 final GetIt sl = GetIt.instance;
 
 Future<void> initDependencies() async {
+  // ==================================================
+  // CORE
+  // ==================================================
 
-  final sharedPreferences =
-      await SharedPreferences.getInstance();
+  final sharedPreferences = await SharedPreferences.getInstance();
 
-  sl.registerLazySingleton<SharedPreferences>(
-    () => sharedPreferences,
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+
+  sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+
+  sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+
+  sl.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
+
+  // ==================================================
+  // AUTH
+  // ==================================================
+
+  sl.registerLazySingleton<AuthRemoteDataSourceInterface>(
+    () => AuthRemoteDataSourceImpl(
+      firebaseAuth: sl<FirebaseAuth>(),
+      firestore: sl<FirebaseFirestore>(),
+      googleSignIn: sl<GoogleSignIn>(),
+    ),
   );
 
-  sl.registerLazySingleton<FirebaseFirestore>(
-    () => FirebaseFirestore.instance,
+  sl.registerLazySingleton<AuthRepoInterface>(
+    () => AuthRepoImpl(remoteDataSource: sl<AuthRemoteDataSourceInterface>()),
   );
 
-  sl.registerLazySingleton<FirebaseAuth>(
-    () => FirebaseAuth.instance,
-  );
+  // ==================================================
+  // ONBOARDING
+  // ==================================================
 
   sl.registerLazySingleton<OnboardingLocalDataSource>(
-    () => OnboardingLocalDataSource(
-      sl<SharedPreferences>(),
-    ),
+    () => OnboardingLocalDataSource(sl<SharedPreferences>()),
   );
 
   sl.registerLazySingleton<OnboardingRepository>(
-    () => OnboardingRepositoryImpl(
-      sl<OnboardingLocalDataSource>(),
-    ),
+    () => OnboardingRepositoryImpl(sl<OnboardingLocalDataSource>()),
   );
 
   sl.registerLazySingleton<GetOnboardingPages>(
-    () => GetOnboardingPages(
-      sl<OnboardingRepository>(),
-    ),
+    () => GetOnboardingPages(sl<OnboardingRepository>()),
   );
 
   sl.registerLazySingleton<SetOnboardingSeen>(
-    () => SetOnboardingSeen(
-      sl<OnboardingRepository>(),
-    ),
+    () => SetOnboardingSeen(sl<OnboardingRepository>()),
   );
 
   sl.registerLazySingleton<IsOnboardingSeen>(
-    () => IsOnboardingSeen(
-      sl<OnboardingRepository>(),
-    ),
+    () => IsOnboardingSeen(sl<OnboardingRepository>()),
   );
 
   sl.registerFactory<OnboardingBloc>(
     () => OnboardingBloc(
-      getOnboardingPages:
-          sl<GetOnboardingPages>(),
-      setOnboardingSeen:
-          sl<SetOnboardingSeen>(),
+      getOnboardingPages: sl<GetOnboardingPages>(),
+      setOnboardingSeen: sl<SetOnboardingSeen>(),
     ),
   );
 
-  sl.registerLazySingleton<
-      PersonalizationRemoteDataSourceInterface>(
+  // ==================================================
+  // PERSONALIZATION
+  // ==================================================
+
+  sl.registerLazySingleton<PersonalizationRemoteDataSourceInterface>(
     () => PersonalizationRemoteDataSourceImpl(
       firebaseAuth: sl<FirebaseAuth>(),
       firestore: sl<FirebaseFirestore>(),
     ),
   );
 
-  sl.registerLazySingleton<
-      PersonalizationRepositoryInterface>(
+  sl.registerLazySingleton<PersonalizationRepositoryInterface>(
     () => PersonalizationRepoImpl(
-      remoteDataSource:
-          sl<PersonalizationRemoteDataSourceInterface>(),
+      remoteDataSource: sl<PersonalizationRemoteDataSourceInterface>(),
     ),
   );
 
-  sl.registerLazySingleton<
-      GetUserPreferencesUseCase>(
-    () => GetUserPreferencesUseCase(
-      sl<PersonalizationRepositoryInterface>(),
-    ),
+  sl.registerLazySingleton<GetUserPreferencesUseCase>(
+    () => GetUserPreferencesUseCase(sl<PersonalizationRepositoryInterface>()),
   );
 
-  sl.registerLazySingleton<
-      SaveUserPreferencesUseCase>(
-    () => SaveUserPreferencesUseCase(
-      sl<PersonalizationRepositoryInterface>(),
-    ),
+  sl.registerLazySingleton<SaveUserPreferencesUseCase>(
+    () => SaveUserPreferencesUseCase(sl<PersonalizationRepositoryInterface>()),
   );
+
+  // ==================================================
+  // HOME
+  // ==================================================
 
   sl.registerLazySingleton<GooglePlacesDataSource>(
     () => GooglePlacesDataSource(),
@@ -125,26 +177,97 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<GetRecommendationsUseCase>(
-    () => GetRecommendationsUseCase(
-      sl<RecommendationRepository>(),
-    ),
+    () => GetRecommendationsUseCase(sl<RecommendationRepository>()),
   );
 
   sl.registerLazySingleton<SearchCafesUseCase>(
-    () => SearchCafesUseCase(
-      sl<RecommendationRepository>(),
-    ),
+    () => SearchCafesUseCase(sl<RecommendationRepository>()),
   );
 
   sl.registerFactoryParam<HomeCubit, String, void>(
     (currentUserId, _) => HomeCubit(
-      getRecommendationsUseCase:
-          sl<GetRecommendationsUseCase>(),
-      getUserPreferencesUseCase:
-          sl<GetUserPreferencesUseCase>(),
-      searchCafesUseCase:
-          sl<SearchCafesUseCase>(),
+      getRecommendationsUseCase: sl<GetRecommendationsUseCase>(),
+      getUserPreferencesUseCase: sl<GetUserPreferencesUseCase>(),
+      searchCafesUseCase: sl<SearchCafesUseCase>(),
       currentUserId: currentUserId,
+    ),
+  );
+
+  // ==================================================
+  // NOTIFICATIONS DATA
+  // ==================================================
+
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(firestore: sl<FirebaseFirestore>()),
+  );
+
+  sl.registerLazySingleton<NotificationRepoInterface>(
+    () => NotificationRepoImp(
+      remoteDataSource: sl<NotificationRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<CreateNotificationUseCase>(
+    () => CreateNotificationUseCase(sl<NotificationRepoInterface>()),
+  );
+
+  sl.registerLazySingleton<GetNotificationsUseCase>(
+    () => GetNotificationsUseCase(sl<NotificationRepoInterface>()),
+  );
+
+  sl.registerLazySingleton<MarkNotificationReadUseCase>(
+    () => MarkNotificationReadUseCase(sl<NotificationRepoInterface>()),
+  );
+
+  sl.registerLazySingleton<MarkAllNotificationsAsReadUseCase>(
+    () => MarkAllNotificationsAsReadUseCase(sl<NotificationRepoInterface>()),
+  );
+
+  sl.registerLazySingleton<DeleteNotificationUseCase>(
+    () => DeleteNotificationUseCase(sl<NotificationRepoInterface>()),
+  );
+
+  // ==================================================
+  // PROFILE
+  // ==================================================
+
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(firestore: sl<FirebaseFirestore>()),
+  );
+
+  sl.registerLazySingleton<ProfileRepoInterface>(
+    () => ProfileRepoImp(remoteDataSource: sl<ProfileRemoteDataSource>()),
+  );
+
+  sl.registerLazySingleton<GetProfileUseCase>(
+    () => GetProfileUseCase(sl<ProfileRepoInterface>()),
+  );
+
+  sl.registerLazySingleton<UpdateProfileUseCase>(
+    () => UpdateProfileUseCase(sl<ProfileRepoInterface>()),
+  );
+
+  sl.registerFactory<ProfileCubit>(
+    () => ProfileCubit(
+      getUserProfileUseCase: sl<GetProfileUseCase>(),
+      updateProfileUseCase: sl<UpdateProfileUseCase>(),
+      authRepository: sl<AuthRepoInterface>(),
+      createNotificationUseCase: sl<CreateNotificationUseCase>(),
+    ),
+  );
+
+  // ==================================================
+  // NOTIFICATION CUBIT
+  // ==================================================
+
+  sl.registerFactory<NotificationCubit>(
+    () => NotificationCubit(
+      getNotificationsUseCase: sl<GetNotificationsUseCase>(),
+      markNotificationReadUseCase: sl<MarkNotificationReadUseCase>(),
+      markAllNotificationsAsReadUseCase:
+          sl<MarkAllNotificationsAsReadUseCase>(),
+      deleteNotificationUseCase: sl<DeleteNotificationUseCase>(),
+      notificationRepository: sl<NotificationRepoInterface>(),
     ),
   );
 }
