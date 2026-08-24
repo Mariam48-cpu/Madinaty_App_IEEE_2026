@@ -11,6 +11,8 @@ class BookingEntity {
   final String? seatingPreference;
   final BookingStatus status;
   final DateTime? createdAt;
+  final double totalAmount;
+  final double reservationFee;
 
   const BookingEntity({
     this.id = '',
@@ -22,5 +24,7 @@ class BookingEntity {
     this.seatingPreference,
     this.status = BookingStatus.pending,
     this.createdAt, required this.cafeId,
+    this.totalAmount = 50.0,
+    this.reservationFee = 50.0,
   });
 }

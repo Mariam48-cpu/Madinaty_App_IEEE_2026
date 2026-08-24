@@ -97,6 +97,17 @@ mixin AppLocale {
   static const String backToHome = 'backToHome';
   static const String viewMyBookings = 'viewMyBookings';
 
+  // --- Digital Pass / QR Ticket Screen ---
+  static const String digitalPassTitle = 'digitalPassTitle';
+  static const String digitalPassSearchHint = 'digitalPassSearchHint';
+  static const String addToCalendar = 'addToCalendar';
+  static const String directions = 'directions';
+  static const String scanQrAtEntrance = 'scanQrAtEntrance';
+  static const String indoorSeating = 'indoorSeating';
+  static const String outdoorSeating = 'outdoorSeating';
+  static const String guestsSuffix = 'guestsSuffix';
+  static const String reservationAddedToCalendar = 'reservationAddedToCalendar';
+
   // --- Toasts & Errors ---
   static const String paymentErrorTitle = 'paymentErrorTitle';
   static const String successTitle = 'successTitle';
@@ -123,7 +134,7 @@ mixin AppLocale {
   static const String work = 'work';
   static const String quietChill = 'quietChill';
   static const String birthday = 'birthday';
-  static const String romanticDate = 'romanticDate'; // تم تعديل الاسم هنا لتفادي التكرار
+  static const String romanticDate = 'romanticDate';
   static const String withFriends = 'withFriends';
   static const String friendsOuting = 'friendsOuting';
   static const String nileView = 'nileView';
@@ -275,6 +286,16 @@ mixin AppLocale {
     paidAmount: 'المبلغ المدفوع',
     backToHome: 'العودة للرئيسية',
     viewMyBookings: 'عرض قائمة حجوزاتي',
+
+    digitalPassTitle: 'التذكرة الرقمية',
+    digitalPassSearchHint: 'ابحث بالاسم، المنطقة، أو نوع القهوة',
+    addToCalendar: 'إضافة للتقويم',
+    directions: 'الاتجاهات',
+    scanQrAtEntrance: 'امسح الرمز عند الوصول للكافيه لتأكيد الدخول',
+    indoorSeating: 'صالة داخلية',
+    outdoorSeating: 'صالة خارجية',
+    guestsSuffix: 'أفراد',
+    reservationAddedToCalendar: 'تمت إضافة الحجز للتقويم بنجاح',
 
     paymentErrorTitle: 'خطأ في عملية الدفع',
     successTitle: 'تم بنجاح',
@@ -447,6 +468,16 @@ mixin AppLocale {
     backToHome: 'Back to Home',
     viewMyBookings: 'View My Bookings',
 
+    digitalPassTitle: 'Digital Pass',
+    digitalPassSearchHint: 'Search by name, area, or coffee type',
+    addToCalendar: 'Add to Calendar',
+    directions: 'Directions',
+    scanQrAtEntrance: 'Scan QR at entrance to verify booking',
+    indoorSeating: 'Indoor Seating',
+    outdoorSeating: 'Outdoor Seating',
+    guestsSuffix: 'Guests',
+    reservationAddedToCalendar: 'Reservation added to calendar successfully',
+
     paymentErrorTitle: 'Payment Error',
     successTitle: 'Success',
     reservationSuccessDesc: 'Your reservation has been confirmed successfully!',
@@ -618,6 +649,16 @@ mixin AppLocale {
     backToHome: 'ត្រឡប់ទៅទំព័រដើម',
     viewMyBookings: 'មើលបញ្ជីការកក់របស់ខ្ញុំ',
 
+    digitalPassTitle: 'សំបុត្រឌីជីថល',
+    digitalPassSearchHint: 'ស្វែងរកតាមឈ្មោះ តំបន់ ឬប្រភេទកាហ្វេ',
+    addToCalendar: 'បន្ថែមទៅប្រតិទិន',
+    directions: 'ទិសដៅ',
+    scanQrAtEntrance: 'ស្កេន QR នៅច្រកចូលដើម្បីបញ្ជាក់ការកក់',
+    indoorSeating: 'កន្លែងអង្គុយខាងក្នុង',
+    outdoorSeating: 'កន្លែងអង្គុយខាងក្រៅ',
+    guestsSuffix: 'នាក់',
+    reservationAddedToCalendar: 'បានបន្ថែមការកក់ទៅក្នុងប្រតិទិនដោយជោគជ័យ',
+
     paymentErrorTitle: 'កំហុសក្នុងការទូទាត់',
     successTitle: 'ជោគជ័យ',
     reservationSuccessDesc: 'ការកក់របស់អ្នកត្រូវបានបញ្ជាក់ដោយជោគជ័យ!',
@@ -774,6 +815,16 @@ mixin AppLocale {
     paidAmount: 'お支払い金額',
     backToHome: 'ホームに戻る',
     viewMyBookings: '予約履歴を見る',
+
+    digitalPassTitle: 'デジタルパス',
+    digitalPassSearchHint: '店名、エリア、コーヒーの種類で検索',
+    addToCalendar: 'カレンダーに追加',
+    directions: 'ルート案内',
+    scanQrAtEntrance: '来店時にQRコードを提示してください',
+    indoorSeating: '店内席',
+    outdoorSeating: 'テラス席',
+    guestsSuffix: '名',
+    reservationAddedToCalendar: '予約をカレンダーに追加しました',
 
     paymentErrorTitle: '決済エラー',
     successTitle: '成功',

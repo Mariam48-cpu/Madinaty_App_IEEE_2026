@@ -52,6 +52,7 @@ dependencies:
 
   flutter_bloc: ^9.1.1
   dio: ^5.11.0
+
   get_it: ^9.2.1
   injectable: ^3.0.0
 
@@ -65,20 +66,23 @@ dependencies:
   http: ^1.6.0
   flutter_dotenv: ^6.0.1
   flutter_map: ^8.3.1
-  flutter_svg: ^2.3.0
+  flutter_svg: ^2.2.3
   latlong2: ^0.10.1
   geocoding: ^3.0.0
   location: ^10.0.2
   flutter_polyline_points: ^3.1.0
+
   provider: ^6.0.5
 
   google_sign_in: ^7.2.0
-  flutter_localization: 0.2.2
 
+  flutter_localization: 0.2.2
   google_fonts: ^8.2.1
   toastification: ^3.2.0
   webview_flutter: ^4.14.1
   localization: ^2.1.1
+  qr_flutter: ^4.1.0
+  url_launcher: ^6.3.2
   image_picker: ^1.2.3
 
 dev_dependencies:
@@ -92,19 +96,21 @@ dev_dependencies:
   # rules and activating additional ones.
 
   flutter_lints: ^6.0.0
+
   build_runner: ^2.15.1
   injectable_generator: ^3.0.2
   flutter_launcher_icons: ^0.14.4
 
-# For information about the generic Dart part of this file, see the
+# For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter packages.
 
 flutter:
+
   # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the
-  # Material Icons font in your application.
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+
   uses-material-design: true
 
   assets:
@@ -115,6 +121,7 @@ flutter:
     - assets/images/onboarding/
 
   # Custom font family definition for Cairo (Arabic UI)
+
   fonts:
     - family: Cairo
       fonts:

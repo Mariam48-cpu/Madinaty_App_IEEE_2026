@@ -2,10 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/digital_pass_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
-import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
 import '../../features/cart/presentation/view/screens/cart_screen.dart';
@@ -24,6 +25,7 @@ abstract class AppRoutes {
   static const String personalization = '/personalization';
   static const String cafeDetails = '/cafe_details';
   static const String booking = '/booking';
+  static const String digitalPass = '/digital_pass';
   static const String orders = '/orders';
   static const String notifications = '/notifications';
   static const String profile = '/profile';
@@ -56,7 +58,6 @@ abstract class AppRoutes {
 
       case home:
         final user = FirebaseAuth.instance.currentUser;
-
         if (user == null) {
           return MaterialPageRoute(
             builder: (_) => const Scaffold(
@@ -65,7 +66,6 @@ abstract class AppRoutes {
             settings: settings,
           );
         }
-
         return MaterialPageRoute(
           builder: (_) => const MainNavigationScreen(),
           settings: settings,
@@ -103,15 +103,20 @@ abstract class AppRoutes {
 
       case checkout:
         final bookingArg = settings.arguments as BookingEntity?;
-
         return MaterialPageRoute(
           builder: (_) => CheckoutScreen(booking: bookingArg ?? dummyBooking),
           settings: settings,
         );
 
+      case digitalPass:
+        final bookingArg = settings.arguments as BookingEntity?;
+        return MaterialPageRoute(
+          builder: (_) => DigitalPassScreen(booking: bookingArg ?? dummyBooking),
+          settings: settings,
+        );
+
       case notifications:
         final user = FirebaseAuth.instance.currentUser;
-
         if (user == null) {
           return MaterialPageRoute(
             builder: (_) => const Scaffold(
@@ -120,11 +125,10 @@ abstract class AppRoutes {
             settings: settings,
           );
         }
-
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) =>
-                sl<NotificationCubit>()..fetchNotifications(user.uid),
+            sl<NotificationCubit>()..fetchNotifications(user.uid),
             child: NotificationsScreen(uid: user.uid),
           ),
           settings: settings,

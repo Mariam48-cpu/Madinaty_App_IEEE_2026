@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
 import '../../../../../core/localization/app_locale.dart';
+import '../../../../../core/routes/app_routes.dart';
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
 import '../../../domain/use_cases/google_signin_usecase.dart';
@@ -116,10 +117,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               backgroundColor: Colors.green.shade700,
             ),
           );
-          Navigator.pushReplacement(
+          Navigator.pushReplacementNamed(
             context,
-            MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
+            AppRoutes.checkout,
           );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
+          // );
         }
       },
       builder: (context, state) {
