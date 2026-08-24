@@ -62,6 +62,30 @@ mixin AppLocale {
   static const String confirmAndPay = 'confirmAndPay';
   static const String backToCart = 'backToCart';
 
+  // --- Cart Screen ---
+  static const String cartTitle = 'cartTitle';
+  static const String cartPickupOrder = 'cartPickupOrder';
+  static const String orderNotesTitle = 'orderNotesTitle';
+  static const String orderNotesHint = 'orderNotesHint';
+  static const String cartSubtotal = 'cartSubtotal';
+  static const String serviceFee = 'serviceFee';
+  static const String proceedToCheckout = 'proceedToCheckout';
+  static const String emptyCartTitle = 'emptyCartTitle';
+  static const String emptyCartSubtitle = 'emptyCartSubtitle';
+  static const String exploreMenu = 'exploreMenu';
+  static const String itemAddedToCart = 'itemAddedToCart';
+  static const String clearCart = 'clearCart';
+
+  // --- Pre-Order Screen ---
+  static const String preOrderMenuTitle = 'preOrderMenuTitle';
+  static const String skipPreOrder = 'skipPreOrder';
+  static const String temporaryTotal = 'temporaryTotal';
+  static const String proceedToCart = 'proceedToCart';
+  static const String itemsCount = 'itemsCount';
+  static const String searchMenuPlaceholder = 'searchMenuPlaceholder';
+  static const String allCategories = 'allCategories';
+  static const String preOrder = 'preOrder';
+
   // --- Confirmation Screen ---
   static const String reservationConfirmedTitle = 'reservationConfirmedTitle';
   static const String reservationConfirmedDesc = 'reservationConfirmedDesc';
@@ -72,6 +96,17 @@ mixin AppLocale {
   static const String paidAmount = 'paidAmount';
   static const String backToHome = 'backToHome';
   static const String viewMyBookings = 'viewMyBookings';
+
+  // --- Digital Pass / QR Ticket Screen ---
+  static const String digitalPassTitle = 'digitalPassTitle';
+  static const String digitalPassSearchHint = 'digitalPassSearchHint';
+  static const String addToCalendar = 'addToCalendar';
+  static const String directions = 'directions';
+  static const String scanQrAtEntrance = 'scanQrAtEntrance';
+  static const String indoorSeating = 'indoorSeating';
+  static const String outdoorSeating = 'outdoorSeating';
+  static const String guestsSuffix = 'guestsSuffix';
+  static const String reservationAddedToCalendar = 'reservationAddedToCalendar';
 
   // --- Toasts & Errors ---
   static const String paymentErrorTitle = 'paymentErrorTitle';
@@ -99,7 +134,7 @@ mixin AppLocale {
   static const String work = 'work';
   static const String quietChill = 'quietChill';
   static const String birthday = 'birthday';
-  static const String romanticDate = 'romanticDate'; // تم تعديل الاسم هنا لتفادي التكرار
+  static const String romanticDate = 'romanticDate';
   static const String withFriends = 'withFriends';
   static const String friendsOuting = 'friendsOuting';
   static const String nileView = 'nileView';
@@ -220,6 +255,28 @@ mixin AppLocale {
     confirmAndPay: 'تأكيد والدفع',
     backToCart: 'العودة للسلة',
 
+    cartTitle: 'السلة',
+    cartPickupOrder: 'طلب استلام من الفرع',
+    orderNotesTitle: 'ملاحظات الطلب',
+    orderNotesHint: 'أي ملاحظات؟',
+    cartSubtotal: 'المجموع الفرعي',
+    serviceFee: 'رسوم الخدمة',
+    proceedToCheckout: 'متابعة للدفع',
+    emptyCartTitle: 'السلة فارغة',
+    emptyCartSubtitle: 'لم تقم بإضافة أي عناصر إلى السلة بعد',
+    exploreMenu: 'استكشف القائمة',
+    itemAddedToCart: 'تمت إضافة العنصر إلى السلة',
+    clearCart: 'تفريغ السلة',
+
+    preOrderMenuTitle: 'اطلب مسبقاً',
+    skipPreOrder: 'تخطي الطلب المسبق',
+    temporaryTotal: 'إجمالي المؤقت',
+    proceedToCart: 'متابعة للسلة',
+    itemsCount: 'منتجات',
+    searchMenuPlaceholder: 'ابحث في القائمة...',
+    allCategories: 'الكل',
+    preOrder: 'اطلب مسبقاً',
+
     reservationConfirmedTitle: 'تم تأكيد الحجز بنجاح!',
     reservationConfirmedDesc: 'تم إرسال تفاصيل الحجز والإشعار إلى حسابك',
     bookingNumber: 'رقم الحجز',
@@ -229,6 +286,16 @@ mixin AppLocale {
     paidAmount: 'المبلغ المدفوع',
     backToHome: 'العودة للرئيسية',
     viewMyBookings: 'عرض قائمة حجوزاتي',
+
+    digitalPassTitle: 'التذكرة الرقمية',
+    digitalPassSearchHint: 'ابحث بالاسم، المنطقة، أو نوع القهوة',
+    addToCalendar: 'إضافة للتقويم',
+    directions: 'الاتجاهات',
+    scanQrAtEntrance: 'امسح الرمز عند الوصول للكافيه لتأكيد الدخول',
+    indoorSeating: 'صالة داخلية',
+    outdoorSeating: 'صالة خارجية',
+    guestsSuffix: 'أفراد',
+    reservationAddedToCalendar: 'تمت إضافة الحجز للتقويم بنجاح',
 
     paymentErrorTitle: 'خطأ في عملية الدفع',
     successTitle: 'تم بنجاح',
@@ -369,6 +436,28 @@ mixin AppLocale {
     confirmAndPay: 'Confirm & Pay',
     backToCart: 'Back to Cart',
 
+    cartTitle: 'Shopping Cart',
+    cartPickupOrder: 'Branch Pickup Order',
+    orderNotesTitle: 'Order Notes',
+    orderNotesHint: 'Any notes?',
+    cartSubtotal: 'Subtotal',
+    serviceFee: 'Service Fee',
+    proceedToCheckout: 'Proceed to Checkout',
+    emptyCartTitle: 'Your Cart is Empty',
+    emptyCartSubtitle: 'You have not added any items yet',
+    exploreMenu: 'Explore Menu',
+    itemAddedToCart: 'Item added to cart',
+    clearCart: 'Clear Cart',
+
+    preOrderMenuTitle: 'Pre-Order Menu',
+    skipPreOrder: 'Skip Pre-Order',
+    temporaryTotal: 'Estimated Total',
+    proceedToCart: 'Proceed to Cart',
+    itemsCount: 'items',
+    searchMenuPlaceholder: 'Search menu...',
+    allCategories: 'All',
+    preOrder: 'Pre-Order',
+
     reservationConfirmedTitle: 'Reservation Confirmed Successfully!',
     reservationConfirmedDesc: 'Booking details and notification have been sent to your account',
     bookingNumber: 'Booking Number',
@@ -378,6 +467,16 @@ mixin AppLocale {
     paidAmount: 'Paid Amount',
     backToHome: 'Back to Home',
     viewMyBookings: 'View My Bookings',
+
+    digitalPassTitle: 'Digital Pass',
+    digitalPassSearchHint: 'Search by name, area, or coffee type',
+    addToCalendar: 'Add to Calendar',
+    directions: 'Directions',
+    scanQrAtEntrance: 'Scan QR at entrance to verify booking',
+    indoorSeating: 'Indoor Seating',
+    outdoorSeating: 'Outdoor Seating',
+    guestsSuffix: 'Guests',
+    reservationAddedToCalendar: 'Reservation added to calendar successfully',
 
     paymentErrorTitle: 'Payment Error',
     successTitle: 'Success',
@@ -518,6 +617,28 @@ mixin AppLocale {
     confirmAndPay: 'បញ្ជាក់ និងទូទាត់',
     backToCart: 'ត្រឡប់ទៅកន្ត្រកវិញ',
 
+    cartTitle: 'កន្ត្រក',
+    cartPickupOrder: 'ការបញ្ជាទិញទទួលពីសាខា',
+    orderNotesTitle: 'កំណត់ចំណាំការបញ្ជាទិញ',
+    orderNotesHint: 'មានកំណត់ចំណាំអ្វីទេ?',
+    cartSubtotal: 'សរុបរង',
+    serviceFee: 'ថ្លៃសេវា',
+    proceedToCheckout: 'បន្តទៅការទូទាត់',
+    emptyCartTitle: 'កន្ត្រករបស់អ្នកទទេ',
+    emptyCartSubtitle: 'អ្នកមិនទាន់បានបន្ថែមទំនិញណាមួយនៅឡើយទេ',
+    exploreMenu: 'រុករកម៉ឺនុយ',
+    itemAddedToCart: 'ទំនិញត្រូវបានបន្ថែមទៅក្នុងកន្ត្រក',
+    clearCart: 'សម្អាតកន្ត្រក',
+
+    preOrderMenuTitle: 'ការបញ្ជាទិញទុកមុន',
+    skipPreOrder: 'រំលងការបញ្ជាទិញទុកមុន',
+    temporaryTotal: 'សរុបបណ្តោះអាសន្ន',
+    proceedToCart: 'បន្តទៅកន្ត្រក',
+    itemsCount: 'មុខទំនិញ',
+    searchMenuPlaceholder: 'ស្វែងរកម៉ឺនុយ...',
+    allCategories: 'ទាំងអស់',
+    preOrder: 'ការបញ្ជាទិញទុកមុន',
+
     reservationConfirmedTitle: 'ការកក់ត្រូវបានបញ្ជាក់ដោយជោគជ័យ!',
     reservationConfirmedDesc: 'ព័ត៌មានលម្អិត និងការជូនដំណឹងត្រូវបានផ្ញើទៅកាន់គណនីរបស់អ្នក',
     bookingNumber: 'លេខកក់',
@@ -527,6 +648,16 @@ mixin AppLocale {
     paidAmount: 'ចំនួនទឹកប្រាក់ដែលបានបង់',
     backToHome: 'ត្រឡប់ទៅទំព័រដើម',
     viewMyBookings: 'មើលបញ្ជីការកក់របស់ខ្ញុំ',
+
+    digitalPassTitle: 'សំបុត្រឌីជីថល',
+    digitalPassSearchHint: 'ស្វែងរកតាមឈ្មោះ តំបន់ ឬប្រភេទកាហ្វេ',
+    addToCalendar: 'បន្ថែមទៅប្រតិទិន',
+    directions: 'ទិសដៅ',
+    scanQrAtEntrance: 'ស្កេន QR នៅច្រកចូលដើម្បីបញ្ជាក់ការកក់',
+    indoorSeating: 'កន្លែងអង្គុយខាងក្នុង',
+    outdoorSeating: 'កន្លែងអង្គុយខាងក្រៅ',
+    guestsSuffix: 'នាក់',
+    reservationAddedToCalendar: 'បានបន្ថែមការកក់ទៅក្នុងប្រតិទិនដោយជោគជ័យ',
 
     paymentErrorTitle: 'កំហុសក្នុងការទូទាត់',
     successTitle: 'ជោគជ័យ',
@@ -653,6 +784,28 @@ mixin AppLocale {
     confirmAndPay: '確定してお支払い',
     backToCart: 'カートに戻る',
 
+    cartTitle: 'カート',
+    cartPickupOrder: '店舗受取注文',
+    orderNotesTitle: '注文メモ',
+    orderNotesHint: 'ご要望など',
+    cartSubtotal: '小計',
+    serviceFee: 'サービス料',
+    proceedToCheckout: 'お支払いに進む',
+    emptyCartTitle: 'カートは空です',
+    emptyCartSubtitle: '商品がまだ追加されていません',
+    exploreMenu: 'メニューを見る',
+    itemAddedToCart: 'カートに追加されました',
+    clearCart: 'カートをクリア',
+
+    preOrderMenuTitle: '事前注文メニュー',
+    skipPreOrder: '事前注文をスキップ',
+    temporaryTotal: '暫定合計',
+    proceedToCart: 'カートに進む',
+    itemsCount: '点',
+    searchMenuPlaceholder: 'メニューを検索...',
+    allCategories: 'すべて',
+    preOrder: '事前注文',
+
     reservationConfirmedTitle: '予約が完了しました！',
     reservationConfirmedDesc: '予約の詳細と通知をアカウントに送信しました',
     bookingNumber: '予約番号',
@@ -662,6 +815,16 @@ mixin AppLocale {
     paidAmount: 'お支払い金額',
     backToHome: 'ホームに戻る',
     viewMyBookings: '予約履歴を見る',
+
+    digitalPassTitle: 'デジタルパス',
+    digitalPassSearchHint: '店名、エリア、コーヒーの種類で検索',
+    addToCalendar: 'カレンダーに追加',
+    directions: 'ルート案内',
+    scanQrAtEntrance: '来店時にQRコードを提示してください',
+    indoorSeating: '店内席',
+    outdoorSeating: 'テラス席',
+    guestsSuffix: '名',
+    reservationAddedToCalendar: '予約をカレンダーに追加しました',
 
     paymentErrorTitle: '決済エラー',
     successTitle: '成功',

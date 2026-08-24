@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
-class CafeBottomButtons extends StatefulWidget {
+class CafeBottomButtons extends StatelessWidget {
   final VoidCallback? onDirections;
   final VoidCallback? onCall;
 
   const CafeBottomButtons({super.key, this.onDirections, this.onCall});
 
   @override
-  State<CafeBottomButtons> createState() => _CafeBottomButtonsState();
-}
-
-class _CafeBottomButtonsState extends State<CafeBottomButtons> {
-  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(12, 9, 12, 10),
+      padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
       decoration: BoxDecoration(
-        color: Color(0xFFFFF9F6),
+        color: const Color(0xFFFFF9F6),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
-            offset: Offset(0, -3),
+            offset: const Offset(0, -3),
           ),
         ],
       ),
@@ -31,39 +28,39 @@ class _CafeBottomButtonsState extends State<CafeBottomButtons> {
             child: SizedBox(
               height: 48,
               child: OutlinedButton(
-                onPressed: widget.onCall,
+                onPressed: onCall,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Color(0xFF8D6654),
+                  foregroundColor: const Color(0xFF8D6654),
                   backgroundColor: Colors.white,
-                  side: BorderSide(color: Color(0xFF8D6654), width: 1.2),
+                  side: const BorderSide(color: Color(0xFF8D6654), width: 1.2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: Text(
-                  'اطلب مسبقًا',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  AppLocale.preOrder.getString(context),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
           ),
 
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             flex: 1,
             child: SizedBox(
               height: 48,
               child: ElevatedButton(
-                onPressed: widget.onDirections,
+                onPressed: onDirections,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF17120F),
+                  backgroundColor: const Color(0xFF17120F),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'احجز مكانك',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 ),

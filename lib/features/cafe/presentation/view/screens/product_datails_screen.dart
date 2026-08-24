@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:madinaty_app_ieee_2026/features/cart/domain/entities/cart_item_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/cart/domain/use_cases/add_to_cart_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/product_datails/product_add_ons_widget.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/product_datails/product_bottom_bar_widget.dart';
@@ -9,6 +14,7 @@ import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/p
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/entities/favorite_item_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/is_favorite_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
+import 'package:toastification/toastification.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductEntity product;
@@ -31,6 +37,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String selectedMilk = 'حليب بقري';
   int quantity = 1;
   bool _isFavorite = false;
+  bool _isAddingToCart = false;
 
   @override
   void initState() {
@@ -53,6 +60,59 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     await getIt<ToggleFavoriteUseCase>()(item);
     if (mounted) {
       setState(() => _isFavorite = !_isFavorite);
+    }
+  }
+
+  Future<void> _handleAddToCart() async {
+    if (_isAddingToCart) return;
+    setState(() => _isAddingToCart = true);
+
+    try {
+      final selectedAddOns = addOns.entries
+          .where((e) => e.value['selected'] == true)
+          .map((e) => e.key)
+          .toList();
+
+      final allOptions = [
+        selectedSize,
+        selectedMilk,
+        ...selectedAddOns,
+      ].where((s) => s.isNotEmpty).join(', ');
+
+      final unitPrice = calculateTotalPrice() / quantity;
+      final cartItem = CartItemEntity(
+        id: '${widget.product.id}_${allOptions.hashCode.abs()}',
+        title: widget.product.name,
+        customOptions: allOptions.isNotEmpty ? allOptions : null,
+        price: unitPrice,
+        quantity: quantity,
+        imageUrl: widget.product.image.isNotEmpty ? widget.product.image : null,
+      );
+
+      await getIt<AddToCartUseCase>()(cartItem);
+
+      if (mounted) {
+        AppToast.showToast(
+          context: context,
+          title: AppLocale.successTitle.getString(context),
+          description: AppLocale.itemAddedToCart.getString(context),
+          type: ToastificationType.success,
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        AppToast.showToast(
+          context: context,
+          title: AppLocale.toastError.getString(context),
+          description: e.toString(),
+          type: ToastificationType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isAddingToCart = false);
+      }
     }
   }
 
@@ -91,11 +151,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
 
                 Transform.translate(
-                  offset: Offset(0, -20),
+                  offset: const Offset(0, -20),
                   child: Container(
                     width: double.infinity,
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(20),
+                    decoration: const BoxDecoration(
                       color: Color(0xFFFFFBF8),
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(24),
@@ -108,8 +168,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${widget.product.price.toInt()} ج.م',
-                              style: TextStyle(
+                              '${widget.product.price.toInt()} ${AppLocale.currency.getString(context)}',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF8D6654),
@@ -117,7 +177,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                             Text(
                               widget.product.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF2D2521),
@@ -125,7 +185,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
                         if (widget.product.description.isNotEmpty) ...[
                           Text(
                             widget.product.description,
@@ -136,24 +196,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               color: Colors.grey.shade700,
                             ),
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                         ],
                         ProductOptionSelectorWidget(
                           title: 'الحجم',
-                          options: ['كبير', 'وسط', 'صغير'],
+                          options: const ['كبير', 'وسط', 'صغير'],
                           selectedOption: selectedSize,
                           onOptionSelected: (val) =>
                               setState(() => selectedSize = val),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         ProductOptionSelectorWidget(
                           title: 'نوع الحليب',
-                          options: ['لوز', 'شوفان', 'حليب بقري'],
+                          options: const ['لوز', 'شوفان', 'حليب بقري'],
                           selectedOption: selectedMilk,
                           onOptionSelected: (val) =>
                               setState(() => selectedMilk = val),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         ProductAddOnsWidget(
                           addOns: addOns,
                           onAddOnChanged: (key, val) {
@@ -180,7 +240,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               onDecrement: () {
                 if (quantity > 1) setState(() => quantity--);
               },
-              onAddToCart: () {},
+              onAddToCart: _handleAddToCart,
             ),
           ),
         ],

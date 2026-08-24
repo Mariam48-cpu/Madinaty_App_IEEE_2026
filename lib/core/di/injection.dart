@@ -6,5 +6,8 @@ import 'injection.config.dart';
 final getIt = GetIt.instance;
 
 @InjectableInit()
-void configureDependencies() => getIt.init();
+void configureDependencies() {
+  getIt.allowReassignment = true;
+  getIt.init();
+}
 

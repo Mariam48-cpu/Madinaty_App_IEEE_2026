@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import '../../../../cart/domain/entities/cart_item_entity.dart';
@@ -25,36 +27,41 @@ class PreOrdersSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('الطلبات المسبقة', style: AppTypography.titleLarge),
+            Text(
+              AppLocale.preOrdersTitle.getString(context),
+              style: AppTypography.titleLarge,
+            ),
             if (onEditPressed != null)
               GestureDetector(
                 onTap: onEditPressed,
                 child: Text(
-                  'تعديل',
+                  AppLocale.edit.getString(context),
                   style: AppTypography.labelLarge.copyWith(
                     color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
           ],
         ),
         const SizedBox(height: 12),
-
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: preOrderItems.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          separatorBuilder: (context, index) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final item = preOrderItems[index];
-            return _buildPreOrderItemCard(item);
+            return _buildPreOrderItemCard(context, item);
           },
         ),
       ],
     );
   }
 
-  Widget _buildPreOrderItemCard(CartItemEntity item) {
+  Widget _buildPreOrderItemCard(BuildContext context, CartItemEntity item) {
+    final currency = AppLocale.currency.getString(context);
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -101,9 +108,7 @@ class PreOrdersSection extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,14 +124,16 @@ class PreOrdersSection extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     item.customOptions!,
-                    style: AppTypography.bodySmall,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
                 const SizedBox(height: 4),
                 Text(
-                  '${item.totalPrice.toStringAsFixed(0)} ج.م',
+                  '${item.totalPrice % 1 == 0 ? item.totalPrice.toInt() : item.totalPrice.toStringAsFixed(2)} $currency',
                   style: AppTypography.titleSmall.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.primary,
@@ -135,9 +142,7 @@ class PreOrdersSection extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(width: 10),
-
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: item.imageUrl != null && item.imageUrl!.isNotEmpty
@@ -146,7 +151,8 @@ class PreOrdersSection extends StatelessWidget {
                     width: 55,
                     height: 55,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => _buildPlaceholderImage(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildPlaceholderImage(),
                   )
                 : _buildPlaceholderImage(),
           ),

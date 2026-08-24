@@ -34,4 +34,26 @@ class CartItemEntity {
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CartItemEntity &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          customOptions == other.customOptions &&
+          price == other.price &&
+          quantity == other.quantity &&
+          imageUrl == other.imageUrl;
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        title,
+        customOptions,
+        price,
+        quantity,
+        imageUrl,
+      );
 }

@@ -13,7 +13,7 @@ class FavoritesRemoteDataSourceImpl
 
   FavoritesRemoteDataSourceImpl();
 
-  String get currentUserId => _firebaseAuth.currentUser?.uid ?? 'guest_user';
+  String? get currentUserId => _firebaseAuth.currentUser?.uid;
 
   CollectionReference<Map<String, dynamic>> _userFavoritesCollection(
     String userId,
@@ -25,7 +25,11 @@ class FavoritesRemoteDataSourceImpl
   }
 
   String _requireUserId() {
-    return currentUserId;
+    final uid = currentUserId;
+    if (uid == null || uid.isEmpty) {
+      throw Exception('يجب تسجيل الدخول لاستخدام المفضلة');
+    }
+    return uid;
   }
 
   @override
@@ -59,47 +63,19 @@ class FavoritesRemoteDataSourceImpl
     FavoriteTargetType? type,
   }) async {
     final uid = currentUserId;
-    if (uid.isEmpty) {
+    if (uid == null || uid.isEmpty) {
       return [];
     }
 
-    Query<Map<String, dynamic>> query = _userFavoritesCollection(uid);
+    try {
+      Query<Map<String, dynamic>> query = _userFavoritesCollection(uid);
 
-    if (type != null) {
-      query = query.where('targetType', isEqualTo: type.value);
-    }
+      if (type != null) {
+        query = query.where('targetType', isEqualTo: type.value);
+      }
 
-    final snapshot = await query.get();
+      final snapshot = await query.get();
 
-    final items = snapshot.docs
-        .map((doc) => FavoriteItemModel.fromFirestore(doc))
-        .toList();
-
-    items.sort((a, b) {
-      final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      return bDate.compareTo(aDate);
-    });
-
-    return items;
-  }
-
-  @override
-  Stream<List<FavoriteItemModel>> watchFavorites({
-    FavoriteTargetType? type,
-  }) {
-    final uid = currentUserId;
-    if (uid.isEmpty) {
-      return Stream.value([]);
-    }
-
-    Query<Map<String, dynamic>> query = _userFavoritesCollection(uid);
-
-    if (type != null) {
-      query = query.where('targetType', isEqualTo: type.value);
-    }
-
-    return query.snapshots().map((snapshot) {
       final items = snapshot.docs
           .map((doc) => FavoriteItemModel.fromFirestore(doc))
           .toList();
@@ -111,7 +87,43 @@ class FavoritesRemoteDataSourceImpl
       });
 
       return items;
-    });
+    } catch (_) {
+      return [];
+    }
+  }
+
+  @override
+  Stream<List<FavoriteItemModel>> watchFavorites({
+    FavoriteTargetType? type,
+  }) {
+    final uid = currentUserId;
+    if (uid == null || uid.isEmpty) {
+      return Stream.value([]);
+    }
+
+    try {
+      Query<Map<String, dynamic>> query = _userFavoritesCollection(uid);
+
+      if (type != null) {
+        query = query.where('targetType', isEqualTo: type.value);
+      }
+
+      return query.snapshots().map((snapshot) {
+        final items = snapshot.docs
+            .map((doc) => FavoriteItemModel.fromFirestore(doc))
+            .toList();
+
+        items.sort((a, b) {
+          final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          return bDate.compareTo(aDate);
+        });
+
+        return items;
+      }).handleError((_) => <FavoriteItemModel>[]);
+    } catch (_) {
+      return Stream.value([]);
+    }
   }
 
   @override
@@ -120,12 +132,16 @@ class FavoritesRemoteDataSourceImpl
     required FavoriteTargetType type,
   }) async {
     final uid = currentUserId;
-    if (uid.isEmpty) {
+    if (uid == null || uid.isEmpty) {
       return false;
     }
 
-    final docId = FavoriteItemEntity.generateId(type, targetId);
-    final doc = await _userFavoritesCollection(uid).doc(docId).get();
-    return doc.exists;
+    try {
+      final docId = FavoriteItemEntity.generateId(type, targetId);
+      final doc = await _userFavoritesCollection(uid).doc(docId).get();
+      return doc.exists;
+    } catch (_) {
+      return false;
+    }
   }
 }
