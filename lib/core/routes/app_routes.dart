@@ -4,12 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
-import '../../features/booking/domain/entities/booking_entity.dart';
+import '../../features/cart/presentation/view/screens/cart_screen.dart';
 import '../../features/checkout/presentation/view/screens/checkout_screen.dart';
 import '../../features/discovery/presentation/view/screens/main_navigation_screen.dart';
 import '../../features/personalization/presentation/view/screens/personalization_screen.dart';
+import '../../features/pre_order/presentation/view/screens/pre_order_screen.dart';
 
 abstract class AppRoutes {
   const AppRoutes._();
@@ -25,12 +28,16 @@ abstract class AppRoutes {
   static const String notifications = '/notifications';
   static const String profile = '/profile';
   static const String checkout = '/checkout';
+  static const String cart = '/cart';
+  static const String preOrder = '/pre_order';
 
   static Map<String, WidgetBuilder> get routes => {
-        auth: (_) => const AuthScreen(),
-        personalization: (_) => const PersonalizationScreen(),
-        home: (_) => const MainNavigationScreen(),
-      };
+    auth: (_) => const AuthScreen(),
+    personalization: (_) => const PersonalizationScreen(),
+    home: (_) => const MainNavigationScreen(),
+    cart: (_) => const CartScreen(),
+    preOrder: (_) => const PreOrderScreen(),
+  };
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -53,9 +60,7 @@ abstract class AppRoutes {
         if (user == null) {
           return MaterialPageRoute(
             builder: (_) => const Scaffold(
-              body: Center(
-                child: Text('User is not logged in'),
-              ),
+              body: Center(child: Text('User is not logged in')),
             ),
             settings: settings,
           );
@@ -66,12 +71,41 @@ abstract class AppRoutes {
           settings: settings,
         );
 
+      case cart:
+        final cafeNameArg = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => CartScreen(cafeName: cafeNameArg),
+          settings: settings,
+        );
+
+      case preOrder:
+        final args = settings.arguments;
+        if (args is BookingEntity) {
+          return MaterialPageRoute(
+            builder: (_) => PreOrderScreen(booking: args, cafeId: args.cafeId),
+            settings: settings,
+          );
+        } else if (args is Map<String, dynamic>) {
+          return MaterialPageRoute(
+            builder: (_) => PreOrderScreen(
+              booking: args['booking'] as BookingEntity?,
+              cafeId: args['cafeId'] as String? ?? 'cafe_default',
+              cafeName: args['cafeName'] as String?,
+              cafe: args['cafe'] as CafeEntity?,
+            ),
+            settings: settings,
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => const PreOrderScreen(),
+          settings: settings,
+        );
+
       case checkout:
         final bookingArg = settings.arguments as BookingEntity?;
 
         return MaterialPageRoute(
-          builder: (_) =>
-              CheckoutScreen(booking: bookingArg ?? dummyBooking),
+          builder: (_) => CheckoutScreen(booking: bookingArg ?? dummyBooking),
           settings: settings,
         );
 
@@ -81,9 +115,7 @@ abstract class AppRoutes {
         if (user == null) {
           return MaterialPageRoute(
             builder: (_) => const Scaffold(
-              body: Center(
-                child: Text('User is not logged in'),
-              ),
+              body: Center(child: Text('User is not logged in')),
             ),
             settings: settings,
           );
@@ -91,11 +123,9 @@ abstract class AppRoutes {
 
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => sl<NotificationCubit>()
-              ..fetchNotifications(user.uid),
-            child: NotificationsScreen(
-              uid: user.uid,
-            ),
+            create: (_) =>
+                sl<NotificationCubit>()..fetchNotifications(user.uid),
+            child: NotificationsScreen(uid: user.uid),
           ),
           settings: settings,
         );
@@ -103,11 +133,7 @@ abstract class AppRoutes {
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            body: Center(
-              child: Text(
-                'No route defined for ${settings.name}',
-              ),
-            ),
+            body: Center(child: Text('No route defined for ${settings.name}')),
           ),
           settings: settings,
         );

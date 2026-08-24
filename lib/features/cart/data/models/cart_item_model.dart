@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/cart_item_entity.dart';
 
 class CartItemModel extends CartItemEntity {
@@ -10,6 +11,17 @@ class CartItemModel extends CartItemEntity {
     super.imageUrl,
   });
 
+  factory CartItemModel.fromEntity(CartItemEntity entity) {
+    return CartItemModel(
+      id: entity.id,
+      title: entity.title,
+      customOptions: entity.customOptions,
+      price: entity.price,
+      quantity: entity.quantity,
+      imageUrl: entity.imageUrl,
+    );
+  }
+
   factory CartItemModel.fromMap(Map<String, dynamic> map, String id) {
     return CartItemModel(
       id: id.isNotEmpty ? id : (map['id'] ?? ''),
@@ -19,6 +31,13 @@ class CartItemModel extends CartItemEntity {
       quantity: (map['quantity'] ?? 1).toInt(),
       imageUrl: map['imageUrl'],
     );
+  }
+
+  factory CartItemModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data() ?? {};
+    return CartItemModel.fromMap(data, doc.id);
   }
 
   Map<String, dynamic> toMap() {

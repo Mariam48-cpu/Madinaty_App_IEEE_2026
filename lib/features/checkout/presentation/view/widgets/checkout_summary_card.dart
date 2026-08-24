@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import '../../../../booking/domain/entities/booking_entity.dart';
@@ -6,19 +8,30 @@ import '../../../../booking/domain/entities/booking_entity.dart';
 class CheckoutSummaryCard extends StatelessWidget {
   final BookingEntity booking;
   final double reservationFee;
+  final double preOrdersAmount;
   final double taxRate;
 
   const CheckoutSummaryCard({
     super.key,
     required this.booking,
     this.reservationFee = 50.0,
+    this.preOrdersAmount = 0.0,
     this.taxRate = 0.14,
   });
 
+  String _formatAmount(double amount) {
+    if (amount % 1 == 0) {
+      return amount.toInt().toString();
+    }
+    return amount.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final double taxAmount = reservationFee * taxRate;
-    final double totalAmount = reservationFee + taxAmount;
+    final currency = AppLocale.currency.getString(context);
+    final double taxableAmount = reservationFee + preOrdersAmount;
+    final double taxAmount = taxableAmount * taxRate;
+    final double totalAmount = taxableAmount + taxAmount;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -37,39 +50,48 @@ class CheckoutSummaryCard extends StatelessWidget {
       child: Column(
         children: [
           _buildSummaryRow(
-            title: 'رسوم حجز الطاولة',
-            subtitle: '(تخصم من الفاتورة)',
-            value: '${reservationFee.toStringAsFixed(0)} ج.م',
+            title: AppLocale.tableReservationFee.getString(context),
+            subtitle: AppLocale.tableReservationFeeSubtitle.getString(context),
+            value: '${_formatAmount(reservationFee)} $currency',
           ),
+          if (preOrdersAmount > 0) ...[
+            const SizedBox(height: 10),
+            _buildSummaryRow(
+              title: AppLocale.preOrdersSubtotal.getString(context),
+              value: '${_formatAmount(preOrdersAmount)} $currency',
+            ),
+          ],
           const SizedBox(height: 10),
-
           _buildSummaryRow(
-            title: 'الضرائب (${(taxRate * 100).toInt()}%)',
-            value: '${taxAmount.toStringAsFixed(1)} ج.م',
+            title: AppLocale.taxes.getString(context),
+            value: '${_formatAmount(taxAmount)} $currency',
           ),
-
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Divider(color: AppColors.divider, height: 1),
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('الإجمالي', style: AppTypography.titleLarge),
+              Text(
+                AppLocale.total.getString(context),
+                style: AppTypography.titleLarge.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${totalAmount.toStringAsFixed(1)} ج.م',
+                    '${_formatAmount(totalAmount)} $currency',
                     style: AppTypography.headlineMedium.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    'شامل الضرائب',
+                    AppLocale.inclusiveOfTaxes.getString(context),
                     style: AppTypography.bodySmall.copyWith(
                       fontSize: 10,
                       color: AppColors.textMuted,
@@ -113,7 +135,6 @@ class CheckoutSummaryCard extends StatelessWidget {
             ],
           ],
         ),
-
         Text(
           value,
           style: AppTypography.titleSmall.copyWith(

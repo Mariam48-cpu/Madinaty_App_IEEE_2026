@@ -245,22 +245,6 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
 
     await docRef.set(confirmedBooking.toFirestore());
 
-    try {
-      final cartSnap = await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('cart')
-          .get();
-
-      final batch = _firestore.batch();
-      for (var doc in cartSnap.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-    } catch (e) {
-      print('Warning: Failed to clear cart after booking confirmation: $e');
-    }
-
     return confirmedBooking;
   }
 }
