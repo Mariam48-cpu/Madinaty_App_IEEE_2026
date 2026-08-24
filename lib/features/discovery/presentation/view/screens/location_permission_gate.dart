@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/explore_map_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/map_picker_screen.dart';
@@ -13,11 +13,12 @@ class LocationPermissionGate extends StatefulWidget {
   const LocationPermissionGate({super.key});
 
   @override
-  State<LocationPermissionGate> createState() => _LocationPermissionGateState();
+  State<LocationPermissionGate> createState() =>
+      _LocationPermissionGateState();
 }
 
 class _LocationPermissionGateState extends State<LocationPermissionGate> {
-  final LocationService locationService = getIt<LocationService>();
+  final LocationService locationService = sl<LocationService>();
 
   bool? permissionGranted;
 
@@ -53,11 +54,17 @@ class _LocationPermissionGateState extends State<LocationPermissionGate> {
   @override
   Widget build(BuildContext context) {
     if (permissionGranted == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     if (permissionGranted == true) {
-      return ExploreMapScreen(cubit: getIt<DiscoveryCubit>());
+      return ExploreMapScreen(
+        cubit: sl<DiscoveryCubit>(),
+      );
     }
 
     return LocationPermissionScreen(
