@@ -62,6 +62,30 @@ mixin AppLocale {
   static const String confirmAndPay = 'confirmAndPay';
   static const String backToCart = 'backToCart';
 
+  // --- Cart Screen ---
+  static const String cartTitle = 'cartTitle';
+  static const String cartPickupOrder = 'cartPickupOrder';
+  static const String orderNotesTitle = 'orderNotesTitle';
+  static const String orderNotesHint = 'orderNotesHint';
+  static const String cartSubtotal = 'cartSubtotal';
+  static const String serviceFee = 'serviceFee';
+  static const String proceedToCheckout = 'proceedToCheckout';
+  static const String emptyCartTitle = 'emptyCartTitle';
+  static const String emptyCartSubtitle = 'emptyCartSubtitle';
+  static const String exploreMenu = 'exploreMenu';
+  static const String itemAddedToCart = 'itemAddedToCart';
+  static const String clearCart = 'clearCart';
+
+  // --- Pre-Order Screen ---
+  static const String preOrderMenuTitle = 'preOrderMenuTitle';
+  static const String skipPreOrder = 'skipPreOrder';
+  static const String temporaryTotal = 'temporaryTotal';
+  static const String proceedToCart = 'proceedToCart';
+  static const String itemsCount = 'itemsCount';
+  static const String searchMenuPlaceholder = 'searchMenuPlaceholder';
+  static const String allCategories = 'allCategories';
+  static const String preOrder = 'preOrder';
+
   // --- Confirmation Screen ---
   static const String reservationConfirmedTitle = 'reservationConfirmedTitle';
   static const String reservationConfirmedDesc = 'reservationConfirmedDesc';
@@ -220,6 +244,28 @@ mixin AppLocale {
     confirmAndPay: 'تأكيد والدفع',
     backToCart: 'العودة للسلة',
 
+    cartTitle: 'السلة',
+    cartPickupOrder: 'طلب استلام من الفرع',
+    orderNotesTitle: 'ملاحظات الطلب',
+    orderNotesHint: 'أي ملاحظات؟',
+    cartSubtotal: 'المجموع الفرعي',
+    serviceFee: 'رسوم الخدمة',
+    proceedToCheckout: 'متابعة للدفع',
+    emptyCartTitle: 'السلة فارغة',
+    emptyCartSubtitle: 'لم تقم بإضافة أي عناصر إلى السلة بعد',
+    exploreMenu: 'استكشف القائمة',
+    itemAddedToCart: 'تمت إضافة العنصر إلى السلة',
+    clearCart: 'تفريغ السلة',
+
+    preOrderMenuTitle: 'اطلب مسبقاً',
+    skipPreOrder: 'تخطي الطلب المسبق',
+    temporaryTotal: 'إجمالي المؤقت',
+    proceedToCart: 'متابعة للسلة',
+    itemsCount: 'منتجات',
+    searchMenuPlaceholder: 'ابحث في القائمة...',
+    allCategories: 'الكل',
+    preOrder: 'اطلب مسبقاً',
+
     reservationConfirmedTitle: 'تم تأكيد الحجز بنجاح!',
     reservationConfirmedDesc: 'تم إرسال تفاصيل الحجز والإشعار إلى حسابك',
     bookingNumber: 'رقم الحجز',
@@ -368,6 +414,28 @@ mixin AppLocale {
     currency: 'EGP',
     confirmAndPay: 'Confirm & Pay',
     backToCart: 'Back to Cart',
+
+    cartTitle: 'Shopping Cart',
+    cartPickupOrder: 'Branch Pickup Order',
+    orderNotesTitle: 'Order Notes',
+    orderNotesHint: 'Any notes?',
+    cartSubtotal: 'Subtotal',
+    serviceFee: 'Service Fee',
+    proceedToCheckout: 'Proceed to Checkout',
+    emptyCartTitle: 'Your Cart is Empty',
+    emptyCartSubtitle: 'You have not added any items yet',
+    exploreMenu: 'Explore Menu',
+    itemAddedToCart: 'Item added to cart',
+    clearCart: 'Clear Cart',
+
+    preOrderMenuTitle: 'Pre-Order Menu',
+    skipPreOrder: 'Skip Pre-Order',
+    temporaryTotal: 'Estimated Total',
+    proceedToCart: 'Proceed to Cart',
+    itemsCount: 'items',
+    searchMenuPlaceholder: 'Search menu...',
+    allCategories: 'All',
+    preOrder: 'Pre-Order',
 
     reservationConfirmedTitle: 'Reservation Confirmed Successfully!',
     reservationConfirmedDesc: 'Booking details and notification have been sent to your account',
@@ -518,6 +586,28 @@ mixin AppLocale {
     confirmAndPay: 'បញ្ជាក់ និងទូទាត់',
     backToCart: 'ត្រឡប់ទៅកន្ត្រកវិញ',
 
+    cartTitle: 'កន្ត្រក',
+    cartPickupOrder: 'ការបញ្ជាទិញទទួលពីសាខា',
+    orderNotesTitle: 'កំណត់ចំណាំការបញ្ជាទិញ',
+    orderNotesHint: 'មានកំណត់ចំណាំអ្វីទេ?',
+    cartSubtotal: 'សរុបរង',
+    serviceFee: 'ថ្លៃសេវា',
+    proceedToCheckout: 'បន្តទៅការទូទាត់',
+    emptyCartTitle: 'កន្ត្រករបស់អ្នកទទេ',
+    emptyCartSubtitle: 'អ្នកមិនទាន់បានបន្ថែមទំនិញណាមួយនៅឡើយទេ',
+    exploreMenu: 'រុករកម៉ឺនុយ',
+    itemAddedToCart: 'ទំនិញត្រូវបានបន្ថែមទៅក្នុងកន្ត្រក',
+    clearCart: 'សម្អាតកន្ត្រក',
+
+    preOrderMenuTitle: 'ការបញ្ជាទិញទុកមុន',
+    skipPreOrder: 'រំលងការបញ្ជាទិញទុកមុន',
+    temporaryTotal: 'សរុបបណ្តោះអាសន្ន',
+    proceedToCart: 'បន្តទៅកន្ត្រក',
+    itemsCount: 'មុខទំនិញ',
+    searchMenuPlaceholder: 'ស្វែងរកម៉ឺនុយ...',
+    allCategories: 'ទាំងអស់',
+    preOrder: 'ការបញ្ជាទិញទុកមុន',
+
     reservationConfirmedTitle: 'ការកក់ត្រូវបានបញ្ជាក់ដោយជោគជ័យ!',
     reservationConfirmedDesc: 'ព័ត៌មានលម្អិត និងការជូនដំណឹងត្រូវបានផ្ញើទៅកាន់គណនីរបស់អ្នក',
     bookingNumber: 'លេខកក់',
@@ -652,6 +742,28 @@ mixin AppLocale {
     currency: 'EGP',
     confirmAndPay: '確定してお支払い',
     backToCart: 'カートに戻る',
+
+    cartTitle: 'カート',
+    cartPickupOrder: '店舗受取注文',
+    orderNotesTitle: '注文メモ',
+    orderNotesHint: 'ご要望など',
+    cartSubtotal: '小計',
+    serviceFee: 'サービス料',
+    proceedToCheckout: 'お支払いに進む',
+    emptyCartTitle: 'カートは空です',
+    emptyCartSubtitle: '商品がまだ追加されていません',
+    exploreMenu: 'メニューを見る',
+    itemAddedToCart: 'カートに追加されました',
+    clearCart: 'カートをクリア',
+
+    preOrderMenuTitle: '事前注文メニュー',
+    skipPreOrder: '事前注文をスキップ',
+    temporaryTotal: '暫定合計',
+    proceedToCart: 'カートに進む',
+    itemsCount: '点',
+    searchMenuPlaceholder: 'メニューを検索...',
+    allCategories: 'すべて',
+    preOrder: '事前注文',
 
     reservationConfirmedTitle: '予約が完了しました！',
     reservationConfirmedDesc: '予約の詳細と通知をアカウントに送信しました',

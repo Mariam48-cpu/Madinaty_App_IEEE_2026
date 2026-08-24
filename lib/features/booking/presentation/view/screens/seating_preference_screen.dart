@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/widgets/cafe_header_card.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/widgets/legend_item.dart';
@@ -58,11 +61,30 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
         child: BlocConsumer<BookingCubit, BookingState>(
           listener: (context, state) {
             if (state is BookingSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('تم تأكيد الحجز بنجاح 🎉')),
+              final cubit = context.read<BookingCubit>();
+              final booking = BookingEntity(
+                id: state.bookingId,
+                userId: FirebaseAuth.instance.currentUser?.uid ?? 'guest_user',
+                cafeId: widget.cafe.id,
+                date: cubit.date ?? DateTime.now(),
+                time: cubit.time ?? '18:00',
+                guests: cubit.guests,
+                occasion: cubit.occasion ?? 'جلسة عمل',
+                seatingPreference: selectedTable ?? 'T3',
+                status: BookingStatus.pending,
+                createdAt: DateTime.now(),
               );
 
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushNamed(
+                context,
+                AppRoutes.preOrder,
+                arguments: {
+                  'booking': booking,
+                  'cafeId': widget.cafe.id,
+                  'cafeName': widget.cafe.name,
+                  'cafe': widget.cafe,
+                },
+              );
             }
 
             if (state is BookingFailure) {
