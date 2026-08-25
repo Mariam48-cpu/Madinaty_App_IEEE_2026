@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_filter_chips.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_results_header.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/cafe_search_delegate.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_filter_chips.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_results_content.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_results_header.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 
 class CategoryResultsScreen extends StatefulWidget {
@@ -50,16 +53,16 @@ class _CategoryResultsScreenState extends State<CategoryResultsScreen> {
     }
   }
 
-  String screenTitle() {
+  String screenTitle(BuildContext context) {
     switch (widget.category) {
       case 'هادئ للمذاكرة':
-        return 'أماكن هادئة للمذاكرة';
+        return AppLocale.study.getString(context);
       case 'مفتوح الآن':
-        return 'أماكن مفتوحة الآن';
+        return AppLocale.openNow.getString(context);
       case 'قهوة مختصة':
-        return 'قهوة مختصة';
+        return AppLocale.specialtyCoffee.getString(context);
       case 'الكل':
-        return 'كل الكافيهات';
+        return AppLocale.all.getString(context);
       default:
         return widget.category;
     }
@@ -77,12 +80,12 @@ class _CategoryResultsScreenState extends State<CategoryResultsScreen> {
     return BlocProvider.value(
       value: widget.cubit,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF9F5F2),
+        backgroundColor: AppColors.background,
         body: SafeArea(
           child: Column(
             children: [
               CategoryResultsHeader(
-                title: screenTitle(),
+                title: screenTitle(context),
                 onBack: () => Navigator.pop(context),
                 onSearch: openSearch,
               ),

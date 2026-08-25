@@ -27,4 +27,7 @@ class CafeEntity {
     this.openingHours = '',
     this.attributes = const [],
   });
+
+  double get latitude => location.latitude;
+  double get longitude => location.longitude;
 }

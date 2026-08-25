@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import '../../../domain/entities/booking_entity.dart';
@@ -13,7 +15,7 @@ class PassStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = _getStatusConfig(status);
+    final config = _getStatusConfig(context, status);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -42,18 +44,18 @@ class PassStatusBadge extends StatelessWidget {
     );
   }
 
-  _StatusConfig _getStatusConfig(BookingStatus status) {
+  _StatusConfig _getStatusConfig(BuildContext context, BookingStatus status) {
     switch (status) {
       case BookingStatus.approved:
         return _StatusConfig(
-          label: 'مؤكد',
+          label: AppLocale.statusConfirmed.getString(context),
           textColor: AppColors.primary,
           backgroundColor: AppColors.primaryContainer,
           icon: Icons.check_circle_rounded,
         );
       case BookingStatus.pending:
         return _StatusConfig(
-          label: 'قيد الانتظار',
+          label: AppLocale.statusPending.getString(context),
           textColor: AppColors.textSecondary,
           backgroundColor: AppColors.surfaceVariant,
           icon: Icons.access_time_rounded,
@@ -61,7 +63,7 @@ class PassStatusBadge extends StatelessWidget {
       case BookingStatus.rejected:
       case BookingStatus.cancelled:
         return _StatusConfig(
-          label: 'ملغي',
+          label: AppLocale.statusCancelled.getString(context),
           textColor: AppColors.error,
           backgroundColor: AppColors.errorContainer,
           icon: Icons.cancel_rounded,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/search/drink_card.dart';
 
 class DrinksSection extends StatelessWidget {
@@ -16,24 +18,24 @@ class DrinksSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'المشروبات اللي ممكن تلاقيها',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          AppLocale.drinksYouMightFind.getString(context),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
-
-        SizedBox(height: 14),
-
+        const SizedBox(height: 14),
         SizedBox(
           height: 115,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            reverse: true,
             itemCount: drinks.length,
             itemBuilder: (_, index) {
               final drink = drinks[index];
-
               return DrinkCard(name: drink.$1, icon: drink.$2);
             },
           ),

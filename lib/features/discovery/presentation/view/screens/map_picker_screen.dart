@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/explore_map_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 
@@ -31,7 +34,16 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('حدد الموقع على الخريطة')),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text(
+          AppLocale.selectLocationOnMap.getString(context),
+          style: const TextStyle(color: AppColors.textPrimary),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Stack(
         children: [
           FlutterMap(
@@ -47,7 +59,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.madinaty_app_ieee_2026',
+                userAgentPackageName: 'madinaty_app_ieee_2026',
               ),
               if (tappedPosition != null)
                 MarkerLayer(
@@ -61,7 +73,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                         child: Icon(
                           Icons.location_on,
                           size: 50,
-                          color: Color(0xFF6D4534),
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -76,6 +88,13 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
             child: SizedBox(
               height: 52,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.darkButton,
+                  foregroundColor: AppColors.onDarkButton,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
                 onPressed: () async {
                   if (tappedPosition != null) {
                     final cubit = getIt<DiscoveryCubit>();
@@ -89,11 +108,17 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                       MaterialPageRoute(
                         builder: (context) => ExploreMapScreen(cubit: cubit),
                       ),
-                      (route) => false,
+                          (route) => false,
                     );
                   }
                 },
-                child: Text('تأكيد هذا الموقع'),
+                child: Text(
+                  AppLocale.confirmThisLocation.getString(context),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ),

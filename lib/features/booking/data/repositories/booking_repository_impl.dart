@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/data/models/booking_model.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/booking_repository_interface.dart';
@@ -19,19 +20,19 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
   @override
   Future<String> createBooking(BookingEntity booking) async {
     if (booking.date == null) {
-      throw Exception('من فضلك اختار تاريخ الحجز');
+      throw Exception(AppLocale.selectDateError);
     }
 
     if (booking.time == null || booking.time!.isEmpty) {
-      throw Exception('من فضلك اختار وقت الحجز');
+      throw Exception(AppLocale.selectTimeError);
     }
 
     if (booking.cafeId.isEmpty) {
-      throw Exception('بيانات الكافيه غير موجودة');
+      throw Exception(AppLocale.cafeDataNotFoundError);
     }
 
     if (booking.userId.isEmpty) {
-      throw Exception('المستخدم غير مسجل الدخول');
+      throw Exception(AppLocale.userNotLoggedInError);
     }
 
     final dateKey =
@@ -60,7 +61,7 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
 
       if (status == 'pending' || status == 'approved') {
         throw Exception(
-          'الطاولة دي محجوزة بالفعل في الوقت والتاريخ المحددين',
+          AppLocale.tableAlreadyBookedError,
         );
       }
     }

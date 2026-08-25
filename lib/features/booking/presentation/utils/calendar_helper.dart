@@ -1,14 +1,23 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/booking_entity.dart';
 
 abstract class CalendarHelper {
   static Future<void> addBookingToCalendar({
+    required BuildContext context,
     required BookingEntity booking,
-    String cafeName = 'مدينتي كافيه',
-    String cafeLocation = 'التجمع الخامس',
+    String? cafeName,
+    String? cafeLocation,
   }) async {
-    final DateTime startDate = booking.date?? DateTime.now();
+    final String resolvedCafeName =
+        cafeName ?? AppLocale.defaultCafeName.getString(context);
+    final String resolvedCafeLocation =
+        cafeLocation ?? AppLocale.defaultCafeLocation.getString(context);
+
+    final DateTime startDate = booking.date ?? DateTime.now();
     final DateTime endDate = startDate.add(const Duration(hours: 2));
 
     final String startIso = startDate
@@ -16,27 +25,38 @@ abstract class CalendarHelper {
         .toIso8601String()
         .replaceAll(RegExp(r'[:-]'), '')
         .split('.')
-        .first + 'Z';
+        .first +
+        'Z';
     final String endIso = endDate
         .toUtc()
         .toIso8601String()
         .replaceAll(RegExp(r'[:-]'), '')
         .split('.')
-        .first + 'Z';
+        .first +
+        'Z';
 
     final String shortId = booking.id.isNotEmpty && booking.id.length >= 8
         ? booking.id.substring(0, 8).toUpperCase()
         : booking.id;
+
+    final String tableBookingPrefix =
+    AppLocale.calendarTableBookingPrefix.getString(context);
+    final String bookingForPrefix =
+    AppLocale.calendarBookingForPrefix.getString(context);
+    final String guestsText = AppLocale.guestsCountText.getString(context);
+    final String bookingNumberPrefix =
+    AppLocale.calendarBookingNumberPrefix.getString(context);
 
     final Uri googleCalendarUrl = Uri.https(
       'calendar.google.com',
       '/calendar/render',
       {
         'action': 'TEMPLATE',
-        'text': 'حجز طاولة - $cafeName',
+        'text': '$tableBookingPrefix - $resolvedCafeName',
         'dates': '$startIso/$endIso',
-        'details': 'حجز طاولة لـ ${booking.guests} أشخاص • رقم الحجز: #$shortId',
-        'location': cafeLocation,
+        'details':
+        '$bookingForPrefix ${booking.guests} $guestsText • $bookingNumberPrefix #$shortId',
+        'location': resolvedCafeLocation,
       },
     );
 

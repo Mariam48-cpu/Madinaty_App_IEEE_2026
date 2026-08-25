@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/explore_map_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/map_picker_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
@@ -25,7 +26,6 @@ class _LocationPermissionGateState extends State<LocationPermissionGate> {
   @override
   void initState() {
     super.initState();
-
     checkPermission();
   }
 
@@ -34,7 +34,7 @@ class _LocationPermissionGateState extends State<LocationPermissionGate> {
 
     final granted =
         permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
+            permission == LocationPermission.whileInUse;
 
     if (!mounted) return;
 
@@ -55,8 +55,11 @@ class _LocationPermissionGateState extends State<LocationPermissionGate> {
   Widget build(BuildContext context) {
     if (permissionGranted == null) {
       return const Scaffold(
+        backgroundColor: AppColors.background,
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            color: AppColors.primary,
+          ),
         ),
       );
     }

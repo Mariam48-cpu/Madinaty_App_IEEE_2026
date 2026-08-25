@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/search/search_bar.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/search/search_content.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/search/search_error_state.dart';
@@ -18,12 +21,14 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController searchController = TextEditingController();
 
-  final List<String> moods = ['العمل', 'جلسة هادئة', 'مع الأصحاب'];
+  List<String> _getMoods(BuildContext context) => [
+    AppLocale.work.getString(context),
+    AppLocale.chillSitting.getString(context),
+    AppLocale.withFriends.getString(context),
+  ];
 
   String currentQuery = '';
-
   int? selectedMoodIndex;
-
   final List<String> recentSearches = [];
 
   @override
@@ -72,6 +77,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void selectMood(int index) {
+    final moods = _getMoods(context);
     final mood = moods[index];
 
     setState(() {
@@ -93,6 +99,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void selectRecentSearch(String value) {
+    final moods = _getMoods(context);
     searchController.text = value;
 
     searchController.selection = TextSelection.fromPosition(
@@ -131,10 +138,12 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final moods = _getMoods(context);
+
     return BlocProvider.value(
       value: widget.cubit,
       child: Scaffold(
-        backgroundColor: Color(0xFFFFF9F6),
+        backgroundColor: AppColors.background,
         body: SafeArea(
           child: Column(
             children: [
@@ -147,14 +156,16 @@ class _SearchScreenState extends State<SearchScreen> {
                   setState(() {});
                 },
               ),
-
-              SizedBox(height: 16),
-
+              const SizedBox(height: 16),
               Expanded(
                 child: BlocBuilder<DiscoveryCubit, DiscoveryState>(
                   builder: (context, state) {
                     if (state is DiscoveryLoading) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      );
                     }
 
                     if (state is DiscoveryError) {
@@ -166,7 +177,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                     if (state is DiscoveryEmpty) {
                       return SearchContent(
-                        cafes: [],
+                        cafes: const [],
                         isEmpty: true,
                         currentQuery: currentQuery,
                         recentSearches: recentSearches,
@@ -197,7 +208,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     }
 
                     return SearchContent(
-                      cafes: [],
+                      cafes: const [],
                       isEmpty: false,
                       currentQuery: currentQuery,
                       recentSearches: recentSearches,

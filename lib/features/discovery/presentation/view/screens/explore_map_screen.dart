@@ -1,15 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/category_results_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/bottom_cafes_cards.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_map.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_top_overlay.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_state.dart';
+import 'package:toastification/toastification.dart';
 
 class ExploreMapScreen extends StatefulWidget {
   final DiscoveryCubit cubit;
@@ -27,11 +32,11 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
   String? cachedLocationName;
   LatLng? lastGeocodedLocation;
 
-  final List<String> filters = [
-    'مفتوح الآن',
+  List<String> _getFilters(BuildContext context) => [
+    AppLocale.openNow.getString(context),
     'Wi-Fi',
-    'هادئ للمذاكرة',
-    'قهوة مختصة',
+    AppLocale.study.getString(context),
+    AppLocale.specialtyCoffee.getString(context),
   ];
 
   void onFilterTap() {
@@ -72,13 +77,18 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
       return cachedLocationName!;
     }
 
+    final defaultDetermining =
+    AppLocale.determiningLocation.getString(context);
+    final defaultCurrentLocation =
+    AppLocale.myCurrentLocation.getString(context);
+
     try {
       final url = Uri.parse(
         'https://nominatim.openstreetmap.org/reverse'
-        '?format=json'
-        '&lat=$latitude'
-        '&lon=$longitude'
-        '&accept-language=ar',
+            '?format=json'
+            '&lat=$latitude'
+            '&lon=$longitude'
+            '&accept-language=ar',
       );
 
       final response = await http.get(
@@ -86,7 +96,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
         headers: {'User-Agent': 'madinaty_app_ieee_2026'},
       );
 
-      if (!mounted) return cachedLocationName ?? 'جاري تحديد الموقع...';
+      if (!mounted) return cachedLocationName ?? defaultDetermining;
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -95,13 +105,13 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
         if (address != null) {
           final String townOrCity =
               address['village'] ??
-              address['town'] ??
-              address['city'] ??
-              address['suburb'] ??
-              '';
+                  address['town'] ??
+                  address['city'] ??
+                  address['suburb'] ??
+                  '';
           final String state = address['state'] ?? address['governorate'] ?? '';
 
-          String resultName = 'موقعي الحالي';
+          String resultName = defaultCurrentLocation;
           if (townOrCity.isNotEmpty && state.isNotEmpty) {
             resultName = '$state، $townOrCity';
           } else if (townOrCity.isNotEmpty) {
@@ -119,7 +129,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
       debugPrint('Reverse Geocoding Error: $e');
     }
 
-    return cachedLocationName ?? 'موقعي الحالي';
+    return cachedLocationName ?? defaultCurrentLocation;
   }
 
   void onChipSelected(int index) {
@@ -165,39 +175,51 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final filters = _getFilters(context);
+
     return BlocProvider.value(
       value: widget.cubit,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         body: SafeArea(
           child: Stack(
             children: [
               BlocConsumer<DiscoveryCubit, DiscoveryState>(
                 listener: (context, state) {
                   if (state is DiscoveryError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.message),
-                        backgroundColor: Colors.red,
-                      ),
+                    AppToast.showToast(
+                      context: context,
+                      title: AppLocale.toastError.getString(context),
+                      description: state.message,
+                      type: ToastificationType.error,
                     );
                   }
                 },
                 builder: (context, state) {
                   if (state is DiscoveryInitial || state is DiscoveryLoading) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(color: AppColors.primary),
+                    );
                   }
                   if (state is DiscoveryError) {
-                    return Center(child: Text(state.message));
+                    return Center(
+                      child: Text(
+                        state.message,
+                        style: const TextStyle(color: AppColors.textPrimary),
+                      ),
+                    );
                   }
                   if (state is DiscoveryEmpty) {
                     return Center(
-                      child: Text('لم يتم العثور على كافيهات قريبة.'),
+                      child: Text(
+                        AppLocale.noNearbyCafesFound.getString(context),
+                        style: const TextStyle(color: AppColors.textSecondary),
+                      ),
                     );
                   }
                   if (state is DiscoverySuccess) {
                     final location =
-                        state.currentLocation ?? LatLng(30.0988, 31.6263);
+                        state.currentLocation ?? const LatLng(30.0988, 31.6263);
                     return Stack(
                       children: [
                         DiscoveryMapWidget(
@@ -219,7 +241,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                     );
                   }
 
-                  return SizedBox.shrink();
+                  return const SizedBox.shrink();
                 },
               ),
               BlocBuilder<DiscoveryCubit, DiscoveryState>(

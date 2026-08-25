@@ -15,10 +15,10 @@ class BookingCubit extends Cubit<BookingState> {
   final UpdateBookingStatusUseCase updateBookingStatusUseCase;
 
   BookingCubit(
-    this.createBookingUseCase,
-    this.getBookingUseCase,
-    this.updateBookingStatusUseCase,
-  ) : super(BookingInitial());
+      this.createBookingUseCase,
+      this.getBookingUseCase,
+      this.updateBookingStatusUseCase,
+      ) : super(BookingInitial());
 
   String? cafeId;
   DateTime? date;
@@ -28,10 +28,6 @@ class BookingCubit extends Cubit<BookingState> {
   String? seatingPreference;
 
   String? bookingId;
-
-  // =========================================================
-  // Booking Data
-  // =========================================================
 
   void setCafeId(String id) {
     cafeId = id;
@@ -76,14 +72,7 @@ class BookingCubit extends Cubit<BookingState> {
 
   void selectSeatingPreference(String preference) {
     seatingPreference = preference;
-
-    // No emit here because createBooking()
-    // is called immediately after selecting the table.
   }
-
-  // =========================================================
-  // Validation
-  // =========================================================
 
   bool validateDateTime() {
     return date != null && time != null && guests > 0;
@@ -102,16 +91,10 @@ class BookingCubit extends Cubit<BookingState> {
         seatingPreference!.isNotEmpty;
   }
 
-  // =========================================================
-  // Create Booking
-  // =========================================================
-
   Future<void> createBooking() async {
     if (!validateBooking()) {
       emit(
-        BookingFailure(
-          'من فضلك كملي كل بيانات الحجز',
-        ),
+         BookingFailure('complete_booking_data_error'),
       );
       return;
     }
@@ -120,9 +103,7 @@ class BookingCubit extends Cubit<BookingState> {
 
     if (user == null) {
       emit(
-        BookingFailure(
-          'يجب تسجيل الدخول أولاً لإتمام الحجز',
-        ),
+         BookingFailure('login_required_booking_error'),
       );
       return;
     }
@@ -160,10 +141,6 @@ class BookingCubit extends Cubit<BookingState> {
     }
   }
 
-  // =========================================================
-  // Get Booking
-  // =========================================================
-
   Future<BookingEntity?> getBooking(String id) async {
     try {
       return await getBookingUseCase(id);
@@ -180,10 +157,6 @@ class BookingCubit extends Cubit<BookingState> {
       return null;
     }
   }
-
-  // =========================================================
-  // Update Booking Status
-  // =========================================================
 
   Future<void> updateBookingStatus({
     required String id,

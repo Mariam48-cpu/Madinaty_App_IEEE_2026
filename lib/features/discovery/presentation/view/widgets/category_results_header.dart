@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/Icon_Button.dart';
 
 class CategoryResultsHeader extends StatelessWidget {
@@ -20,25 +21,21 @@ class CategoryResultsHeader extends StatelessWidget {
       child: Row(
         children: [
           IconButtonWidget(icon: Icons.arrow_back_ios_new, onTap: onBack),
-
-          SizedBox(width: 8),
-
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               title,
               textAlign: TextAlign.right,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2D2521),
+                color: AppColors.textPrimary,
               ),
             ),
           ),
-
-          SizedBox(width: 8),
-
+          const SizedBox(width: 8),
           IconButtonWidget(icon: Icons.search, onTap: onSearch),
         ],
       ),

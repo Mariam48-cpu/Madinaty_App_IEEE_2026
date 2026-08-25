@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class TimeGrid extends StatelessWidget {
   final String? selectedTime;
   final ValueChanged<String> onSelected;
 
-  const TimeGrid({required this.selectedTime, required this.onSelected});
+  const TimeGrid({
+    super.key,
+    required this.selectedTime,
+    required this.onSelected,
+  });
 
-  static const times = [
-    '05:00 م',
-    '05:30 م',
-    '06:00 م',
-    '06:30 م',
-    '07:00 م',
-    '07:30 م',
-    '08:00 م',
-    '08:30 م',
-    '09:00 م',
+  static const _baseTimes = [
+    '05:00',
+    '05:30',
+    '06:00',
+    '06:30',
+    '07:00',
+    '07:30',
+    '08:00',
+    '08:30',
+    '09:00',
   ];
 
   @override
   Widget build(BuildContext context) {
+    final String pmSuffix = AppLocale.pm.getString(context);
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: times.length,
+      itemCount: _baseTimes.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 8,
@@ -31,26 +40,26 @@ class TimeGrid extends StatelessWidget {
         childAspectRatio: 2.4,
       ),
       itemBuilder: (_, index) {
-        final time = times[index];
-        final selected = time == selectedTime;
+        final timeDisplay = '${_baseTimes[index]} $pmSuffix';
+        final selected = timeDisplay == selectedTime;
 
         return InkWell(
-          onTap: () => onSelected(time),
+          onTap: () => onSelected(timeDisplay),
           borderRadius: BorderRadius.circular(10),
           child: Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: selected ? Color(0xFF6E4027) : Colors.white,
+              color: selected ? AppColors.primaryDark : AppColors.surface,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: selected ? Color(0xFF6E4027) : Color(0xFFE1D8D1),
+                color: selected ? AppColors.primaryDark : AppColors.border,
               ),
             ),
             child: Text(
-              time,
+              timeDisplay,
               style: TextStyle(
                 fontSize: 11,
-                color: selected ? Colors.white : Colors.black87,
+                color: selected ? AppColors.textWhite : AppColors.textPrimary,
                 fontWeight: selected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

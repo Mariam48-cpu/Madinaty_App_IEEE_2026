@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class DrinkCard extends StatelessWidget {
   final String name;
   final IconData icon;
 
- const DrinkCard({super.key, required this.name, required this.icon});
+  const DrinkCard({super.key, required this.name, required this.icon});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 105,
-      margin: EdgeInsets.only(left: 10),
+      margin: const EdgeInsetsDirectional.only(end: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -24,19 +30,26 @@ class DrinkCard extends StatelessWidget {
           Container(
             width: 55,
             height: 55,
-            decoration: BoxDecoration(
-              color: Color(0xFFF4ECE8),
+            decoration: const BoxDecoration(
+              color: AppColors.surfaceVariant,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Color(0xFF8D6654), size: 28),
+            child: Icon(icon, color: AppColors.primary, size: 28),
           ),
-
-          SizedBox(height: 8),
-
-          Text(
-            name,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text(
+              name,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
           ),
         ],
       ),

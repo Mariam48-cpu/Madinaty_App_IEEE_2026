@@ -14,7 +14,6 @@ import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterLocalization.instance.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseService.init();
@@ -61,8 +60,6 @@ class _MyAppState extends State<MyApp> {
           countryCode: 'US',
           fontFamily: 'Cairo',
         ),
-        const MapLocale('km', AppLocale.KM, countryCode: 'KH'),
-        const MapLocale('ja', AppLocale.JA, countryCode: 'JP'),
       ],
     );
   }

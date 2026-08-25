@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class TodayDateCard extends StatelessWidget {
   final DateTime date;
   final VoidCallback onTap;
 
-  const TodayDateCard({required this.date, required this.onTap});
+  const TodayDateCard({
+    super.key,
+    required this.date,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,25 +20,32 @@ class TodayDateCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Color(0xFFE6DDD6)),
+          border: Border.all(color: AppColors.border),
         ),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.calendar_today_outlined,
               size: 20,
-              color: Color(0xFF6E4027),
+              color: AppColors.primaryDark,
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 '${date.day} / ${date.month} / ${date.year}',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: AppColors.textSecondary,
+            ),
           ],
         ),
       ),

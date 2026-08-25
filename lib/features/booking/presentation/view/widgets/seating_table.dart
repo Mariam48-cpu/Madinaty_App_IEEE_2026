@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class SeatingTable extends StatelessWidget {
   final String id;
@@ -21,21 +22,21 @@ class SeatingTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color borderColor = booked
-        ? Colors.grey.shade300
+        ? AppColors.border
         : selected
-        ? Color(0xFF6E4027)
-        : Color(0xFFE0D7D0);
+        ? AppColors.primaryDark
+        : AppColors.border;
 
     final Color backgroundColor = booked
-        ? Color(0xFFE8E4E1)
+        ? AppColors.surfaceVariant
         : selected
-        ? Color(0xFF6E4027)
-        : Colors.white;
+        ? AppColors.primaryDark
+        : AppColors.surface;
 
     return GestureDetector(
       onTap: booked ? null : onTap,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 180),
         width: rectangle ? size * 1.35 : size,
         height: size,
         decoration: BoxDecoration(
@@ -45,7 +46,10 @@ class SeatingTable extends StatelessWidget {
           border: Border.all(color: borderColor, width: selected ? 2 : 1),
           boxShadow: [
             if (!booked)
-              BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 5),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 5,
+              ),
           ],
         ),
         child: Center(
@@ -55,10 +59,10 @@ class SeatingTable extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: booked
-                  ? Colors.grey
+                  ? AppColors.textMuted
                   : selected
-                  ? Colors.white
-                  : Colors.black87,
+                  ? AppColors.textWhite
+                  : AppColors.textPrimary,
             ),
           ),
         ),

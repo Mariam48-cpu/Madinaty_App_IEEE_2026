@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:toastification/toastification.dart';
 
 class ManualLocationScreen extends StatefulWidget {
   final Function(LatLng selectedLocation) onLocationSelected;
@@ -30,8 +35,11 @@ class _ManualLocationScreenState extends State<ManualLocationScreen> {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('يرجى تفعيل خدمة الموقع (GPS)')),
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastError.getString(context),
+            description: AppLocale.enableGpsPrompt.getString(context),
+            type: ToastificationType.warning,
           );
         }
         setState(() => isLoading = false);
@@ -73,9 +81,13 @@ class _ManualLocationScreenState extends State<ManualLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF8F5),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('تحديد الموقع'),
+        title: Text(
+          AppLocale.selectLocationTitle.getString(context),
+          style: const TextStyle(color: AppColors.textPrimary),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -95,7 +107,7 @@ class _ManualLocationScreenState extends State<ManualLocationScreen> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.app',
+                userAgentPackageName: 'madinaty_app_ieee_2026',
               ),
               MarkerLayer(
                 markers: [
@@ -105,7 +117,7 @@ class _ManualLocationScreenState extends State<ManualLocationScreen> {
                     height: 40,
                     child: const Icon(
                       Icons.location_on,
-                      color: Color(0xFF6D4534),
+                      color: AppColors.primary,
                       size: 40,
                     ),
                   ),
@@ -113,18 +125,17 @@ class _ManualLocationScreenState extends State<ManualLocationScreen> {
               ),
             ],
           ),
-
           if (isLoading)
             const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6D4534)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
           Positioned(
             top: 16,
             right: 16,
             child: FloatingActionButton.small(
-              backgroundColor: const Color(0xFF6D4534),
+              backgroundColor: AppColors.primary,
               onPressed: _getCurrentGPSLocation,
-              child: const Icon(Icons.my_location, color: Colors.white),
+              child: const Icon(Icons.my_location, color: AppColors.textWhite),
             ),
           ),
           Positioned(
@@ -133,7 +144,8 @@ class _ManualLocationScreenState extends State<ManualLocationScreen> {
             right: 16,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6D4534),
+                backgroundColor: AppColors.darkButton,
+                foregroundColor: AppColors.onDarkButton,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -143,12 +155,12 @@ class _ManualLocationScreenState extends State<ManualLocationScreen> {
                 widget.onLocationSelected(currentSelectedLocation);
                 Navigator.pop(context);
               },
-              child: const Text(
-                'تأكيد الموقع المحدد',
-                style: TextStyle(
+              child: Text(
+                AppLocale.confirmSelectedLocation.getString(context),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.onDarkButton,
                 ),
               ),
             ),

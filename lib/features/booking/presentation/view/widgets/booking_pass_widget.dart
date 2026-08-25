@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import '../../../domain/entities/booking_entity.dart';
@@ -7,18 +9,23 @@ import 'qr_code_widget.dart';
 
 class BookingPassWidget extends StatelessWidget {
   final BookingEntity booking;
-  final String cafeName;
-  final String cafeLocation;
+  final String? cafeName;
+  final String? cafeLocation;
 
   const BookingPassWidget({
     super.key,
     required this.booking,
-    this.cafeName = 'روستري لاب',
-    this.cafeLocation = 'التجمع الخامس',
+    this.cafeName,
+    this.cafeLocation,
   });
 
   @override
   Widget build(BuildContext context) {
+    final String resolvedCafeName =
+        cafeName ?? AppLocale.defaultCafeName.getString(context);
+    final String resolvedCafeLocation =
+        cafeLocation ?? AppLocale.defaultCafeLocation.getString(context);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -27,7 +34,7 @@ class BookingPassWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -39,60 +46,70 @@ class BookingPassWidget extends StatelessWidget {
         children: [
           PassStatusBadge(status: booking.status),
           const SizedBox(height: 14),
-
           Text(
-            cafeName,
+            resolvedCafeName,
             style: AppTypography.headlineSmall.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
-
           Text(
-            cafeLocation,
+            resolvedCafeLocation,
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 20),
-
           QrCodeWidget(booking: booking),
           const SizedBox(height: 24),
-
           _buildDashedDivider(),
           const SizedBox(height: 20),
-
-          _buildDetailsGrid(),
+          _buildDetailsGrid(context),
         ],
       ),
     );
   }
 
-  Widget _buildDetailsGrid() {
+  Widget _buildDetailsGrid(BuildContext context) {
+    final String notSpecified = AppLocale.notSpecifiedText.getString(context);
     final String formattedDate = booking.date != null
-        ? '${booking.date!.day} ${_getArabicMonth(booking.date!.month)} ${booking.date!.year}'
-        : 'غير محدد';
+        ? '${booking.date!.day}/${booking.date!.month}/${booking.date!.year}'
+        : notSpecified;
 
-    final String timeStr = booking.time ?? 'غير محدد';
-    final String seatingStr = booking.seatingPreference ?? 'ركن هادئ';
-    final String guestsStr = '${booking.guests} شخص';
+    final String timeStr = booking.time ?? notSpecified;
+    final String seatingStr =
+        booking.seatingPreference ?? AppLocale.filterQuietCorner.getString(context);
+    final String guestsStr =
+        '${booking.guests} ${AppLocale.guestsCountText.getString(context)}';
 
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildDetailColumn(title: 'التاريخ', value: formattedDate),
-            _buildDetailColumn(title: 'الوقت', value: timeStr),
+            _buildDetailColumn(
+              title: AppLocale.date.getString(context),
+              value: formattedDate,
+            ),
+            _buildDetailColumn(
+              title: AppLocale.time.getString(context),
+              value: timeStr,
+            ),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildDetailColumn(title: 'الجلوس', value: seatingStr),
-            _buildDetailColumn(title: 'الأشخاص', value: guestsStr),
+            _buildDetailColumn(
+              title: AppLocale.seating.getString(context),
+              value: seatingStr,
+            ),
+            _buildDetailColumn(
+              title: AppLocale.guests.getString(context),
+              value: guestsStr,
+            ),
           ],
         ),
       ],
@@ -134,7 +151,8 @@ class BookingPassWidget extends StatelessWidget {
       builder: (context, constraints) {
         const double dashWidth = 5;
         const double dashSpace = 4;
-        final int dashCount = (constraints.constrainWidth() / (dashWidth + dashSpace)).floor();
+        final int dashCount =
+        (constraints.constrainWidth() / (dashWidth + dashSpace)).floor();
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,26 +168,5 @@ class BookingPassWidget extends StatelessWidget {
         );
       },
     );
-  }
-
-  String _getArabicMonth(int month) {
-    const months = [
-      'يناير',
-      'فبراير',
-      'مارس',
-      'أبريل',
-      'مايو',
-      'يونيو',
-      'يوليو',
-      'أغسطس',
-      'سبتمبر',
-      'أكتوبر',
-      'نوفمبر',
-      'ديسمبر',
-    ];
-    if (month >= 1 && month <= 12) {
-      return months[month - 1];
-    }
-    return '';
   }
 }

@@ -21,19 +21,19 @@ class OccasionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? AppColors.primary : Color(0xFFE3DAD3),
+            color: selected ? AppColors.primary : AppColors.border,
             width: selected ? 1.5 : 1,
           ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.025),
               blurRadius: 6,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -43,16 +43,16 @@ class OccasionCard extends StatelessWidget {
             Icon(
               icon,
               size: 28,
-              color: selected ? AppColors.primary : Colors.black87,
+              color: selected ? AppColors.primary : AppColors.textPrimary,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                color: Colors.black87,
+                color: AppColors.textPrimary,
               ),
             ),
           ],

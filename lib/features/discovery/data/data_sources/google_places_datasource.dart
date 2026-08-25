@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/data/models/cafe_dto.dart';
@@ -6,6 +7,19 @@ import 'package:madinaty_app_ieee_2026/features/discovery/data/models/cafe_dto.d
 @injectable
 class GooglePlacesDataSource {
   final String apiKey = 'AIzaSyAUyp5BGoG23a36VGYfbxyC_Dg7P9jDmY4';
+
+  String get _languageCode {
+    return FlutterLocalization.instance.currentLocale?.languageCode ?? 'ar';
+  }
+
+  Map<String, String> get _baseHeaders => {
+    'Content-Type': 'application/json',
+    'X-Goog-Api-Key': apiKey,
+    'X-Goog-FieldMask': 'places.id,places.displayName,places.location,'
+        'places.rating,places.formattedAddress,'
+        'places.currentOpeningHours,places.photos',
+  };
+
   Future<List<CafeDto>> getNearbyCafes({
     required double latitude,
     required double longitude,
@@ -16,17 +30,10 @@ class GooglePlacesDataSource {
 
     final response = await http.post(
       url,
-
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask':
-            'places.id,places.displayName,places.location,'
-            'places.rating,places.formattedAddress,'
-            'places.currentOpeningHours,places.photos',
-      },
+      headers: _baseHeaders,
       body: jsonEncode({
         'includedTypes': ['cafe'],
+        'languageCode': _languageCode,
         'locationRestriction': {
           'circle': {
             'center': {'latitude': latitude, 'longitude': longitude},
@@ -39,6 +46,7 @@ class GooglePlacesDataSource {
     if (response.statusCode != 200) {
       throw Exception('Failed to get nearby cafes: ${response.statusCode}');
     }
+
     final data = jsonDecode(response.body);
     final places = data['places'] as List? ?? [];
     return places
@@ -51,27 +59,19 @@ class GooglePlacesDataSource {
 
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask':
-            'places.id,'
-            'places.displayName,'
-            'places.location,'
-            'places.rating,'
-            'places.formattedAddress,'
-            'places.currentOpeningHours,'
-            'places.photos',
-      },
+      headers: _baseHeaders,
       body: jsonEncode({
         'textQuery': '$query cafe',
         'includedType': 'cafe',
+        'languageCode': _languageCode,
         'maxResultCount': 20,
       }),
     );
+
     if (response.statusCode != 200) {
       throw Exception('Failed to search cafes: ${response.statusCode}');
     }
+
     final data = jsonDecode(response.body);
     final places = data['places'] as List? ?? [];
     return places
