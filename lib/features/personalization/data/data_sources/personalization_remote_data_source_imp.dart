@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
 import '../models/personalization_model.dart';
 import 'personalization_remote_data_source_interface.dart';
 
+@LazySingleton(as: PersonalizationRemoteDataSourceInterface)
 class PersonalizationRemoteDataSourceImpl
     implements PersonalizationRemoteDataSourceInterface {
   final FirebaseAuth _firebaseAuth;
@@ -11,8 +13,8 @@ class PersonalizationRemoteDataSourceImpl
   PersonalizationRemoteDataSourceImpl({
     FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   User? get currentUser => _firebaseAuth.currentUser;
@@ -37,7 +39,9 @@ class PersonalizationRemoteDataSourceImpl
 
   @override
   Future<void> saveUserPreferences(PersonalizationModel preferences) async {
-    final uid = preferences.userId.isNotEmpty ? preferences.userId : currentUserId;
+    final uid = preferences.userId.isNotEmpty
+        ? preferences.userId
+        : currentUserId;
 
     if (uid == null || uid.isEmpty) {
       throw Exception('المستخدم غير مسجل الدخول');

@@ -2,11 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
-import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
+import 'package:madinaty_app_ieee_2026/features/ai_planner/presentation/view/screens/ai_planner_page.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 import 'core/routes/app_routes.dart';
-import 'core/services/firebase_service.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
@@ -42,7 +40,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
 
-      home: const AuthScreen(),
+      home: const AIPlannerPage(),
     );
   }
 }

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/features/ai_planner/presentation/view/screens/ai_planner_page.dart';
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
 import '../../features/personalization/presentation/view/screens/personalization_screen.dart';
-
-/// Centralized route names and router configuration for Madinaty app.
 abstract class AppRoutes {
-  // Prevent instantiation
   const AppRoutes._();
 
   // --- Route Name Constants ---
@@ -18,12 +16,14 @@ abstract class AppRoutes {
   static const String orders = '/orders';
   static const String notifications = '/notifications';
   static const String profile = '/profile';
+  static const String aiPlanner = '/ai-planner';
 
   /// Pre-configured route map for [MaterialApp.routes].
   static Map<String, WidgetBuilder> get routes => {
         auth: (_) => const AuthScreen(),
         personalization: (_) => const PersonalizationScreen(),
         home: (_) => const Scaffold(body: Center(child: Text('Home'))),
+        aiPlanner: (_) => const AIPlannerPage(),
       };
 
   /// Generates dynamic routes for navigation.
@@ -38,6 +38,11 @@ abstract class AppRoutes {
       case personalization:
         return MaterialPageRoute(
           builder: (_) => const PersonalizationScreen(),
+          settings: settings,
+        );
+      case aiPlanner:
+        return MaterialPageRoute(
+          builder: (_) => const AIPlannerPage(),
           settings: settings,
         );
       case home:
