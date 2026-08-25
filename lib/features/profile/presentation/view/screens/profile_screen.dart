@@ -1,40 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:toastification/toastification.dart';
 
+import '../../../../../core/utils/app_toast.dart';
 import '../../view_model/profile_cubit.dart';
 import 'edit_profile_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final String uid;
 
   const ProfileScreen({super.key, required this.uid});
 
   @override
-  Widget build(BuildContext context) {
-    context.read<ProfileCubit>().fetchUserProfile(uid);
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
 
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileCubit>().fetchUserProfile(widget.uid);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF7F2),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: BlocConsumer<ProfileCubit, ProfileState>(
           listener: (context, state) {
             if (state is ProfileLoggedOut) {
               Navigator.pushReplacementNamed(context, '/auth');
             } else if (state is ProfileError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
+              AppToast.showToast(
+                context: context,
+                title: AppLocale.toastError.getString(context),
+                description: state.message,
+                type: ToastificationType.error,
               );
             }
           },
           builder: (context, state) {
             if (state is ProfileLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
             }
 
-            String name = "مستخدم مادينتي";
+            String name = AppLocale.defaultUser.getString(context);
             String email = "";
             String phone = "";
             String? profileImageUrl;
@@ -55,23 +71,29 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // App Bar / Header
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Profile Title on start
+                      Text(
+                        AppLocale.navMyAccount.getString(context),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const Spacer(),
+                      // Language Switcher
+                      const _HeaderLanguageSwitch(),
+                      const SizedBox(width: 8),
+                      // Settings Icon
                       IconButton(
                         icon: const Icon(
                           Icons.settings_outlined,
-                          color: Colors.brown,
+                          color: AppColors.primary,
                         ),
                         onPressed: () {},
-                      ),
-                      const Text(
-                        "حسابي",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
                       ),
                     ],
                   ),
@@ -81,11 +103,11 @@ class ProfileScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
+                          color: Colors.black.withValues(alpha: 0.03),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -94,24 +116,22 @@ class ProfileScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         Stack(
-                          alignment: Alignment.bottomRight,
+                          alignment: AlignmentDirectional.bottomEnd,
                           children: [
                             CircleAvatar(
                               radius: 45,
-                              backgroundColor: Colors.brown.shade100,
-                              backgroundImage:
-                                  profileImageUrl != null &&
-                                      profileImageUrl!.isNotEmpty
+                              backgroundColor: AppColors.surfaceVariant,
+                              backgroundImage: profileImageUrl != null &&
+                                  profileImageUrl!.isNotEmpty
                                   ? NetworkImage(profileImageUrl!)
                                   : null,
-                              child:
-                                  profileImageUrl == null ||
-                                      profileImageUrl!.isEmpty
+                              child: profileImageUrl == null ||
+                                  profileImageUrl!.isEmpty
                                   ? const Icon(
-                                      Icons.person,
-                                      size: 50,
-                                      color: Colors.brown,
-                                    )
+                                Icons.person,
+                                size: 50,
+                                color: AppColors.primary,
+                              )
                                   : null,
                             ),
 
@@ -124,7 +144,7 @@ class ProfileScreen extends StatelessWidget {
                                     builder: (_) => BlocProvider.value(
                                       value: context.read<ProfileCubit>(),
                                       child: EditProfileScreen(
-                                        uid: uid,
+                                        uid: widget.uid,
                                         currentName: name,
                                         currentPhone: phone,
                                         currentImageUrl: profileImageUrl,
@@ -138,13 +158,13 @@ class ProfileScreen extends StatelessWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: const BoxDecoration(
-                                  color: Colors.black87,
+                                  color: AppColors.darkButton,
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
                                   Icons.edit,
                                   size: 14,
-                                  color: Colors.white,
+                                  color: AppColors.onDarkButton,
                                 ),
                               ),
                             ),
@@ -158,6 +178,7 @@ class ProfileScreen extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                         ),
 
@@ -165,25 +186,34 @@ class ProfileScreen extends StatelessWidget {
 
                         Text(
                           email,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade600,
+                            color: AppColors.textSecondary,
                           ),
                         ),
 
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: Divider(color: Colors.black12),
+                          child: Divider(color: AppColors.border),
                         ),
 
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _ProfileStatItem(title: "الحجوزات", value: "12"),
-                            _VerticalDivider(),
-                            _ProfileStatItem(title: "المفضلة", value: "8"),
-                            _VerticalDivider(),
-                            _ProfileStatItem(title: "الطلبات", value: "45"),
+                            _ProfileStatItem(
+                              title: AppLocale.bookingsTitle.getString(context),
+                              value: "12",
+                            ),
+                            const _VerticalDivider(),
+                            _ProfileStatItem(
+                              title: AppLocale.navFavorites.getString(context),
+                              value: "8",
+                            ),
+                            const _VerticalDivider(),
+                            _ProfileStatItem(
+                              title: AppLocale.ordersTitle.getString(context),
+                              value: "45",
+                            ),
                           ],
                         ),
                       ],
@@ -201,29 +231,33 @@ class ProfileScreen extends StatelessWidget {
                     childAspectRatio: 1.4,
                     children: [
                       _buildMenuCard(
-                        "حجوزاتي",
-                        "إدارة الحجوزات القادمة",
+                        context,
+                        AppLocale.bookingsTitle.getString(context),
+                        AppLocale.bookingsSubtitle.getString(context),
                         Icons.calendar_today_outlined,
-                        Colors.orange.shade100,
-                        Colors.orange,
+                        AppColors.surfaceVariant,
+                        AppColors.primary,
                       ),
                       _buildMenuCard(
-                        "الأماكن المفضلة",
-                        "مقاهيك ومطاعمك المفضلة",
+                        context,
+                        AppLocale.navFavorites.getString(context),
+                        AppLocale.favoritePlacesSubtitle.getString(context),
                         Icons.favorite_border,
-                        Colors.red.shade50,
-                        Colors.red,
+                        AppColors.error.withValues(alpha: 0.1),
+                        AppColors.error,
                       ),
                       _buildMenuCard(
-                        "المنتجات المفضلة",
-                        "قائمة مشروباتك المفضلة",
+                        context,
+                        AppLocale.favoriteProducts.getString(context),
+                        AppLocale.favoriteProductsSubtitle.getString(context),
                         Icons.coffee_outlined,
-                        Colors.brown.shade50,
-                        Colors.brown,
+                        AppColors.surfaceVariant,
+                        AppColors.primary,
                       ),
                       _buildMenuCard(
-                        "نقاط الولاء",
-                        "$loyaltyPoints نقطة",
+                        context,
+                        AppLocale.loyaltyPoints.getString(context),
+                        "$loyaltyPoints ${AppLocale.pointsUnit.getString(context)}",
                         Icons.workspace_premium_outlined,
                         Colors.amber.shade50,
                         Colors.amber.shade800,
@@ -234,23 +268,35 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   Material(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
                       children: [
-                        _buildListTile("طرق الدفع", Icons.credit_card_outlined),
-
-                        const Divider(height: 1, indent: 16, endIndent: 16),
-
                         _buildListTile(
-                          "العناوين المحفوظة",
+                          AppLocale.paymentMethods.getString(context),
+                          Icons.credit_card_outlined,
+                        ),
+                        const Divider(
+                          height: 1,
+                          indent: 16,
+                          endIndent: 16,
+                          color: AppColors.border,
+                        ),
+                        _buildListTile(
+                          AppLocale.savedAddresses.getString(context),
                           Icons.location_on_outlined,
                         ),
-
-                        const Divider(height: 1, indent: 16, endIndent: 16),
-
-                        _buildListTile("المساعدة والدعم", Icons.help_outline),
+                        const Divider(
+                          height: 1,
+                          indent: 16,
+                          endIndent: 16,
+                          color: AppColors.border,
+                        ),
+                        _buildListTile(
+                          AppLocale.helpAndSupport.getString(context),
+                          Icons.help_outline,
+                        ),
                       ],
                     ),
                   ),
@@ -262,7 +308,7 @@ class ProfileScreen extends StatelessWidget {
                     height: 50,
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
+                        side: const BorderSide(color: AppColors.error),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -270,10 +316,13 @@ class ProfileScreen extends StatelessWidget {
                       onPressed: () {
                         context.read<ProfileCubit>().logout();
                       },
-                      icon: const Icon(Icons.logout, color: Colors.red),
-                      label: const Text(
-                        "تسجيل الخروج",
-                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      icon: const Icon(Icons.logout, color: AppColors.error),
+                      label: Text(
+                        AppLocale.logoutBtn.getString(context),
+                        style: const TextStyle(
+                          color: AppColors.error,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -289,17 +338,19 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildMenuCard(
-    String title,
-    String subtitle,
-    IconData icon,
-    Color bgColor,
-    Color iconColor,
-  ) {
+      BuildContext context,
+      String title,
+      String subtitle,
+      IconData icon,
+      Color bgColor,
+      Color iconColor,
+      ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,6 +365,7 @@ class ProfileScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
+                    color: AppColors.textPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -328,12 +380,13 @@ class ProfileScreen extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 6),
-
           Text(
             subtitle,
-            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -344,17 +397,94 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildListTile(String title, IconData icon) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black87),
+      leading: Icon(icon, color: AppColors.textPrimary),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
+        ),
       ),
       trailing: const Icon(
         Icons.arrow_forward_ios,
         size: 14,
-        color: Colors.grey,
+        color: AppColors.textSecondary,
       ),
       onTap: () {},
+    );
+  }
+}
+
+class _HeaderLanguageSwitch extends StatelessWidget {
+  const _HeaderLanguageSwitch();
+
+  @override
+  Widget build(BuildContext context) {
+    final localization = FlutterLocalization.instance;
+    final currentCode = localization.currentLocale?.languageCode ?? 'ar';
+    final isArabic = currentCode == 'ar';
+
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildLangBtn(
+              title: 'AR',
+              isSelected: isArabic,
+              onTap: () {
+                if (!isArabic) {
+                  localization.translate('ar');
+                }
+              },
+            ),
+            _buildLangBtn(
+              title: 'EN',
+              isSelected: !isArabic,
+              onTap: () {
+                if (isArabic) {
+                  localization.translate('en');
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLangBtn({
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -371,12 +501,19 @@ class _ProfileStatItem extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           title,
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
         ),
       ],
     );
@@ -388,6 +525,6 @@ class _VerticalDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 24, width: 1, color: Colors.grey.shade300);
+    return Container(height: 24, width: 1, color: AppColors.border);
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:toastification/toastification.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 
 import '../../../../../core/constants/app_assets.dart';
 import '../../../../../core/di/injection_container.dart';

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import '../../domain/entities/cafe_recommendation_entity.dart';
 import '../../domain/repositories/recommendation_repository.dart';
@@ -58,16 +59,19 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
   }) {
     return CafeRecommendationEntity(
       id: dto.id ?? '',
-      name: dto.displayName ?? 'كافيه',
+      name: dto.displayName ?? AppLocale.defaultCafeName,
       imageUrl: imageUrl,
       rating: dto.rating ?? 0.0,
       reviewsCount: dto.userRatingCount ?? 0,
       distanceKm: distanceKm,
       location: dto.formattedAddress ?? location,
-      description: description ?? 'كافيه مناسب لك',
-      interests: interests?.isNotEmpty == true ? interests! : ['قهوة مختصة'],
-      moods: moods?.isNotEmpty == true ? moods! : ['جلسة هادئة'],
-      occasions: occasions?.isNotEmpty == true ? occasions! : ['عام'],
+      description: description ?? AppLocale.suitableCafeForYou,
+      interests: interests?.isNotEmpty == true
+          ? interests!
+          : [AppLocale.specialtyCoffee],
+      moods: moods?.isNotEmpty == true ? moods! : [AppLocale.quietChill],
+      occasions:
+      occasions?.isNotEmpty == true ? occasions! : [AppLocale.occasionOther],
     );
   }
 
@@ -96,7 +100,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
 
             if (firebaseImages.isNotEmpty) {
               imageUrl =
-                  firebaseImages[allCafes.length % firebaseImages.length];
+              firebaseImages[allCafes.length % firebaseImages.length];
             }
 
             if (imageUrl.isEmpty) {
@@ -113,15 +117,15 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
                   if (mood != null && mood.trim().isNotEmpty)
                     mood
                   else
-                    'جلسة هادئة',
+                    AppLocale.quietChill,
                 ],
                 occasions: [
                   if (occasion != null && occasion.trim().isNotEmpty)
                     occasion
                   else
-                    'عام',
+                    AppLocale.occasionOther,
                 ],
-                description: 'مناسب لـ $interest',
+                description: '${AppLocale.suitableForPrefix} $interest',
                 distanceKm: 2.0,
               ),
             );
@@ -155,16 +159,16 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
               dto: dto,
               imageUrl: imageUrl,
               location: location,
-              interests: ['قهوة مختصة'],
-              moods: [mood ?? 'جلسة هادئة'],
-              occasions: [occasion ?? 'عام'],
-              description: 'مقترح قريب منك',
+              interests: [AppLocale.specialtyCoffee],
+              moods: [mood ?? AppLocale.quietChill],
+              occasions: [occasion ?? AppLocale.occasionOther],
+              description: AppLocale.nearbyRecommendation,
               distanceKm: 1.5,
             ),
           );
         }
       } catch (e) {
-        throw Exception('فشل في تحميل الكافيهات: $e');
+        throw Exception('${AppLocale.failedToLoadCafesError}: $e');
       }
     }
 
@@ -252,11 +256,11 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
           _createCafeEntity(
             dto: dto,
             imageUrl: imageUrl,
-            location: dto.formattedAddress ?? 'الموقع غير متوفر',
-            interests: ['قهوة', 'قهوة مختصة'],
-            moods: ['جلسة هادئة'],
-            occasions: ['عام'],
-            description: 'نتيجة بحث عن "$searchQuery"',
+            location: dto.formattedAddress ?? AppLocale.defaultCafeLocation,
+            interests: [AppLocale.specialtyCoffee],
+            moods: [AppLocale.quietChill],
+            occasions: [AppLocale.occasionOther],
+            description: '${AppLocale.searchResultForPrefix} "$searchQuery"',
           ),
         );
       }
@@ -271,7 +275,7 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
 
       return uniqueResults.values.toList();
     } catch (e) {
-      throw Exception('فشل في البحث عن الكافيهات: $e');
+      throw Exception('${AppLocale.failedToSearchCafesError}: $e');
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import '../../domain/entities/cafe_recommendation_entity.dart';
 
 abstract class HomeState {
@@ -32,17 +33,19 @@ class HomeLoaded extends HomeState {
   final List<CafeRecommendationEntity> searchResults;
   final bool isSearching;
   final String? searchError;
+
   const HomeLoaded({
     required this.recommendations,
     required this.filteredCafes,
     required this.userInterests,
     this.activeMoodOrOccasion,
-    this.selectedCategory = 'الكل',
+    this.selectedCategory = AppLocale.all,
     this.searchQuery = '',
     this.searchResults = const [],
     this.isSearching = false,
     this.searchError,
   });
+
   bool get isSearchActive {
     return searchQuery.trim().isNotEmpty;
   }
@@ -61,21 +64,13 @@ class HomeLoaded extends HomeState {
   }) {
     return HomeLoaded(
       recommendations: recommendations ?? this.recommendations,
-
       filteredCafes: filteredCafes ?? this.filteredCafes,
-
       userInterests: userInterests ?? this.userInterests,
-
       activeMoodOrOccasion: activeMoodOrOccasion ?? this.activeMoodOrOccasion,
-
       selectedCategory: selectedCategory ?? this.selectedCategory,
-
       searchQuery: searchQuery ?? this.searchQuery,
-
       searchResults: searchResults ?? this.searchResults,
-
       isSearching: isSearching ?? this.isSearching,
-
       searchError: clearSearchError ? null : searchError ?? this.searchError,
     );
   }

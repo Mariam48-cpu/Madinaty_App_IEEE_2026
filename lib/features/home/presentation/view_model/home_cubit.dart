@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import '../../../personalization/domain/use_cases/get_user_preferences_usecase.dart';
 import '../../domain/entities/cafe_recommendation_entity.dart';
@@ -25,20 +26,19 @@ class HomeCubit extends Cubit<HomeState> {
     required this.searchCafesUseCase,
     @factoryParam required this.currentUserId,
   }) : super(const HomeInitial());
+
   Future<void> fetchHomeData({String? categoryFilter}) async {
     emit(const HomeLoading());
 
     try {
       final preferences = await getUserPreferencesUseCase(currentUserId);
 
-      final interests =
-          preferences?.interests ?? ['قهوة مختصة', 'أماكن للمذاكرة'];
+      final interests = preferences?.interests ??
+          [AppLocale.specialtyCoffee, AppLocale.studyPlaces];
 
       final mood = preferences?.selectedMood;
-
       final occasion = preferences?.selectedOccasion;
-
-      const location = 'مدينتي، القاهرة';
+      const location = AppLocale.madinatyCairo;
 
       final cafes = await getRecommendationsUseCase(
         interests: interests,
@@ -52,8 +52,7 @@ class HomeCubit extends Cubit<HomeState> {
         return;
       }
 
-      final selectedCategory = categoryFilter ?? 'الكل';
-
+      final selectedCategory = categoryFilter ?? AppLocale.all;
       final filtered = _filterCafes(cafes, selectedCategory);
 
       emit(
@@ -71,12 +70,13 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   List<CafeRecommendationEntity> _filterCafes(
-    List<CafeRecommendationEntity> cafes,
-    String category,
-  ) {
-    if (category == 'الكل') {
+      List<CafeRecommendationEntity> cafes,
+      String category,
+      ) {
+    if (category == AppLocale.all || category == 'الكل' || category == 'All') {
       return cafes;
     }
+
     String normalize(String value) {
       return value.trim().toLowerCase();
     }
@@ -100,16 +100,18 @@ class HomeCubit extends Cubit<HomeState> {
     }
 
     return cafes.where((cafe) {
-      if (category == 'للعمل') {
+      if (category == AppLocale.forWork ||
+          category == 'للعمل' ||
+          category == 'Work / Study') {
         return containsAny(cafe.interests, [
-              'للعمل',
-              'أماكن للمذاكرة',
-              'مذاكرة',
-              'study',
-              'work',
-              'workspace',
-              'working',
-            ]) ||
+          'للعمل',
+          'أماكن للمذاكرة',
+          'مذاكرة',
+          'study',
+          'work',
+          'workspace',
+          'working',
+        ]) ||
             containsAny(cafe.moods, [
               'جلسة هادئة',
               'هادئ',
@@ -122,13 +124,15 @@ class HomeCubit extends Cubit<HomeState> {
             ]) ||
             containsAny(cafe.occasions, ['للعمل', 'work', 'study']);
       }
-      if (category == 'قهوة') {
+      if (category == AppLocale.coffeeCategoryTag ||
+          category == 'قهوة' ||
+          category == 'Coffee') {
         return containsAny(cafe.interests, [
-              'قهوة',
-              'قهوة مختصة',
-              'coffee',
-              'specialty coffee',
-            ]) ||
+          'قهوة',
+          'قهوة مختصة',
+          'coffee',
+          'specialty coffee',
+        ]) ||
             containsAny(cafe.moods, ['قهوة', 'coffee']);
       }
 
@@ -167,7 +171,6 @@ class HomeCubit extends Cubit<HomeState> {
       return;
     }
 
-    // Don't search with less than 4 characters
     if (searchQuery.length < 4) {
       return;
     }
@@ -220,9 +223,7 @@ class HomeCubit extends Cubit<HomeState> {
       String message = e.toString();
 
       if (message.contains('429')) {
-        message =
-            'تم الوصول للحد اليومي للبحث. '
-            'جرب مرة أخرى لاحقًا.';
+        message = AppLocale.searchRateLimitExceeded;
       } else {
         message = message.replaceAll('Exception: ', '');
       }

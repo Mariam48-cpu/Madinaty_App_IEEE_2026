@@ -4,9 +4,13 @@ mixin AppLocale {
   // ==========================================
   static const String appTitle = 'appTitle';
   static const String nextButtonText = 'nextButtonText';
+  static const String previousButton = 'previousButton';
   static const String continueBtnText = 'continueBtnText';
   static const String continueBtn = 'continueBtn';
   static const String confirmButton = 'confirmButton';
+  static const String deleteButton = 'deleteButton';
+  static const String getStarted = 'getStarted';
+  static const String skip = 'skip';
   static const String toastSuccess = 'toastSuccess';
   static const String toastError = 'toastError';
   static const String successTitle = 'successTitle';
@@ -33,6 +37,75 @@ mixin AppLocale {
   static const String closed = 'closed';
   static const String closedNow = 'closedNow';
   static const String placesCountText = 'placesCountText';
+  static const String defaultUser = 'defaultUser';
+  static const String goodMorningLoading = 'goodMorningLoading';
+  static const String goodMorningPrefix = 'goodMorningPrefix';
+  static const String madinatyCairo = 'madinatyCairo';
+  static const String yourMoodPrefix = 'yourMoodPrefix';
+  static const String waitingCafeConfirmationSub = 'waitingCafeConfirmationSub';
+  static const String forWork = 'forWork';
+  static const String coffeeCategoryTag = 'coffeeCategoryTag';
+  static const String suitableTag = 'suitableTag';
+  static const String studyPlaces = 'studyPlaces';
+  static const String searchErrorOccurred = 'searchErrorOccurred';
+  static const String trySearchingDifferentName = 'trySearchingDifferentName';
+  static const String searchRateLimitExceeded = 'searchRateLimitExceeded';
+
+  // ==========================================
+  // Profile & Settings
+  // ==========================================
+  static const String editProfileTitle = 'editProfileTitle';
+  static const String profileUpdatedSuccess = 'profileUpdatedSuccess';
+  static const String profileUpdatedNotifTitle = 'profileUpdatedNotifTitle';
+  static const String profileUpdatedNotifBody = 'profileUpdatedNotifBody';
+  static const String changePhoto = 'changePhoto';
+  static const String appLanguageTitle = 'appLanguageTitle';
+  static const String phoneNumberLabel = 'phoneNumberLabel';
+  static const String birthDateLabel = 'birthDateLabel';
+  static const String saveChanges = 'saveChanges';
+  static const String changePasswordBtn = 'changePasswordBtn';
+  static const String deleteAccountBtn = 'deleteAccountBtn';
+  static const String deleteAccountTitle = 'deleteAccountTitle';
+  static const String deleteAccountConfirmMessage = 'deleteAccountConfirmMessage';
+  static const String deletingAccountProgress = 'deletingAccountProgress';
+  static const String dialogNo = 'dialogNo';
+  static const String dialogYes = 'dialogYes';
+  static const String logoutBtn = 'logoutBtn';
+  static const String bookingsTitle = 'bookingsTitle';
+  static const String bookingsSubtitle = 'bookingsSubtitle';
+  static const String ordersTitle = 'ordersTitle';
+  static const String favoritePlacesSubtitle = 'favoritePlacesSubtitle';
+  static const String favoriteProducts = 'favoriteProducts';
+  static const String favoriteProductsSubtitle = 'favoriteProductsSubtitle';
+  static const String loyaltyPoints = 'loyaltyPoints';
+  static const String pointsUnit = 'pointsUnit';
+  static const String paymentMethods = 'paymentMethods';
+  static const String savedAddresses = 'savedAddresses';
+  static const String helpAndSupport = 'helpAndSupport';
+
+  // ==========================================
+  // Onboarding
+  // ==========================================
+  static const String onboardingTitle1 = 'onboardingTitle1';
+  static const String onboardingDesc1 = 'onboardingDesc1';
+  static const String onboardingTitle2 = 'onboardingTitle2';
+  static const String onboardingDesc2 = 'onboardingDesc2';
+  static const String onboardingTitle3 = 'onboardingTitle3';
+  static const String onboardingDesc3 = 'onboardingDesc3';
+
+  // ==========================================
+  // Notifications
+  // ==========================================
+  static const String notificationsTitle = 'notificationsTitle';
+  static const String noNotificationsTitle = 'noNotificationsTitle';
+  static const String noNotificationsSubtitle = 'noNotificationsSubtitle';
+  static const String deleteNotificationTitle = 'deleteNotificationTitle';
+  static const String deleteNotificationConfirm = 'deleteNotificationConfirm';
+  static const String momentsAgo = 'momentsAgo';
+  static const String sincePrefix = 'sincePrefix';
+  static const String minutesAgoSuffix = 'minutesAgoSuffix';
+  static const String hoursAgoSuffix = 'hoursAgoSuffix';
+  static const String daysAgoSuffix = 'daysAgoSuffix';
 
   // ==========================================
   // Location & Discovery
@@ -60,6 +133,9 @@ mixin AppLocale {
   static const String showNearbyCafes = 'showNearbyCafes';
   static const String recentSearches = 'recentSearches';
   static const String searchBarHint = 'searchBarHint';
+  static const String homeSearchBarHint = 'homeSearchBarHint';
+  static const String searchResultsTitle = 'searchResultsTitle';
+  static const String selectedCafesForYou = 'selectedCafesForYou';
   static const String discoverySearchHint = 'discoverySearchHint';
   static const String noRatingText = 'noRatingText';
   static const String typeCafeNamePrompt = 'typeCafeNamePrompt';
@@ -75,6 +151,12 @@ mixin AppLocale {
   static const String noOpenPlacesNow = 'noOpenPlacesNow';
   static const String noNearbyPlacesAvailable = 'noNearbyPlacesAvailable';
   static const String tryAnotherFilterSubtitle = 'tryAnotherFilterSubtitle';
+  static const String suitableCafeForYou = 'suitableCafeForYou';
+  static const String suitableForPrefix = 'suitableForPrefix';
+  static const String nearbyRecommendation = 'nearbyRecommendation';
+  static const String searchResultForPrefix = 'searchResultForPrefix';
+  static const String failedToLoadCafesError = 'failedToLoadCafesError';
+  static const String failedToSearchCafesError = 'failedToSearchCafesError';
 
   // ==========================================
   // Authentication & Profile
@@ -106,6 +188,7 @@ mixin AppLocale {
   static const String resendOtpButton = 'resendOtpButton';
   static const String resetLinkSentSuccess = 'resetLinkSentSuccess';
   static const String resetPasswordEmailSentDefault = 'resetPasswordEmailSentDefault';
+  static const String loginRequiredToProceed = 'loginRequiredToProceed';
 
   // Auth Validation & Errors
   static const String enterNameError = 'enterNameError';
@@ -122,6 +205,8 @@ mixin AppLocale {
   // Navigation
   // ==========================================
   static const String navHome = 'navHome';
+  static const String navExplore = 'navExplore';
+  static const String navFavorites = 'navFavorites';
   static const String navMap = 'navMap';
   static const String navMyLists = 'navMyLists';
   static const String navMyAccount = 'navMyAccount';
@@ -165,7 +250,7 @@ mixin AppLocale {
   static const String barAreaTitle = 'barAreaTitle';
   static const String tablePrefix = 'tablePrefix';
   static const String selectedStatusLabel = 'selectedStatusLabel';
-  static const dynamic legendAvailable = 'legendAvailable';
+  static const String legendAvailable = 'legendAvailable';
   static const String legendSelected = 'legendSelected';
   static const String legendBooked = 'legendBooked';
 
@@ -244,7 +329,7 @@ mixin AppLocale {
   static const String allCategories = 'allCategories';
   static const String skipPreOrder = 'skipPreOrder';
   static const String proceedToCart = 'proceedToCart';
-  static const dynamic temporaryTotal = 'temporaryTotal';
+  static const String temporaryTotal = 'temporaryTotal';
   static const String itemsCount = 'itemsCount';
 
   // Reviews & Ratings
@@ -268,10 +353,10 @@ mixin AppLocale {
   // Favorites
   static const String places = 'places';
   static const String products = 'products';
-  static const dynamic noFavoritesYet = 'noFavoritesYet';
+  static const String noFavoritesYet = 'noFavoritesYet';
 
   // Personalization & Preferences
-  static const dynamic step2Of3 = 'step2Of3';
+  static const String step2Of3 = 'step2Of3';
   static const String whatDoYouLikeTitle = 'whatDoYouLikeTitle';
   static const String whatDoYouLikeSubtitle = 'whatDoYouLikeSubtitle';
   static const String whyGoingOutTitle = 'whyGoingOutTitle';
@@ -285,14 +370,14 @@ mixin AppLocale {
   static const String multiSelect = 'multiSelect';
   static const String singleSelect = 'singleSelect';
   static const String whatsYourMoodToday = 'whatsYourMoodToday';
-  static const dynamic chooseGeneralVibe = 'chooseGeneralVibe';
+  static const String chooseGeneralVibe = 'chooseGeneralVibe';
   static const String whatIsYourOccasion = 'whatIsYourOccasion';
   static const String selectOccasionType = 'selectOccasionType';
   static const String specialtyCoffee = 'specialtyCoffee';
   static const String study = 'study';
   static const String work = 'work';
   static const String quietChill = 'quietChill';
-  static const dynamic chillSitting = 'chillSitting';
+  static const String chillSitting = 'chillSitting';
   static const String birthday = 'birthday';
   static const String withFriends = 'withFriends';
   static const String friendsOuting = 'friendsOuting';
@@ -334,11 +419,11 @@ mixin AppLocale {
   static const String aiYourDayPlanTitle = 'aiYourDayPlanTitle';
   static const String aiPlanAnotherDay = 'aiPlanAnotherDay';
   static const String aiHeroSubtitle = 'aiHeroSubtitle';
-  static const moodCalm = 'moodCalm';
-  static const moodCheerful = 'moodCheerful';
-  static const moodRomantic = 'moodRomantic';
-  static const moodSocial = 'moodSocial';
-  static const moodProductive = 'moodProductive';
+  static const String moodCalm = 'moodCalm';
+  static const String moodCheerful = 'moodCheerful';
+  static const String moodRomantic = 'moodRomantic';
+  static const String moodSocial = 'moodSocial';
+  static const String moodProductive = 'moodProductive';
   static const String aiPlanMyDayButton = 'aiPlanMyDayButton';
   static const String quickPickCoffee = 'quickPickCoffee';
   static const String quickPickStudy = 'quickPickStudy';
@@ -354,9 +439,13 @@ mixin AppLocale {
     // General
     appTitle: 'مدينتي',
     nextButtonText: 'التالي',
+    previousButton: 'السابق',
     continueBtnText: 'متابعة',
     continueBtn: 'متابعة',
     confirmButton: 'تأكيد',
+    deleteButton: 'حذف',
+    getStarted: 'ابدأ الآن',
+    skip: 'تخطي',
     toastSuccess: 'تم بنجاح',
     toastError: 'تنبيه',
     successTitle: 'نجاح',
@@ -383,6 +472,69 @@ mixin AppLocale {
     closed: 'مغلق',
     closedNow: 'مغلق الآن',
     placesCountText: 'أماكن',
+    defaultUser: 'مستخدم',
+    goodMorningLoading: 'صباح الخير...',
+    goodMorningPrefix: 'صباح الخير،',
+    madinatyCairo: 'مدينتي، القاهرة',
+    yourMoodPrefix: 'مزاجك',
+    waitingCafeConfirmationSub: 'بانتظار تأكيد الكافيه • رحل هادي',
+    forWork: 'للعمل',
+    coffeeCategoryTag: 'قهوة',
+    suitableTag: 'مناسب',
+    studyPlaces: 'أماكن للمذاكرة',
+    searchErrorOccurred: 'حدث خطأ أثناء البحث',
+    trySearchingDifferentName: 'جرب البحث باسم كافيه أو منطقة أخرى',
+    searchRateLimitExceeded: 'تم الوصول للحد اليومي للبحث. جرب مرة أخرى لاحقًا.',
+
+    // Profile & Settings
+    editProfileTitle: 'تعديل الحساب',
+    profileUpdatedSuccess: 'تم تحديث البيانات بنجاح',
+    profileUpdatedNotifTitle: 'تم تحديث الملف الشخصي',
+    profileUpdatedNotifBody: 'تم تحديث بيانات ملفك الشخصي بنجاح.',
+    changePhoto: 'تغيير الصورة',
+    appLanguageTitle: 'لغة التطبيق',
+    phoneNumberLabel: 'رقم الهاتف',
+    birthDateLabel: 'تاريخ الميلاد',
+    saveChanges: 'حفظ التغييرات',
+    changePasswordBtn: 'تغيير كلمة المرور',
+    deleteAccountBtn: 'حذف الحساب',
+    deleteAccountTitle: 'حذف الحساب',
+    deleteAccountConfirmMessage: 'هل أنت متأكد من حذف الحساب؟\nلا يمكن التراجع عن هذا الإجراء.',
+    deletingAccountProgress: 'جاري حذف الحساب...',
+    dialogNo: 'لا',
+    dialogYes: 'نعم',
+    logoutBtn: 'تسجيل الخروج',
+    bookingsTitle: 'حجوزاتي',
+    bookingsSubtitle: 'إدارة الحجوزات القادمة',
+    ordersTitle: 'الطلبات',
+    favoritePlacesSubtitle: 'مقاهيك ومطاعمك المفضلة',
+    favoriteProducts: 'المنتجات المفضلة',
+    favoriteProductsSubtitle: 'قائمة مشروباتك المفضلة',
+    loyaltyPoints: 'نقاط الولاء',
+    pointsUnit: 'نقطة',
+    paymentMethods: 'طرق الدفع',
+    savedAddresses: 'العناوين المحفوظة',
+    helpAndSupport: 'المساعدة والدعم',
+
+    // Onboarding
+    onboardingTitle1: 'اكتشف المكان المناسب ليك',
+    onboardingDesc1: 'اكتشف أفضل الكافيهات والأماكن اللي تناسب ذوقك واهتماماتك.',
+    onboardingTitle2: 'احجز تجربتك بسهولة',
+    onboardingDesc2: 'اختار الوقت والمناسبة والموقع اللي يناسبك واحجز مكانك بسهولة.',
+    onboardingTitle3: 'جهز طلبك قبل ما توصل',
+    onboardingDesc3: 'اختار قهوتك وحلوياتك من المنيو وخلي طلبك جاهز وقت وصولك.',
+
+    // Notifications
+    notificationsTitle: 'الإشعارات',
+    noNotificationsTitle: 'لا توجد إشعارات',
+    noNotificationsSubtitle: 'ستظهر هنا تأكيدات الحجوزات والتحديثات والعروض.',
+    deleteNotificationTitle: 'حذف الإشعار',
+    deleteNotificationConfirm: 'هل تريد حذف هذا الإشعار؟',
+    momentsAgo: 'منذ لحظات',
+    sincePrefix: 'منذ',
+    minutesAgoSuffix: 'دقيقة',
+    hoursAgoSuffix: 'ساعة',
+    daysAgoSuffix: 'يوم',
 
     // Location & Discovery
     noNearbyCafesFound: 'لم يتم العثور على كافيهات قريبة.',
@@ -408,6 +560,9 @@ mixin AppLocale {
     showNearbyCafes: 'عرض الكافيهات القريبة',
     recentSearches: 'عمليات البحث الأخيرة',
     searchBarHint: 'ابحث بالاسم، المنطقة أو النوع',
+    homeSearchBarHint: 'ابحث بالاسم، المنطقة، أو نوع القهوة',
+    searchResultsTitle: 'نتائج البحث',
+    selectedCafesForYou: 'المقاهي المختارة لك',
     discoverySearchHint: 'ابحث عن كافيه، منطقة',
     noRatingText: 'بدون تقييم',
     typeCafeNamePrompt: 'اكتبي اسم الكافيه',
@@ -423,6 +578,12 @@ mixin AppLocale {
     noOpenPlacesNow: 'لا توجد أماكن مفتوحة الآن.',
     noNearbyPlacesAvailable: 'لا توجد أماكن قريبة متاحة.',
     tryAnotherFilterSubtitle: 'جربي اختيار فلتر آخر.',
+    suitableCafeForYou: 'كافيه مناسب لك',
+    suitableForPrefix: 'مناسب لـ',
+    nearbyRecommendation: 'مقترح قريب منك',
+    searchResultForPrefix: 'نتيجة بحث عن',
+    failedToLoadCafesError: 'فشل في تحميل الكافيهات',
+    failedToSearchCafesError: 'فشل في البحث عن الكافيهات',
 
     // Authentication
     welcome: 'أهلاً بك',
@@ -452,6 +613,7 @@ mixin AppLocale {
     resendOtpButton: 'إعادة إرسال الرمز',
     resetLinkSentSuccess: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني بنجاح',
     resetPasswordEmailSentDefault: 'تم إرسال البريد بنجاح',
+    loginRequiredToProceed: 'يجب تسجيل الدخول أولاً',
 
     // Auth Validation & Errors
     enterNameError: 'يرجى إدخال الاسم',
@@ -466,6 +628,8 @@ mixin AppLocale {
 
     // Navigation
     navHome: 'الرئيسية',
+    navExplore: 'استكشف',
+    navFavorites: 'المفضلة',
     navMap: 'الخريطة',
     navMyLists: 'قوائمي',
     navMyAccount: 'حسابي',
@@ -694,9 +858,13 @@ mixin AppLocale {
     // General
     appTitle: 'Madinaty',
     nextButtonText: 'Next',
+    previousButton: 'Previous',
     continueBtnText: 'Continue',
     continueBtn: 'Continue',
     confirmButton: 'Confirm',
+    deleteButton: 'Delete',
+    getStarted: 'Get Started',
+    skip: 'Skip',
     toastSuccess: 'Success',
     toastError: 'Alert',
     successTitle: 'Success',
@@ -723,6 +891,69 @@ mixin AppLocale {
     closed: 'Closed',
     closedNow: 'Closed Now',
     placesCountText: 'places',
+    defaultUser: 'User',
+    goodMorningLoading: 'Good morning...',
+    goodMorningPrefix: 'Good morning,',
+    madinatyCairo: 'Madinaty, Cairo',
+    yourMoodPrefix: 'Your Vibe',
+    waitingCafeConfirmationSub: 'Awaiting cafe confirmation • Relaxed vibe',
+    forWork: 'Work / Study',
+    coffeeCategoryTag: 'Coffee',
+    suitableTag: 'Suitable',
+    studyPlaces: 'Study Spots',
+    searchErrorOccurred: 'An error occurred while searching',
+    trySearchingDifferentName: 'Try searching for another cafe name or area',
+    searchRateLimitExceeded: 'Daily search limit reached. Please try again later.',
+
+    // Profile & Settings
+    editProfileTitle: 'Edit Profile',
+    profileUpdatedSuccess: 'Profile updated successfully',
+    profileUpdatedNotifTitle: 'Profile Updated',
+    profileUpdatedNotifBody: 'Your profile details have been successfully updated.',
+    changePhoto: 'Change Photo',
+    appLanguageTitle: 'App Language',
+    phoneNumberLabel: 'Phone Number',
+    birthDateLabel: 'Date of Birth',
+    saveChanges: 'Save Changes',
+    changePasswordBtn: 'Change Password',
+    deleteAccountBtn: 'Delete Account',
+    deleteAccountTitle: 'Delete Account',
+    deleteAccountConfirmMessage: 'Are you sure you want to delete your account?\nThis action cannot be undone.',
+    deletingAccountProgress: 'Deleting account...',
+    dialogNo: 'No',
+    dialogYes: 'Yes',
+    logoutBtn: 'Logout',
+    bookingsTitle: 'My Bookings',
+    bookingsSubtitle: 'Manage upcoming reservations',
+    ordersTitle: 'Orders',
+    favoritePlacesSubtitle: 'Your favorite cafes and restaurants',
+    favoriteProducts: 'Favorite Products',
+    favoriteProductsSubtitle: 'Your favorite beverages and items',
+    loyaltyPoints: 'Loyalty Points',
+    pointsUnit: 'pts',
+    paymentMethods: 'Payment Methods',
+    savedAddresses: 'Saved Addresses',
+    helpAndSupport: 'Help & Support',
+
+    // Onboarding
+    onboardingTitle1: 'Discover the right place for you',
+    onboardingDesc1: 'Discover the best cafes and spots that match your taste and interests.',
+    onboardingTitle2: 'Book your experience easily',
+    onboardingDesc2: 'Choose your preferred time, occasion, and spot, and reserve with ease.',
+    onboardingTitle3: 'Get your order ready in advance',
+    onboardingDesc3: 'Pick your drinks and desserts from the menu to have them ready upon arrival.',
+
+    // Notifications
+    notificationsTitle: 'Notifications',
+    noNotificationsTitle: 'No Notifications',
+    noNotificationsSubtitle: 'Booking confirmations, updates, and offers will appear here.',
+    deleteNotificationTitle: 'Delete Notification',
+    deleteNotificationConfirm: 'Do you want to delete this notification?',
+    momentsAgo: 'Just now',
+    sincePrefix: '',
+    minutesAgoSuffix: 'mins ago',
+    hoursAgoSuffix: 'hours ago',
+    daysAgoSuffix: 'days ago',
 
     // Location & Discovery
     noNearbyCafesFound: 'No nearby cafes found.',
@@ -748,6 +979,9 @@ mixin AppLocale {
     showNearbyCafes: 'Show nearby cafes',
     recentSearches: 'Recent Searches',
     searchBarHint: 'Search by name, area, or type',
+    homeSearchBarHint: 'Search by name, area, or coffee type',
+    searchResultsTitle: 'Search Results',
+    selectedCafesForYou: 'Selected Cafes for You',
     discoverySearchHint: 'Search cafe, area',
     noRatingText: 'No rating',
     typeCafeNamePrompt: 'Type cafe name',
@@ -763,6 +997,12 @@ mixin AppLocale {
     noOpenPlacesNow: 'No places open right now.',
     noNearbyPlacesAvailable: 'No nearby places available.',
     tryAnotherFilterSubtitle: 'Try selecting a different filter.',
+    suitableCafeForYou: 'A cafe that suits you',
+    suitableForPrefix: 'Suitable for',
+    nearbyRecommendation: 'Suggested spot near you',
+    searchResultForPrefix: 'Search result for',
+    failedToLoadCafesError: 'Failed to load cafes',
+    failedToSearchCafesError: 'Failed to search cafes',
 
     // Authentication
     welcome: 'Welcome',
@@ -792,6 +1032,7 @@ mixin AppLocale {
     resendOtpButton: 'Resend Code',
     resetLinkSentSuccess: 'Password reset link sent to your email successfully',
     resetPasswordEmailSentDefault: 'Email sent successfully',
+    loginRequiredToProceed: 'Please log in first',
 
     // Auth Validation & Errors
     enterNameError: 'Please enter your name',
@@ -806,6 +1047,8 @@ mixin AppLocale {
 
     // Navigation
     navHome: 'Home',
+    navExplore: 'Explore',
+    navFavorites: 'Favorites',
     navMap: 'Map',
     navMyLists: 'My Lists',
     navMyAccount: 'Profile',

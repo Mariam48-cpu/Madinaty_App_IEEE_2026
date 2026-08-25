@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 import '../../../domain/entities/onboarding_entity.dart';
 
@@ -27,29 +29,28 @@ class OnboardingPage extends StatelessWidget {
             ),
           ),
         ),
-
         const SizedBox(height: 24),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
               Text(
-                page.title,
+                page.title.getString(context),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
-
               const SizedBox(height: 12),
-
               Text(
-                page.description,
+                page.description.getString(context),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 16,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
                 ),
               ),
             ],

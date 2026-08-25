@@ -1,13 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/digital_pass_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/onboarding/presentation/view/screens/splash_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/profile_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view_model/profile_cubit.dart';
 
 import '../../features/auth/presentation/view/screens/auth_screen.dart';
 import '../../features/cart/presentation/view/screens/cart_screen.dart';
@@ -20,8 +26,8 @@ abstract class AppRoutes {
   const AppRoutes._();
 
   static const String initial = '/';
-  static const String home = '/home';
   static const String splash = '/splash';
+  static const String home = '/home';
   static const String auth = '/auth';
   static const String personalization = '/personalization';
   static const String cafeDetails = '/cafe_details';
@@ -34,17 +40,15 @@ abstract class AppRoutes {
   static const String cart = '/cart';
   static const String preOrder = '/pre_order';
 
-  static Map<String, WidgetBuilder> get routes => {
-    auth: (_) => const AuthScreen(),
-    personalization: (_) => const PersonalizationScreen(),
-    home: (_) => const MainNavigationScreen(),
-    cart: (_) => const CartScreen(),
-    preOrder: (_) => const PreOrderScreen(),
-  };
-
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case initial:
+      case splash:
+        return MaterialPageRoute(
+          builder: (_) => const SplashScreen(),
+          settings: settings,
+        );
+
       case auth:
         return MaterialPageRoute(
           builder: (_) => const AuthScreen(),
@@ -53,7 +57,9 @@ abstract class AppRoutes {
 
       case personalization:
         return MaterialPageRoute(
-          builder: (context) => PersonalizationScreen(userLocation: context.read<DiscoveryCubit>().currentLocation,),
+          builder: (context) => PersonalizationScreen(
+            userLocation: context.read<DiscoveryCubit>().currentLocation,
+          ),
           settings: settings,
         );
 
@@ -61,14 +67,44 @@ abstract class AppRoutes {
         final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
           return MaterialPageRoute(
-            builder: (_) => const Scaffold(
-              body: Center(child: Text('User is not logged in')),
+            builder: (context) => Scaffold(
+              backgroundColor: AppColors.background,
+              body: Center(
+                child: Text(
+                  AppLocale.loginRequiredToProceed.getString(context),
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
             ),
             settings: settings,
           );
         }
         return MaterialPageRoute(
           builder: (_) => const MainNavigationScreen(),
+          settings: settings,
+        );
+
+      case profile:
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) {
+          return MaterialPageRoute(
+            builder: (context) => Scaffold(
+              backgroundColor: AppColors.background,
+              body: Center(
+                child: Text(
+                  AppLocale.loginRequiredToProceed.getString(context),
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
+            ),
+            settings: settings,
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<ProfileCubit>()..fetchUserProfile(user.uid),
+            child: ProfileScreen(uid: user.uid),
+          ),
           settings: settings,
         );
 
@@ -112,7 +148,8 @@ abstract class AppRoutes {
       case digitalPass:
         final bookingArg = settings.arguments as BookingEntity?;
         return MaterialPageRoute(
-          builder: (_) => DigitalPassScreen(booking: bookingArg ?? dummyBooking),
+          builder: (_) =>
+              DigitalPassScreen(booking: bookingArg ?? dummyBooking),
           settings: settings,
         );
 
@@ -120,8 +157,14 @@ abstract class AppRoutes {
         final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
           return MaterialPageRoute(
-            builder: (_) => const Scaffold(
-              body: Center(child: Text('User is not logged in')),
+            builder: (context) => Scaffold(
+              backgroundColor: AppColors.background,
+              body: Center(
+                child: Text(
+                  AppLocale.loginRequiredToProceed.getString(context),
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
             ),
             settings: settings,
           );
@@ -137,8 +180,14 @@ abstract class AppRoutes {
 
       default:
         return MaterialPageRoute(
-          builder: (_) => Scaffold(
-            body: Center(child: Text('No route defined for ${settings.name}')),
+          builder: (context) => Scaffold(
+            backgroundColor: AppColors.background,
+            body: Center(
+              child: Text(
+                '${AppLocale.noResultsFound.getString(context)}: ${settings.name}',
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
           ),
           settings: settings,
         );
