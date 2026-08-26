@@ -4,6 +4,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/reviews_skeleton.dart';
 import 'package:toastification/toastification.dart';
 import 'package:madinaty_app_ieee_2026/features/reviews/presentation/view_model/cubit/reviews_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/reviews/presentation/view_model/cubit/reviews_state.dart';
@@ -17,11 +18,7 @@ class ReviewsScreen extends StatelessWidget {
   final String cafeId;
   final String cafeName;
 
-  const ReviewsScreen({
-    super.key,
-    required this.cafeId,
-    this.cafeName = '',
-  });
+  const ReviewsScreen({super.key, required this.cafeId, this.cafeName = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +33,7 @@ class _ReviewsScreenContent extends StatelessWidget {
   final String cafeId;
   final String cafeName;
 
-  const _ReviewsScreenContent({
-    required this.cafeId,
-    required this.cafeName,
-  });
+  const _ReviewsScreenContent({required this.cafeId, required this.cafeName});
 
   void _navigateToWriteReview(BuildContext context, ReviewsLoaded state) {
     final cubit = context.read<ReviewsCubit>();
@@ -81,12 +75,8 @@ class _ReviewsScreenContent extends StatelessWidget {
             Expanded(
               child: BlocBuilder<ReviewsCubit, ReviewsState>(
                 builder: (context, state) {
-                  if (state is ReviewsLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF8D6654),
-                      ),
-                    );
+                  if (state is ReviewsInitial || state is ReviewsLoading) {
+                    return const ReviewsSkeleton();
                   }
 
                   if (state is ReviewsError) {

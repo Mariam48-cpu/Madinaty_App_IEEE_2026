@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:latlong2/latlong.dart';
+
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/loading_widget.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/skeleton_primitives.dart';
+
+import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/cafe_details_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/home/domain/entities/cafe_recommendation_entity.dart';
+
 import '../../view_model/home_cubit.dart';
 import '../../view_model/home_state.dart';
+
 import '../../../../favorites/domain/entities/favorite_item_entity.dart';
 import '../../../../favorites/presentation/view_model/cubit/favorites_cubit.dart';
 import '../../../../favorites/presentation/view_model/cubit/favorites_state.dart';
@@ -116,7 +126,9 @@ class HomeFilters extends StatelessWidget {
                     vertical: 9,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.surfaceVariant : AppColors.surface,
+                    color: isSelected
+                        ? AppColors.surfaceVariant
+                        : AppColors.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected ? AppColors.primary : AppColors.border,
@@ -126,8 +138,12 @@ class HomeFilters extends StatelessWidget {
                     filter,
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -140,9 +156,45 @@ class HomeFilters extends StatelessWidget {
   }
 }
 
-class CafeCard extends StatelessWidget {
-  final dynamic cafe;
+CafeEntity _recommendationToCafeEntity(
+  CafeRecommendationEntity recommendation,
+) {
+  final latitude = recommendation.latitude ?? 30.0444;
+  final longitude = recommendation.longitude ?? 31.2357;
 
+  return CafeEntity(
+    id: recommendation.id,
+    name: recommendation.name,
+
+    // Convert recommendation coordinates to LatLng.
+    location: LatLng(latitude, longitude),
+
+    rating: recommendation.rating,
+
+    photos: recommendation.imageUrl.trim().isNotEmpty
+        ? <String>[recommendation.imageUrl.trim()]
+        : const <String>[],
+
+    address: recommendation.location,
+
+    isOpen: true,
+
+    description: recommendation.description,
+
+    reviewsCount: recommendation.reviewsCount,
+
+    openingHours: '',
+
+    attributes: <String>[
+      ...recommendation.interests,
+      ...recommendation.moods,
+      ...recommendation.occasions,
+    ].toSet().toList(),
+  );
+}
+
+class CafeCard extends StatelessWidget {
+  final CafeRecommendationEntity cafe;
   const CafeCard({super.key, required this.cafe});
 
   @override
@@ -168,217 +220,232 @@ class CafeCard extends StatelessWidget {
           );
         }
 
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  SizedBox(
-                    height: 175,
-                    width: double.infinity,
-                    child: imageUrl.isNotEmpty
-                        ? Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        }
-                        return Container(
-                          color: AppColors.surfaceVariant,
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return const CafeImagePlaceholder();
-                      },
-                    )
-                        : const CafeImagePlaceholder(),
-                  ),
-                  PositionedDirectional(
-                    top: 10,
-                    start: 10,
-                    child: GestureDetector(
-                      onTap: () async {
-                        final favoriteItem = FavoriteItemEntity(
-                          id: FavoriteItemEntity.generateId(
-                            FavoriteTargetType.cafe,
-                            cafe.id.toString(),
-                          ),
-                          targetId: cafe.id.toString(),
-                          targetType: FavoriteTargetType.cafe,
-                          title: cafe.name.toString(),
-                          imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
-                          rating: cafe.rating > 0 ? cafe.rating : null,
-                          address: cafe.location?.toString(),
-                          tagText: cafe.interests.isNotEmpty
-                              ? cafe.interests.first
-                              : null,
-                          createdAt: DateTime.now(),
-                        );
+        return GestureDetector(
+          onTap: () {
+            final CafeEntity cafeEntity = _recommendationToCafeEntity(cafe);
 
-                        await context.read<FavoritesCubit>().toggleFavorite(
-                          favoriteItem,
-                        );
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 36,
-                        height: 36,
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CafeDetailsScreen(cafe: cafeEntity),
+              ),
+            );
+          },
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    SizedBox(
+                      height: 175,
+                      width: double.infinity,
+                      child: imageUrl.isNotEmpty
+                          ? Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                    if (loadingProgress == null) {
+                                      return child;
+                                    }
+                                    return const AppSkeleton(
+                                      height: 175,
+                                      radius: 0,
+                                    );
+                                  },
+                              errorBuilder: (context, error, stackTrace) {
+                                return const CafeImagePlaceholder();
+                              },
+                            )
+                          : const CafeImagePlaceholder(),
+                    ),
+                    PositionedDirectional(
+                      top: 10,
+                      start: 10,
+                      child: GestureDetector(
+                        onTap: () async {
+                          final favoriteItem = FavoriteItemEntity(
+                            id: FavoriteItemEntity.generateId(
+                              FavoriteTargetType.cafe,
+                              cafe.id.toString(),
+                            ),
+                            targetId: cafe.id.toString(),
+                            targetType: FavoriteTargetType.cafe,
+                            title: cafe.name.toString(),
+                            imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
+                            rating: cafe.rating > 0 ? cafe.rating : null,
+                            address: cafe.location?.toString(),
+                            tagText: cafe.interests.isNotEmpty
+                                ? cafe.interests.first
+                                : null,
+                            createdAt: DateTime.now(),
+                          );
+
+                          await context.read<FavoritesCubit>().toggleFavorite(
+                            favoriteItem,
+                          );
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: AppColors.surface.withValues(alpha: 0.94),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isFavorite
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            size: 20,
+                            color: isFavorite
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    PositionedDirectional(
+                      top: 10,
+                      end: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surface.withValues(alpha: 0.94),
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Icon(
-                          isFavorite
-                              ? Icons.favorite_rounded
-                              : Icons.favorite_border_rounded,
-                          size: 20,
-                          color: isFavorite ? AppColors.error : AppColors.textSecondary,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 15,
+                              color: AppColors.star,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              cafe.rating.toStringAsFixed(1),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                  PositionedDirectional(
-                    top: 10,
-                    end: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface.withValues(alpha: 0.94),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
-                            Icons.star_rounded,
-                            size: 15,
-                            color: Colors.amber,
+                          Expanded(
+                            child: Text(
+                              cafe.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.right,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 10),
                           Text(
-                            cafe.rating.toStringAsFixed(1),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            cafe.name,
+                            '(${cafe.reviewsCount}) ⭐ ${cafe.rating.toStringAsFixed(1)}',
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.right,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '(${cafe.reviewsCount}) ⭐ ${cafe.rating.toStringAsFixed(1)}',
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on_outlined,
-                          size: 14,
-                          color: AppColors.textSecondary,
-                        ),
-                        const SizedBox(width: 3),
-                        Expanded(
-                          child: Text(
-                            '${cafe.location} • ${cafe.distanceKm} ${AppLocale.distanceKm.getString(context)}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.textSecondary,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      cafe.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        height: 1.5,
-                        color: AppColors.textPrimary,
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const SmallTag(icon: Icons.wifi_rounded, text: 'Wi-Fi'),
-                        const SizedBox(width: 6),
-                        SmallTag(
-                          icon: Icons.groups_outlined,
-                          text: AppLocale.suitableTag.getString(context),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              '${cafe.location} • ${cafe.distanceKm} ${AppLocale.distanceKm.getString(context)}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        cafe.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          height: 1.5,
+                          color: AppColors.textPrimary,
                         ),
-                        const SizedBox(width: 6),
-                        SmallTag(
-                          icon: Icons.coffee_rounded,
-                          text: AppLocale.coffeeCategoryTag.getString(context),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const SmallTag(
+                            icon: Icons.wifi_rounded,
+                            text: 'Wi-Fi',
+                          ),
+                          const SizedBox(width: 6),
+                          SmallTag(
+                            icon: Icons.groups_outlined,
+                            text: AppLocale.suitableTag.getString(context),
+                          ),
+                          const SizedBox(width: 6),
+                          SmallTag(
+                            icon: Icons.coffee_rounded,
+                            text: AppLocale.coffeeCategoryTag.getString(
+                              context,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -425,10 +492,7 @@ class SmallTag extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             text,
-            style: const TextStyle(
-              fontSize: 9,
-              color: AppColors.textSecondary,
-            ),
+            style: const TextStyle(fontSize: 9, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -558,7 +622,10 @@ class NoFilteredResults extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             AppLocale.noMatchingCafesFound.getString(context),
-            style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -693,7 +760,10 @@ class SearchErrorWidget extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -728,7 +798,10 @@ class NoSearchResults extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             AppLocale.trySearchingDifferentName.getString(context),
-            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/profile_skeleton.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../../../core/utils/app_toast.dart';
@@ -44,10 +45,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
           },
           builder: (context, state) {
-            if (state is ProfileLoading) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              );
+            if (state is ProfileInitial || state is ProfileLoading) {
+              return const ProfileSkeleton();
             }
 
             String name = AppLocale.defaultUser.getString(context);
@@ -121,17 +120,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             CircleAvatar(
                               radius: 45,
                               backgroundColor: AppColors.surfaceVariant,
-                              backgroundImage: profileImageUrl != null &&
-                                  profileImageUrl!.isNotEmpty
+                              backgroundImage:
+                                  profileImageUrl != null &&
+                                      profileImageUrl!.isNotEmpty
                                   ? NetworkImage(profileImageUrl!)
                                   : null,
-                              child: profileImageUrl == null ||
-                                  profileImageUrl!.isEmpty
+                              child:
+                                  profileImageUrl == null ||
+                                      profileImageUrl!.isEmpty
                                   ? const Icon(
-                                Icons.person,
-                                size: 50,
-                                color: AppColors.primary,
-                              )
+                                      Icons.person,
+                                      size: 50,
+                                      color: AppColors.primary,
+                                    )
                                   : null,
                             ),
 
@@ -338,13 +339,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildMenuCard(
-      BuildContext context,
-      String title,
-      String subtitle,
-      IconData icon,
-      Color bgColor,
-      Color iconColor,
-      ) {
+    BuildContext context,
+    String title,
+    String subtitle,
+    IconData icon,
+    Color bgColor,
+    Color iconColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -510,10 +511,7 @@ class _ProfileStatItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
       ],
     );

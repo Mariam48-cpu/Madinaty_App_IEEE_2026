@@ -10,10 +10,23 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
+import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart'
     as _i162;
+import 'package:madinaty_app_ieee_2026/features/ai_planner/data/datasources/ai_planner_data_source.dart'
+    as _i928;
+import 'package:madinaty_app_ieee_2026/features/ai_planner/data/datasources/weather_data_source.dart'
+    as _i482;
+import 'package:madinaty_app_ieee_2026/features/ai_planner/data/repositories/ai_planner_repository_impl.dart'
+    as _i397;
+import 'package:madinaty_app_ieee_2026/features/ai_planner/domain/repositories/ai_planner_repository.dart'
+    as _i663;
+import 'package:madinaty_app_ieee_2026/features/ai_planner/domain/use_cases/create_ai_plan.dart'
+    as _i812;
+import 'package:madinaty_app_ieee_2026/features/ai_planner/presentation/view_model/ai_planner_cubit.dart'
+    as _i237;
 import 'package:madinaty_app_ieee_2026/features/booking/data/repositories/booking_repository_impl.dart'
     as _i498;
 import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/booking_repository_interface.dart'
@@ -106,6 +119,14 @@ import 'package:madinaty_app_ieee_2026/features/home/domain/use_cases/search_caf
     as _i965;
 import 'package:madinaty_app_ieee_2026/features/home/presentation/view_model/home_cubit.dart'
     as _i991;
+import 'package:madinaty_app_ieee_2026/features/personalization/data/data_sources/personalization_remote_data_source_imp.dart'
+    as _i1009;
+import 'package:madinaty_app_ieee_2026/features/personalization/data/data_sources/personalization_remote_data_source_interface.dart'
+    as _i587;
+import 'package:madinaty_app_ieee_2026/features/personalization/data/repositories/personalization_repo_imp.dart'
+    as _i210;
+import 'package:madinaty_app_ieee_2026/features/personalization/domain/repositories/personalization_repository_interface.dart'
+    as _i557;
 import 'package:madinaty_app_ieee_2026/features/personalization/domain/use_cases/get_user_preferences_usecase.dart'
     as _i957;
 import 'package:madinaty_app_ieee_2026/features/pre_order/data/data_sources/pre_order_remote_data_source_impl.dart'
@@ -166,8 +187,19 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1065.GooglePlacesDataSource>(
       () => _i1065.GooglePlacesDataSource(),
     );
-    gh.lazySingleton<_i1025.BookingRepositoryInterface>(
-      () => _i498.BookingRepositoryImpl(),
+    gh.lazySingleton<_i587.PersonalizationRemoteDataSourceInterface>(
+      () => _i1009.PersonalizationRemoteDataSourceImpl(
+        firebaseAuth: gh<_i59.FirebaseAuth>(),
+        firestore: gh<_i974.FirebaseFirestore>(),
+      ),
+    );
+    gh.lazySingleton<_i482.WeatherDataSource>(
+      () => _i482.WeatherDataSourceImpl(),
+    );
+    gh.lazySingleton<_i557.PersonalizationRepositoryInterface>(
+      () => _i210.PersonalizationRepoImpl(
+        remoteDataSource: gh<_i587.PersonalizationRemoteDataSourceInterface>(),
+      ),
     );
     gh.factory<_i46.FavoritesRemoteDataSourceInterface>(
       () => _i472.FavoritesRemoteDataSourceImpl(),
@@ -180,22 +212,18 @@ extension GetItInjectableX on _i174.GetIt {
         dataSource: gh<_i793.CafeFirestoreDataSource>(),
       ),
     );
-    gh.factory<_i102.CreateBookingUseCase>(
-      () => _i102.CreateBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
-    );
-    gh.factory<_i749.GetBookingUseCase>(
-      () => _i749.GetBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
-    );
-    gh.factory<_i266.UpdateBookingStatusUseCase>(
-      () => _i266.UpdateBookingStatusUseCase(
-        gh<_i1025.BookingRepositoryInterface>(),
-      ),
+    gh.lazySingleton<_i928.AIPlannerDataSource>(
+      () => _i928.AIPlannerDataSourceImpl(),
     );
     gh.factory<_i451.CartRemoteDataSourceInterface>(
       () => _i40.CartRemoteDataSourceImpl(),
     );
     gh.factory<_i762.ReviewsRemoteDataSourceInterface>(
       () => _i451.ReviewsRemoteDataSourceImpl(),
+    );
+    gh.lazySingleton<_i1025.BookingRepositoryInterface>(
+      () =>
+          _i498.BookingRepositoryImpl(firestore: gh<_i974.FirebaseFirestore>()),
     );
     gh.factory<_i1020.CafeRepositoryInterface>(
       () => _i525.CafeRepositoryImpl(
@@ -234,13 +262,6 @@ extension GetItInjectableX on _i174.GetIt {
         repository: gh<_i297.CafeeRepositoryInterface>(),
       ),
     );
-    gh.factory<_i437.BookingCubit>(
-      () => _i437.BookingCubit(
-        gh<_i102.CreateBookingUseCase>(),
-        gh<_i749.GetBookingUseCase>(),
-        gh<_i266.UpdateBookingStatusUseCase>(),
-      ),
-    );
     gh.factory<_i473.CartRepositoryInterface>(
       () => _i633.CartRepositoryImpl(
         dataSource: gh<_i451.CartRemoteDataSourceInterface>(),
@@ -251,6 +272,17 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i616.SearchCafes>(
       () => _i616.SearchCafes(gh<_i1020.CafeRepositoryInterface>()),
+    );
+    gh.factory<_i102.CreateBookingUseCase>(
+      () => _i102.CreateBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
+    );
+    gh.factory<_i749.GetBookingUseCase>(
+      () => _i749.GetBookingUseCase(gh<_i1025.BookingRepositoryInterface>()),
+    );
+    gh.factory<_i266.UpdateBookingStatusUseCase>(
+      () => _i266.UpdateBookingStatusUseCase(
+        gh<_i1025.BookingRepositoryInterface>(),
+      ),
     );
     gh.factory<_i839.GetRecommendationsUseCase>(
       () =>
@@ -319,6 +351,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i302.WatchCafeReviewsUseCase>(
       () => _i302.WatchCafeReviewsUseCase(
         repository: gh<_i361.ReviewsRepositoryInterface>(),
+      ),
+    );
+    gh.lazySingleton<_i663.AIPlannerRepository>(
+      () => _i397.AIPlannerRepositoryImpl(
+        aiDataSource: gh<_i928.AIPlannerDataSource>(),
+        weatherDataSource: gh<_i482.WeatherDataSource>(),
+        discoveryRepository: gh<_i1020.CafeRepositoryInterface>(),
+        cafeRepository: gh<_i297.CafeeRepositoryInterface>(),
+        locationService: gh<_i162.LocationService>(),
+      ),
+    );
+    gh.factory<_i733.WatchCartUseCase>(
+      () => _i733.WatchCartUseCase(
+        gh<_i473.CartRepositoryInterface>(),
+        repository: gh<_i473.CartRepositoryInterface>(),
       ),
     );
     gh.factory<_i351.CancelPreOrderUseCase>(
@@ -391,15 +438,17 @@ extension GetItInjectableX on _i174.GetIt {
         repository: gh<_i473.CartRepositoryInterface>(),
       ),
     );
-    gh.factory<_i733.WatchCartUseCase>(
-      () => _i733.WatchCartUseCase(
-        repository: gh<_i473.CartRepositoryInterface>(),
-      ),
-    );
     gh.factory<_i768.PreOrderCubit>(
       () => _i768.PreOrderCubit(
         getCafeMenuUseCase: gh<_i297.GetCafeMenuUseCase>(),
         createPreOrderUseCase: gh<_i340.CreatePreOrderUseCase>(),
+      ),
+    );
+    gh.factory<_i437.BookingCubit>(
+      () => _i437.BookingCubit(
+        gh<_i102.CreateBookingUseCase>(),
+        gh<_i749.GetBookingUseCase>(),
+        gh<_i266.UpdateBookingStatusUseCase>(),
       ),
     );
     gh.factoryParam<_i991.HomeCubit, String, dynamic>(
@@ -419,6 +468,12 @@ extension GetItInjectableX on _i174.GetIt {
         clearCartUseCase: gh<_i708.ClearCartUseCase>(),
         getCartUseCase: gh<_i87.GetCartUseCase>(),
       ),
+    );
+    gh.factory<_i812.CreateAIPlan>(
+      () => _i812.CreateAIPlan(gh<_i663.AIPlannerRepository>()),
+    );
+    gh.factory<_i237.AIPlannerCubit>(
+      () => _i237.AIPlannerCubit(gh<_i812.CreateAIPlan>()),
     );
     return this;
   }

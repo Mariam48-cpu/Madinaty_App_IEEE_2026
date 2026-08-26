@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/favorites_skeleton.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/cafe_details_screen.dart';
@@ -48,17 +49,14 @@ class _FavoritesScreenContent extends StatelessWidget {
             // ==================================================
             // APP BAR
             // ==================================================
-
             _buildAppBar(context),
 
             // ==================================================
             // TABS
             // ==================================================
-
             BlocBuilder<FavoritesCubit, FavoritesState>(
               buildWhen: (previous, current) {
-                if (previous is FavoritesLoaded &&
-                    current is FavoritesLoaded) {
+                if (previous is FavoritesLoaded && current is FavoritesLoaded) {
                   return previous.selectedTab != current.selectedTab;
                 }
 
@@ -79,7 +77,6 @@ class _FavoritesScreenContent extends StatelessWidget {
             // ==================================================
             // CONTENT
             // ==================================================
-
             Expanded(
               child: BlocBuilder<FavoritesCubit, FavoritesState>(
                 builder: (context, state) {
@@ -87,12 +84,8 @@ class _FavoritesScreenContent extends StatelessWidget {
                   // LOADING
                   // --------------------------------------------------
 
-                  if (state is FavoritesLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF8D6654),
-                      ),
-                    );
+                  if (state is FavoritesInitial || state is FavoritesLoading) {
+                    return const FavoritesSkeleton();
                   }
 
                   // --------------------------------------------------
@@ -185,10 +178,7 @@ class _FavoritesScreenContent extends StatelessWidget {
                               cubit.toggleFavorite(item);
                             },
                             onTap: () {
-                              _navigateToCafeDetails(
-                                context,
-                                item,
-                              );
+                              _navigateToCafeDetails(context, item);
                             },
                           );
                         }
@@ -203,10 +193,7 @@ class _FavoritesScreenContent extends StatelessWidget {
                             cubit.toggleFavorite(item);
                           },
                           onTap: () {
-                            _navigateToProductDetails(
-                              context,
-                              item,
-                            );
+                            _navigateToProductDetails(context, item);
                           },
                         );
                       },
@@ -233,17 +220,13 @@ class _FavoritesScreenContent extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 10.0,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // --------------------------------------------------
           // NOTIFICATION
           // --------------------------------------------------
-
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -271,7 +254,6 @@ class _FavoritesScreenContent extends StatelessWidget {
           // --------------------------------------------------
           // TITLE
           // --------------------------------------------------
-
           Text(
             AppLocale.navMyLists.getString(context),
             style: const TextStyle(
@@ -284,7 +266,6 @@ class _FavoritesScreenContent extends StatelessWidget {
           // --------------------------------------------------
           // LOCATION
           // --------------------------------------------------
-
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -317,17 +298,11 @@ class _FavoritesScreenContent extends StatelessWidget {
   // CAFE DETAILS
   // ==================================================
 
-  void _navigateToCafeDetails(
-    BuildContext context,
-    FavoriteItemEntity item,
-  ) {
+  void _navigateToCafeDetails(BuildContext context, FavoriteItemEntity item) {
     final cafe = CafeEntity(
       id: item.targetId,
       name: item.title,
-      location: LatLng(
-        item.latitude ?? 0.0,
-        item.longitude ?? 0.0,
-      ),
+      location: LatLng(item.latitude ?? 0.0, item.longitude ?? 0.0),
       rating: item.rating ?? 0.0,
       photos: item.imageUrl != null && item.imageUrl!.isNotEmpty
           ? [item.imageUrl!]
@@ -340,11 +315,7 @@ class _FavoritesScreenContent extends StatelessWidget {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => CafeDetailsScreen(
-          cafe: cafe,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => CafeDetailsScreen(cafe: cafe)),
     );
   }
 
@@ -368,11 +339,7 @@ class _FavoritesScreenContent extends StatelessWidget {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProductDetailsScreen(
-          product: product,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => ProductDetailsScreen(product: product)),
     );
   }
 }

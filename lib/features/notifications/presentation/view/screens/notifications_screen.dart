@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/notifications_skeleton.dart';
 
 import '../../view_model/notification_cubit.dart';
 
@@ -46,12 +47,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
       body: BlocBuilder<NotificationCubit, NotificationState>(
         builder: (context, state) {
-          if (state is NotificationLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
+          if (state is NotificationInitial || state is NotificationLoading) {
+            return const NotificationsSkeleton();
           }
-
           if (state is NotificationError) {
             return Center(
               child: Padding(
@@ -270,7 +268,9 @@ class _NotificationItem extends StatelessWidget {
             color: isRead ? AppColors.surface : AppColors.surfaceVariant,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isRead ? AppColors.border : AppColors.primary.withValues(alpha: 0.3),
+              color: isRead
+                  ? AppColors.border
+                  : AppColors.primary.withValues(alpha: 0.3),
             ),
             boxShadow: [
               BoxShadow(
@@ -305,7 +305,9 @@ class _NotificationItem extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15,
                               color: AppColors.textPrimary,
-                              fontWeight: isRead ? FontWeight.w600 : FontWeight.bold,
+                              fontWeight: isRead
+                                  ? FontWeight.w600
+                                  : FontWeight.bold,
                             ),
                           ),
                         ),

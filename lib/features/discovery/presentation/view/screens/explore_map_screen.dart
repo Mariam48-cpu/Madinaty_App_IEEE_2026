@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/discovery_skeleton.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/category_results_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/bottom_cafes_cards.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_map.dart';
@@ -77,18 +78,18 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
       return cachedLocationName!;
     }
 
-    final defaultDetermining =
-    AppLocale.determiningLocation.getString(context);
-    final defaultCurrentLocation =
-    AppLocale.myCurrentLocation.getString(context);
+    final defaultDetermining = AppLocale.determiningLocation.getString(context);
+    final defaultCurrentLocation = AppLocale.myCurrentLocation.getString(
+      context,
+    );
 
     try {
       final url = Uri.parse(
         'https://nominatim.openstreetmap.org/reverse'
-            '?format=json'
-            '&lat=$latitude'
-            '&lon=$longitude'
-            '&accept-language=ar',
+        '?format=json'
+        '&lat=$latitude'
+        '&lon=$longitude'
+        '&accept-language=ar',
       );
 
       final response = await http.get(
@@ -105,10 +106,10 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
         if (address != null) {
           final String townOrCity =
               address['village'] ??
-                  address['town'] ??
-                  address['city'] ??
-                  address['suburb'] ??
-                  '';
+              address['town'] ??
+              address['city'] ??
+              address['suburb'] ??
+              '';
           final String state = address['state'] ?? address['governorate'] ?? '';
 
           String resultName = defaultCurrentLocation;
@@ -197,9 +198,7 @@ class _ExploreMapScreenState extends State<ExploreMapScreen> {
                 },
                 builder: (context, state) {
                   if (state is DiscoveryInitial || state is DiscoveryLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
-                    );
+                    return const ExploreMapSkeleton();
                   }
                   if (state is DiscoveryError) {
                     return Center(

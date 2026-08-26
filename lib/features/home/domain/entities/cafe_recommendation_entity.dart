@@ -10,6 +10,8 @@ class CafeRecommendationEntity {
   final List<String> interests;
   final List<String> moods;
   final List<String> occasions;
+    final double? latitude;
+  final double? longitude;
 
   const CafeRecommendationEntity({
     required this.id,
@@ -22,6 +24,6 @@ class CafeRecommendationEntity {
     required this.description,
     required this.interests,
     required this.moods,
-    required this.occasions,
+    required this.occasions, this.latitude, this.longitude,
   });
 }

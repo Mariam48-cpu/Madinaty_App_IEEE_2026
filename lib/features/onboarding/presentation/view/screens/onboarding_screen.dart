@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/onboarding_skeleton.dart';
 import '../../../../auth/presentation/view/screens/auth_screen.dart';
 import '../../view_model/onboarding_bloc.dart';
 import '../../view_model/onboarding_event.dart';
@@ -25,9 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     _pageController = PageController();
-    context.read<OnboardingBloc>().add(
-      OnboardingStartedEvent(),
-    );
+    context.read<OnboardingBloc>().add(OnboardingStartedEvent());
   }
 
   @override
@@ -55,17 +54,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             if (state is OnboardingCompleted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AuthScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const AuthScreen()),
               );
             }
           },
           builder: (context, state) {
             if (state is OnboardingLoading || state is OnboardingInitial) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              );
+              return const OnboardingSkeleton();
             }
 
             if (state is OnboardingError) {
@@ -127,9 +122,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         }
                       },
                       itemBuilder: (context, index) {
-                        return OnboardingPage(
-                          page: state.pages[index],
-                        );
+                        return OnboardingPage(page: state.pages[index]);
                       },
                     ),
                   ),
@@ -139,25 +132,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Page Indicator
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      state.pages.length,
-                          (index) {
-                        final isSelected = index == state.currentPage;
+                    children: List.generate(state.pages.length, (index) {
+                      final isSelected = index == state.currentPage;
 
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: isSelected ? 24 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.border,
-                          ),
-                        );
-                      },
-                    ),
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: isSelected ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.border,
+                        ),
+                      );
+                    }),
                   ),
 
                   const SizedBox(height: 24),

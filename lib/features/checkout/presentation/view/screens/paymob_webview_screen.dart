@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/payment_skeleton.dart';
 import 'package:toastification/toastification.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../../../core/utils/app_toast.dart';
@@ -130,7 +131,8 @@ class _PaymobWebViewScreenState extends State<PaymobWebViewScreen> {
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
-          if (_isLoading) const Center(child: CircularProgressIndicator()),
+          if (_isLoading)
+            const Positioned.fill(child: PaymentWebViewSkeleton()),
         ],
       ),
     );

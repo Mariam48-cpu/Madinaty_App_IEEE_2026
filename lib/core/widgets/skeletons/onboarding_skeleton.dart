@@ -1,0 +1,4 @@
+import 'package:flutter/material.dart';
+import 'skeleton_primitives.dart';
+
+class OnboardingSkeleton extends StatelessWidget { const OnboardingSkeleton({super.key}); @override Widget build(BuildContext context)=>Column(children:const[SizedBox(height:18),Align(alignment:AlignmentDirectional.topEnd,child:Padding(padding:EdgeInsets.symmetric(horizontal:20),child:SkeletonChip(width:70,height:30)),),SizedBox(height:26),AppSkeleton(width:280,height:280,radius:140),SizedBox(height:30),SkeletonText(widthFactor:.55,height:24),SizedBox(height:12),SkeletonText(widthFactor:.75,height:12),SizedBox(height:8),SkeletonText(widthFactor:.65,height:12),Spacer(),SkeletonText(widthFactor:.3,height:8),SizedBox(height:18),Padding(padding:EdgeInsets.symmetric(horizontal:20),child:AppSkeleton(height:52,radius:17)),SizedBox(height:24)]); }

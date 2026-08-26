@@ -2,28 +2,44 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/features/ai_planner/presentation/view/screens/ai_planner_page.dart';
+
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/digital_pass_screen.dart';
+
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/main_navigation_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
+
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
+
 import 'package:madinaty_app_ieee_2026/features/onboarding/presentation/view/screens/splash_screen.dart';
+
 import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/profile_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/profile/presentation/view_model/profile_cubit.dart';
 
-import '../../features/auth/presentation/view/screens/auth_screen.dart';
-import '../../features/cart/presentation/view/screens/cart_screen.dart';
-import '../../features/checkout/presentation/view/screens/checkout_screen.dart';
-import '../../features/discovery/presentation/view/screens/main_navigation_screen.dart';
-import '../../features/personalization/presentation/view/screens/personalization_screen.dart';
-import '../../features/pre_order/presentation/view/screens/pre_order_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/auth/presentation/view/screens/auth_screen.dart';
+
+import 'package:madinaty_app_ieee_2026/features/cart/presentation/view/screens/cart_screen.dart';
+
+import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view/screens/checkout_screen.dart';
+
+import 'package:madinaty_app_ieee_2026/features/personalization/presentation/view/screens/personalization_screen.dart';
+
+import 'package:madinaty_app_ieee_2026/features/pre_order/presentation/view/screens/pre_order_screen.dart';
+
 
 abstract class AppRoutes {
   const AppRoutes._();
+
+  // ================================================================
+  // ROUTES
+  // ================================================================
 
   static const String initial = '/';
   static const String splash = '/splash';
@@ -40,8 +56,19 @@ abstract class AppRoutes {
   static const String cart = '/cart';
   static const String preOrder = '/pre_order';
 
+  // AI Planner
+  static const String aiPlanner = '/ai_planner';
+
+  // ================================================================
+  // ROUTE GENERATOR
+  // ================================================================
+
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      // ============================================================
+      // APP START
+      // ============================================================
+
       case initial:
       case splash:
         return MaterialPageRoute(
@@ -49,143 +76,298 @@ abstract class AppRoutes {
           settings: settings,
         );
 
+      // ============================================================
+      // AUTH
+      // ============================================================
+
       case auth:
         return MaterialPageRoute(
           builder: (_) => const AuthScreen(),
           settings: settings,
         );
 
-      case personalization:
-        return MaterialPageRoute(
-          builder: (context) => PersonalizationScreen(
-            userLocation: context.read<DiscoveryCubit>().currentLocation,
-          ),
-          settings: settings,
-        );
+      // ============================================================
+      // HOME
+      // ============================================================
 
       case home:
         final user = FirebaseAuth.instance.currentUser;
-        if (user == null) {
-          return MaterialPageRoute(
-            builder: (context) => Scaffold(
-              backgroundColor: AppColors.background,
-              body: Center(
-                child: Text(
-                  AppLocale.loginRequiredToProceed.getString(context),
-                  style: const TextStyle(color: AppColors.textSecondary),
-                ),
-              ),
-            ),
-            settings: settings,
-          );
-        }
-        return MaterialPageRoute(
-          builder: (_) => const MainNavigationScreen(),
-          settings: settings,
-        );
 
-      case profile:
-        final user = FirebaseAuth.instance.currentUser;
         if (user == null) {
           return MaterialPageRoute(
             builder: (context) => Scaffold(
               backgroundColor: AppColors.background,
               body: Center(
-                child: Text(
-                  AppLocale.loginRequiredToProceed.getString(context),
-                  style: const TextStyle(color: AppColors.textSecondary),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    AppLocale.loginRequiredToProceed.getString(context),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ),
               ),
             ),
             settings: settings,
           );
         }
+
+        /*
+         * IMPORTANT
+         *
+         * default = 0
+         * 0 = Home
+         *
+         * لو عايزة تفتحي Explore:
+         * Navigator.pushNamed(
+         *   context,
+         *   AppRoutes.home,
+         *   arguments: 1,
+         * );
+         */
+
+        final initialIndex = settings.arguments is int
+            ? settings.arguments as int
+            : 0;
+
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<ProfileCubit>()..fetchUserProfile(user.uid),
-            child: ProfileScreen(uid: user.uid),
+          builder: (_) => MainNavigationScreen(
+            initialIndex: initialIndex,
           ),
           settings: settings,
         );
 
-      case cart:
-        final cafeNameArg = settings.arguments as String?;
+      // ============================================================
+      // AI PLANNER
+      // ============================================================
+
+      case aiPlanner:
         return MaterialPageRoute(
-          builder: (_) => CartScreen(cafeName: cafeNameArg),
+          builder: (_) => const AIPlannerPage(),
           settings: settings,
         );
 
-      case preOrder:
-        final args = settings.arguments;
-        if (args is BookingEntity) {
+      // ============================================================
+      // PERSONALIZATION
+      // ============================================================
+
+      case personalization:
+        /*
+         * DON'T DO THIS:
+         *
+         * context.read<DiscoveryCubit>()
+         *
+         * because the route itself doesn't have
+         * DiscoveryCubit above its BuildContext.
+         *
+         * Instead, create the cubit here through GetIt.
+         */
+
+        final discoveryCubit = sl<DiscoveryCubit>();
+
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<DiscoveryCubit>.value(
+            value: discoveryCubit,
+            child: PersonalizationScreen(
+              userLocation: discoveryCubit.currentLocation,
+            ),
+          ),
+          settings: settings,
+        );
+
+      // ============================================================
+      // PROFILE
+      // ============================================================
+
+      case profile:
+        final user = FirebaseAuth.instance.currentUser;
+
+        if (user == null) {
           return MaterialPageRoute(
-            builder: (_) => PreOrderScreen(booking: args, cafeId: args.cafeId),
+            builder: (context) => Scaffold(
+              backgroundColor: AppColors.background,
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    AppLocale.loginRequiredToProceed.getString(context),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             settings: settings,
           );
-        } else if (args is Map<String, dynamic>) {
+        }
+
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<ProfileCubit>(
+            create: (_) => sl<ProfileCubit>()
+              ..fetchUserProfile(user.uid),
+            child: ProfileScreen(
+              uid: user.uid,
+            ),
+          ),
+          settings: settings,
+        );
+
+      // ============================================================
+      // CART
+      // ============================================================
+
+      case cart:
+        final cafeNameArg = settings.arguments is String
+            ? settings.arguments as String
+            : null;
+
+        return MaterialPageRoute(
+          builder: (_) => CartScreen(
+            cafeName: cafeNameArg,
+          ),
+          settings: settings,
+        );
+
+      // ============================================================
+      // PRE ORDER
+      // ============================================================
+
+      case preOrder:
+        final args = settings.arguments;
+
+        // -------------------------
+        // BookingEntity
+        // -------------------------
+
+        if (args is BookingEntity) {
+          return MaterialPageRoute(
+            builder: (_) => PreOrderScreen(
+              booking: args,
+              cafeId: args.cafeId,
+            ),
+            settings: settings,
+          );
+        }
+
+        // -------------------------
+        // Map arguments
+        // -------------------------
+
+        if (args is Map<String, dynamic>) {
           return MaterialPageRoute(
             builder: (_) => PreOrderScreen(
               booking: args['booking'] as BookingEntity?,
-              cafeId: args['cafeId'] as String? ?? 'cafe_default',
+              cafeId:
+                  args['cafeId'] as String? ?? 'cafe_default',
               cafeName: args['cafeName'] as String?,
               cafe: args['cafe'] as CafeEntity?,
             ),
             settings: settings,
           );
         }
+
+        // -------------------------
+        // Default
+        // -------------------------
+
         return MaterialPageRoute(
           builder: (_) => const PreOrderScreen(),
           settings: settings,
         );
 
+      // ============================================================
+      // CHECKOUT
+      // ============================================================
+
       case checkout:
-        final bookingArg = settings.arguments as BookingEntity?;
+        final bookingArg = settings.arguments is BookingEntity
+            ? settings.arguments as BookingEntity
+            : null;
+
         return MaterialPageRoute(
-          builder: (_) => CheckoutScreen(booking: bookingArg ?? dummyBooking),
+          builder: (_) => CheckoutScreen(
+            booking: bookingArg ?? dummyBooking,
+          ),
           settings: settings,
         );
 
+      // ============================================================
+      // DIGITAL PASS
+      // ============================================================
+
       case digitalPass:
-        final bookingArg = settings.arguments as BookingEntity?;
+        final bookingArg = settings.arguments is BookingEntity
+            ? settings.arguments as BookingEntity
+            : null;
+
         return MaterialPageRoute(
-          builder: (_) =>
-              DigitalPassScreen(booking: bookingArg ?? dummyBooking),
+          builder: (_) => DigitalPassScreen(
+            booking: bookingArg ?? dummyBooking,
+          ),
           settings: settings,
         );
+
+      // ============================================================
+      // NOTIFICATIONS
+      // ============================================================
 
       case notifications:
         final user = FirebaseAuth.instance.currentUser;
+
         if (user == null) {
           return MaterialPageRoute(
             builder: (context) => Scaffold(
               backgroundColor: AppColors.background,
               body: Center(
-                child: Text(
-                  AppLocale.loginRequiredToProceed.getString(context),
-                  style: const TextStyle(color: AppColors.textSecondary),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    AppLocale.loginRequiredToProceed.getString(context),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ),
               ),
             ),
             settings: settings,
           );
         }
+
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-            sl<NotificationCubit>()..fetchNotifications(user.uid),
-            child: NotificationsScreen(uid: user.uid),
+          builder: (_) => BlocProvider<NotificationCubit>(
+            create: (_) => sl<NotificationCubit>()
+              ..fetchNotifications(user.uid),
+            child: NotificationsScreen(
+              uid: user.uid,
+            ),
           ),
           settings: settings,
         );
+
+      // ============================================================
+      // UNKNOWN ROUTE
+      // ============================================================
 
       default:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
             backgroundColor: AppColors.background,
             body: Center(
-              child: Text(
-                '${AppLocale.noResultsFound.getString(context)}: ${settings.name}',
-                style: const TextStyle(color: AppColors.textSecondary),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  '${AppLocale.noResultsFound.getString(context)}: ${settings.name}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
             ),
           ),
@@ -195,11 +377,17 @@ abstract class AppRoutes {
   }
 }
 
+// ================================================================
+// DUMMY BOOKING
+// ================================================================
+
 final dummyBooking = BookingEntity(
   id: 'booking_dummy_001',
   userId: 'user_123',
   cafeId: 'cafe_tbs',
-  date: DateTime.now().add(const Duration(days: 2)),
+  date: DateTime.now().add(
+    const Duration(days: 2),
+  ),
   time: '18:00',
   guests: 4,
   seatingPreference: 'صالة داخلية',

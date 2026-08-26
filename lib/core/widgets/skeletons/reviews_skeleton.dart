@@ -1,0 +1,6 @@
+import 'package:flutter/material.dart';
+import 'skeleton_primitives.dart';
+import '../../theme/app_colors.dart';
+
+class ReviewsSkeleton extends StatelessWidget { const ReviewsSkeleton({super.key}); @override Widget build(BuildContext context)=>ListView(padding:const EdgeInsets.all(18),physics:const NeverScrollableScrollPhysics(),children:const[SkeletonText(widthFactor:.48,height:22),SizedBox(height:18),AppSkeleton(height:130,radius:22),SizedBox(height:16),ReviewRowSkeleton(),ReviewRowSkeleton(),ReviewRowSkeleton()]); }
+class ReviewRowSkeleton extends StatelessWidget { const ReviewRowSkeleton({super.key}); @override Widget build(BuildContext context)=>Container(margin:const EdgeInsets.only(bottom:12),padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:AppColors.surface,borderRadius:BorderRadius.circular(18),border:Border.all(color:AppColors.border)),child:const Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Row(children:[AppSkeleton(width:40,height:40,radius:20),SizedBox(width:10),Expanded(child:SkeletonText(widthFactor:.55,height:14))]),SizedBox(height:13),SkeletonText(widthFactor:1,height:10),SizedBox(height:7),SkeletonText(widthFactor:.72,height:10),SizedBox(height:11),SkeletonText(widthFactor:.3,height:10)])); }

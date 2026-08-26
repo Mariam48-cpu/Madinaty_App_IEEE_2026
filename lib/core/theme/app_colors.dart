@@ -87,6 +87,9 @@ abstract class AppColors {
   /// Chip border color
   static const Color chipBorder = Color(0xFFE8DEC8);
   static const Color accent = Color(0xFFBF9B7A); // بني فاتح للإبرازات والبطاقات
+  static const Color star = Color(0xFFE5A23C);
+  static const Color overlay = Color(0x14000000);
+  static const Color skeletonHighlight = Color(0xFFFFFFFF);
   static const Color textBody = Color(0xFF7D7D7D); // رمادي غامق للنصوص الثانوية
   static const Color textDark = Colors.black87;
 }

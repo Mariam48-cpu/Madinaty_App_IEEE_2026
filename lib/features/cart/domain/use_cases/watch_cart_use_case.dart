@@ -6,7 +6,7 @@ import '../repositories/cart_repository_interface.dart';
 class WatchCartUseCase {
   final CartRepositoryInterface repository;
 
-  const WatchCartUseCase({required this.repository});
+  const WatchCartUseCase(CartRepositoryInterface cartRepositoryInterface, {required this.repository});
 
   Stream<List<CartItemEntity>> call() {
     return repository.watchCart();

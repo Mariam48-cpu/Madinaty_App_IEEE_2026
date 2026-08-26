@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:toastification/toastification.dart';
+
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
-import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/skeletons.dart';
+
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_results_card.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_empty_view.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_error_view.dart';
@@ -34,22 +36,29 @@ class CategoryResultsContent extends StatelessWidget {
 
     if (selectedFilterIndex == 1) {
       final LatLng? userLocation = state.currentLocation;
-      if (userLocation == null) return cafes;
+
+      if (userLocation == null) {
+        return cafes;
+      }
 
       const Distance distanceCalculator = Distance();
+
       cafes.sort((a, b) {
         final double distanceA = distanceCalculator.as(
           LengthUnit.Kilometer,
           userLocation,
           a.location,
         );
+
         final double distanceB = distanceCalculator.as(
           LengthUnit.Kilometer,
           userLocation,
           b.location,
         );
+
         return distanceA.compareTo(distanceB);
       });
+
       return cafes;
     }
 
@@ -75,9 +84,7 @@ class CategoryResultsContent extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is DiscoveryInitial || state is DiscoveryLoading) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          );
+          return const DiscoverySkeleton();
         }
 
         if (state is DiscoveryError) {
