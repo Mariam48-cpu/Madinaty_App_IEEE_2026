@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
-
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/favorites_skeleton.dart';
@@ -10,6 +11,10 @@ import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/favorites_skeleton
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/cafe_details_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/product_datails_screen.dart';
+
+import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
+
 
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
@@ -46,14 +51,7 @@ class _FavoritesScreenContent extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // ==================================================
-            // APP BAR
-            // ==================================================
             _buildAppBar(context),
-
-            // ==================================================
-            // TABS
-            // ==================================================
             BlocBuilder<FavoritesCubit, FavoritesState>(
               buildWhen: (previous, current) {
                 if (previous is FavoritesLoaded && current is FavoritesLoaded) {
@@ -73,25 +71,12 @@ class _FavoritesScreenContent extends StatelessWidget {
                 );
               },
             ),
-
-            // ==================================================
-            // CONTENT
-            // ==================================================
             Expanded(
               child: BlocBuilder<FavoritesCubit, FavoritesState>(
                 builder: (context, state) {
-                  // --------------------------------------------------
-                  // LOADING
-                  // --------------------------------------------------
-
                   if (state is FavoritesInitial || state is FavoritesLoading) {
                     return const FavoritesSkeleton();
                   }
-
-                  // --------------------------------------------------
-                  // ERROR
-                  // --------------------------------------------------
-
                   if (state is FavoritesError) {
                     return Center(
                       child: Padding(
@@ -134,26 +119,11 @@ class _FavoritesScreenContent extends StatelessWidget {
                       ),
                     );
                   }
-
-                  // --------------------------------------------------
-                  // LOADED
-                  // --------------------------------------------------
-
                   if (state is FavoritesLoaded) {
                     final items = state.currentTabItems;
-
-                    // --------------------------------------------------
-                    // EMPTY
-                    // --------------------------------------------------
-
                     if (items.isEmpty) {
                       return const FavoritesEmptyView();
                     }
-
-                    // --------------------------------------------------
-                    // FAVORITES LIST
-                    // --------------------------------------------------
-
                     return ListView.separated(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -167,10 +137,6 @@ class _FavoritesScreenContent extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final item = items[index];
 
-                        // --------------------------------------------------
-                        // CAFE FAVORITE
-                        // --------------------------------------------------
-
                         if (item.isCafe) {
                           return FavoritePlaceCard(
                             item: item,
@@ -182,11 +148,6 @@ class _FavoritesScreenContent extends StatelessWidget {
                             },
                           );
                         }
-
-                        // --------------------------------------------------
-                        // PRODUCT FAVORITE
-                        // --------------------------------------------------
-
                         return FavoriteProductCard(
                           item: item,
                           onFavoriteToggle: () {
@@ -199,11 +160,6 @@ class _FavoritesScreenContent extends StatelessWidget {
                       },
                     );
                   }
-
-                  // --------------------------------------------------
-                  // INITIAL
-                  // --------------------------------------------------
-
                   return const SizedBox.shrink();
                 },
               ),
@@ -214,46 +170,129 @@ class _FavoritesScreenContent extends StatelessWidget {
     );
   }
 
-  // ==================================================
-  // APP BAR
-  // ==================================================
-
   Widget _buildAppBar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // --------------------------------------------------
-          // NOTIFICATION
-          // --------------------------------------------------
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications_none_rounded,
-                color: Color(0xFF2D2521),
-                size: 22,
-              ),
-              onPressed: () {
-                // TODO: Navigate to notifications screen
+          BlocProvider(
+            create: (_) {
+              final cubit = sl<NotificationCubit>();
+
+              final user = FirebaseAuth.instance.currentUser;
+
+              if (user != null) {
+                cubit.watchNotifications(user.uid);
+              }
+
+              return cubit;
+            },
+
+            child: BlocBuilder<NotificationCubit, NotificationState>(
+              builder: (context, notificationState) {
+                int unreadCount = 0;
+
+                if (notificationState is NotificationLoaded) {
+                  unreadCount = notificationState.unreadCount;
+                }
+
+                return Stack(
+                  clipBehavior: Clip.none,
+
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.border,
+                        ),
+                      ),
+
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+
+                        icon: const Icon(
+                          Icons.notifications_none_rounded,
+                          size: 22,
+                          color: AppColors.textSecondary,
+                        ),
+
+                        onPressed: () {
+                          final user =
+                              FirebaseAuth.instance.currentUser;
+
+                          if (user == null) {
+                            return;
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BlocProvider(
+                                create: (_) {
+                                  final cubit =
+                                  sl<NotificationCubit>();
+
+                                  cubit.fetchNotifications(user.uid);
+
+                                  return cubit;
+                                },
+
+                                child: NotificationsScreen(
+                                  uid: user.uid,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    if (unreadCount > 0)
+                      PositionedDirectional(
+                        top: -5,
+                        end: -5,
+
+                        child: Container(
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                          ),
+
+                          decoration: const BoxDecoration(
+                            color: AppColors.error,
+                            shape: BoxShape.circle,
+                          ),
+
+                          child: Center(
+                            child: Text(
+                              unreadCount > 99
+                                  ? '99+'
+                                  : unreadCount.toString(),
+
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
               },
             ),
           ),
-
-          // --------------------------------------------------
-          // TITLE
-          // --------------------------------------------------
           Text(
             AppLocale.navMyLists.getString(context),
             style: const TextStyle(
@@ -262,10 +301,6 @@ class _FavoritesScreenContent extends StatelessWidget {
               color: Color(0xFF2D2521),
             ),
           ),
-
-          // --------------------------------------------------
-          // LOCATION
-          // --------------------------------------------------
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -293,11 +328,6 @@ class _FavoritesScreenContent extends StatelessWidget {
       ),
     );
   }
-
-  // ==================================================
-  // CAFE DETAILS
-  // ==================================================
-
   void _navigateToCafeDetails(BuildContext context, FavoriteItemEntity item) {
     final cafe = CafeEntity(
       id: item.targetId,
@@ -318,15 +348,10 @@ class _FavoritesScreenContent extends StatelessWidget {
       MaterialPageRoute(builder: (_) => CafeDetailsScreen(cafe: cafe)),
     );
   }
-
-  // ==================================================
-  // PRODUCT DETAILS
-  // ==================================================
-
   void _navigateToProductDetails(
-    BuildContext context,
-    FavoriteItemEntity item,
-  ) {
+      BuildContext context,
+      FavoriteItemEntity item,
+      ) {
     final product = ProductEntity(
       id: item.targetId,
       cafeId: item.cafeId ?? '',

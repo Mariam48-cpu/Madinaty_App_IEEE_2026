@@ -5,6 +5,7 @@ class NotificationEntity extends Equatable {
   final String title;
   final String body;
   final String type;
+  final String? bookingId;
   final DateTime createdAt;
   final bool isRead;
 
@@ -13,10 +14,19 @@ class NotificationEntity extends Equatable {
     required this.title,
     required this.body,
     required this.type,
+    this.bookingId,
     required this.createdAt,
     required this.isRead,
   });
 
   @override
-  List<Object?> get props => [id, title, body, type, createdAt, isRead];
+  List<Object?> get props => [
+    id,
+    title,
+    body,
+    type,
+    bookingId,
+    createdAt,
+    isRead,
+  ];
 }

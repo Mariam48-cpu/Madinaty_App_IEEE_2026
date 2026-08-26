@@ -66,10 +66,7 @@ class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButtonWidget(
-                icon: Icons.arrow_forward_ios,
-                onTap: widget.onBack,
-              ),
+              SizedBox.shrink(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(

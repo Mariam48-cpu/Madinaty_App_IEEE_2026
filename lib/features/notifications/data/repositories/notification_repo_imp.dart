@@ -11,8 +11,8 @@ class NotificationRepoImp implements NotificationRepoInterface {
 
   @override
   Future<Either<Exception, List<NotificationEntity>>> getNotifications(
-    String uid,
-  ) async {
+      String uid,
+      ) async {
     try {
       final notifications = await remoteDataSource.getNotifications(uid);
 
@@ -33,6 +33,7 @@ class NotificationRepoImp implements NotificationRepoInterface {
     required String title,
     required String body,
     required String type,
+    String? bookingId,
   }) async {
     try {
       await remoteDataSource.createNotification(
@@ -40,6 +41,7 @@ class NotificationRepoImp implements NotificationRepoInterface {
         title: title,
         body: body,
         type: type,
+        bookingId: bookingId,
       );
 
       return const Right(null);

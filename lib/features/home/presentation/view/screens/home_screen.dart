@@ -48,10 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _userName = '';
   bool _isLoadingUser = true;
 
-  // ============================================================
-  // LOCATION
-  // ============================================================
-
+  String _locationName = '';
   bool _isLoadingLocation = true;
 
   final TextEditingController _searchController = TextEditingController();
@@ -64,17 +61,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _loadUserName();
 
-    // ============================================================
-    // IMPORTANT
-    // ============================================================
-    //
-    // احنا هنا مش هننده loadNearbyCafes()
-    //
-    // MainNavigationScreen هو المسؤول عن تشغيل الـ DiscoveryCubit.
-    //
-    // HomeScreen هتسمع للـ DiscoverySuccess وتجيب اسم المكان.
-    //
-    // ============================================================
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final discoveryCubit = context.read<DiscoveryCubit>();
+
+      final location = discoveryCubit.currentLocation;
+
+      if (location != null) {
+        _resolveLocationName(location);
+      }
+    });
   }
 
   @override
@@ -82,10 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchController.dispose();
     super.dispose();
   }
-
-  // ============================================================
-  // USER
-  // ============================================================
 
   Future<void> _loadUserName() async {
     try {
@@ -138,11 +131,6 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
   }
-
-  // ============================================================
-  // LOCATION NAME
-  // ============================================================
-
   Future<void> _resolveLocationName(LatLng location) async {
     try {
       if (mounted) {
@@ -160,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (placemarks.isEmpty) {
         setState(() {
+          _locationName = '';
           _isLoadingLocation = false;
         });
 
@@ -169,19 +158,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final place = placemarks.first;
 
       String locationName = '';
-
-      // ==========================================================
-      // ORDER
-      // ==========================================================
-      //
-      // subLocality
-      // locality
-      // subAdministrativeArea
-      // administrativeArea
-      //
-      // أول قيمة موجودة هنستخدمها.
-      //
-      // ==========================================================
 
       final possibleNames = <String?>[
         place.subLocality,
@@ -197,33 +173,29 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
 
-      if (!mounted) return;
+      setState(() {
+        _locationName = locationName;
+        _isLoadingLocation = false;
+      });
     } catch (_) {
       if (!mounted) return;
 
       setState(() {
+        _locationName = '';
         _isLoadingLocation = false;
       });
     }
   }
-
-  // ============================================================
-  // BUILD
-  // ============================================================
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(child: _buildCurrentPage()),
+      body: SafeArea(
+        child: _buildCurrentPage(),
+      ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
-
-  // ============================================================
-  // CURRENT PAGE
-  // ============================================================
-
   Widget _buildCurrentPage() {
     switch (_selectedNavIndex) {
       case 0:
@@ -245,11 +217,6 @@ class _HomeScreenState extends State<HomeScreen> {
         return _buildHomePage();
     }
   }
-
-  // ============================================================
-  // HOME PAGE
-  // ============================================================
-
   Widget _buildHomePage() {
     return BlocListener<DiscoveryCubit, DiscoveryState>(
       listenWhen: (previous, current) {
@@ -271,33 +238,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
-            // ======================================================
-            // LOADING
-            // ======================================================
 
             if (state is HomeLoading || state is HomeInitial) {
               return const HomeSkeleton();
             }
-
-            // ======================================================
-            // ERROR
-            // ======================================================
-
             if (state is HomeError) {
               return ErrorStateWidget(state: state);
             }
 
-            // ======================================================
-            // EMPTY
-            // ======================================================
-
             if (state is HomeEmpty) {
               return const EmptyStateWidget();
             }
-
-            // ======================================================
-            // LOADED
-            // ======================================================
 
             if (state is HomeLoaded) {
               return RefreshIndicator(
@@ -309,10 +260,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   await context.read<HomeCubit>().fetchHomeData();
 
                   await _loadUserName();
-
-                  // ------------------------------------------------
-                  // لو الموقع موجود بالفعل نعمل resolve للاسم تاني
-                  // ------------------------------------------------
 
                   final discoveryCubit = context.read<DiscoveryCubit>();
 
@@ -333,22 +280,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // ============================================================
-  // CART
-  // ============================================================
-
   Widget _buildCartPage() {
     return BlocProvider(
       create: (_) => sl<CartCubit>()..initCartWatcher(),
       child: const CartScreen(),
     );
   }
-
-  // ============================================================
-  // PROFILE
-  // ============================================================
-
   Widget _buildProfilePage() {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -356,7 +293,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return Center(
         child: Text(
           AppLocale.loginRequiredToProceed.getString(context),
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+          ),
         ),
       );
     }
@@ -366,12 +305,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ProfileScreen(uid: user.uid),
     );
   }
-
-  // ============================================================
-  // HOME CONTENT
-  // ============================================================
-
-  Widget _buildHomeContent(BuildContext context, HomeLoaded state) {
+  Widget _buildHomeContent(
+      BuildContext context,
+      HomeLoaded state,
+      ) {
     final effectiveUserName = _userName.isNotEmpty
         ? _userName
         : AppLocale.defaultUser.getString(context);
@@ -385,16 +322,10 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
-          // ========================================================
-          // HEADER
-          // ========================================================
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              // ======================================================
-              // NOTIFICATIONS
-              // ======================================================
               BlocProvider(
                 create: (_) {
                   final cubit = sl<NotificationCubit>();
@@ -418,6 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     return Stack(
                       clipBehavior: Clip.none,
+
                       children: [
                         Container(
                           width: 40,
@@ -426,7 +358,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.surface,
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.border),
+                            border: Border.all(
+                              color: AppColors.border,
+                            ),
                           ),
 
                           child: IconButton(
@@ -439,7 +373,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
 
                             onPressed: () {
-                              final user = FirebaseAuth.instance.currentUser;
+                              final user =
+                                  FirebaseAuth.instance.currentUser;
 
                               if (user == null) {
                                 return;
@@ -450,13 +385,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 MaterialPageRoute(
                                   builder: (_) => BlocProvider(
                                     create: (_) {
-                                      final cubit = sl<NotificationCubit>();
+                                      final cubit =
+                                      sl<NotificationCubit>();
 
                                       cubit.fetchNotifications(user.uid);
 
                                       return cubit;
                                     },
-                                    child: NotificationsScreen(uid: user.uid),
+
+                                    child: NotificationsScreen(
+                                      uid: user.uid,
+                                    ),
                                   ),
                                 ),
                               );
@@ -506,21 +445,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(width: 10),
-
-              // ======================================================
-              // USER + LOCATION
-              // ======================================================
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
 
                   children: [
-                    // ------------------------------------------------
-                    // USER NAME
-                    // ------------------------------------------------
                     Text(
                       _isLoadingUser
-                          ? AppLocale.goodMorningLoading.getString(context)
+                          ? AppLocale.goodMorningLoading
+                          .getString(context)
                           : '${AppLocale.goodMorningPrefix.getString(context)} $effectiveUserName',
 
                       maxLines: 1,
@@ -535,7 +468,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 15,
+                          color: AppColors.primary,
+                        ),
+
+                        const SizedBox(width: 3),
+
+                        Flexible(
+                          child: Text(
+                            _isLoadingLocation
+                                ? 'جاري تحديد موقعك...'
+                                : _locationName.isNotEmpty
+                                ? _locationName
+                                : 'الموقع غير متاح',
+
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+
+                            textAlign: TextAlign.right,
+
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -543,15 +509,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           const SizedBox(height: 18),
-
-
           Container(
             height: 52,
 
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(17),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(
+                color: AppColors.border,
+              ),
             ),
 
             child: TextField(
@@ -564,7 +530,8 @@ class _HomeScreenState extends State<HomeScreen> {
               },
 
               decoration: InputDecoration(
-                hintText: AppLocale.homeSearchBarHint.getString(context),
+                hintText:
+                AppLocale.homeSearchBarHint.getString(context),
 
                 hintStyle: const TextStyle(
                   color: AppColors.textSecondary,
@@ -572,12 +539,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 prefixIcon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
+                  duration: const Duration(
+                    milliseconds: 220,
+                  ),
 
-                  transitionBuilder: (child, animation) {
+                  transitionBuilder: (
+                      child,
+                      animation,
+                      ) {
                     return ScaleTransition(
                       scale: animation,
-                      child: FadeTransition(opacity: animation, child: child),
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
                     );
                   },
 
@@ -586,7 +561,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? Icons.manage_search_rounded
                         : Icons.search_rounded,
 
-                    key: ValueKey(state.isSearchActive),
+                    key: ValueKey(
+                      state.isSearchActive,
+                    ),
 
                     color: AppColors.textSecondary,
 
@@ -595,52 +572,67 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 suffixIcon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
+                  duration: const Duration(
+                    milliseconds: 220,
+                  ),
 
-                  transitionBuilder: (child, animation) {
+                  transitionBuilder: (
+                      child,
+                      animation,
+                      ) {
                     return ScaleTransition(
                       scale: animation,
-                      child: FadeTransition(opacity: animation, child: child),
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
                     );
                   },
 
                   child: state.isSearchActive
                       ? IconButton(
-                          key: const ValueKey('clear-search'),
+                    key: const ValueKey(
+                      'clear-search',
+                    ),
 
-                          icon: const Icon(
-                            Icons.close_rounded,
-                            color: AppColors.textSecondary,
-                            size: 20,
-                          ),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color:
+                      AppColors.textSecondary,
+                      size: 20,
+                    ),
 
-                          onPressed: () {
-                            _searchController.clear();
+                    onPressed: () {
+                      _searchController.clear();
 
-                            context.read<HomeCubit>().clearSearch();
-                          },
-                        )
-                      : const SizedBox.shrink(key: ValueKey('no-clear')),
+                      context
+                          .read<HomeCubit>()
+                          .clearSearch();
+                    },
+                  )
+                      : const SizedBox.shrink(
+                    key: ValueKey(
+                      'no-clear',
+                    ),
+                  ),
                 ),
 
                 border: InputBorder.none,
 
-                contentPadding: const EdgeInsets.symmetric(
+                contentPadding:
+                const EdgeInsets.symmetric(
                   horizontal: 15,
                   vertical: 15,
                 ),
               ),
             ),
           ),
-
-          // ========================================================
-          // SEARCH RESULTS
-          // ========================================================
           if (state.isSearchActive) ...[
             const SizedBox(height: 18),
 
             Text(
-              AppLocale.searchResultsTitle.getString(context),
+              AppLocale.searchResultsTitle
+                  .getString(context),
 
               style: const TextStyle(
                 fontSize: 17,
@@ -652,13 +644,20 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 11),
 
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 320),
+              duration: const Duration(
+                milliseconds: 320,
+              ),
 
-              switchInCurve: Curves.easeOutCubic,
+              switchInCurve:
+              Curves.easeOutCubic,
 
-              switchOutCurve: Curves.easeInCubic,
+              switchOutCurve:
+              Curves.easeInCubic,
 
-              transitionBuilder: (child, animation) {
+              transitionBuilder: (
+                  child,
+                  animation,
+                  ) {
                 return FadeTransition(
                   opacity: animation,
 
@@ -675,37 +674,54 @@ class _HomeScreenState extends State<HomeScreen> {
 
               child: state.isSearching
                   ? const Padding(
-                      key: ValueKey('search-loading'),
+                key: ValueKey(
+                  'search-loading',
+                ),
 
-                      padding: EdgeInsets.symmetric(vertical: 8),
+                padding:
+                EdgeInsets.symmetric(
+                  vertical: 8,
+                ),
 
-                      child: _SearchSkeleton(),
-                    )
+                child: _SearchSkeleton(),
+              )
                   : state.searchError != null
                   ? SearchErrorWidget(
-                      key: const ValueKey('search-error'),
-                      message: state.searchError!,
-                    )
+                key: const ValueKey(
+                  'search-error',
+                ),
+                message:
+                state.searchError!,
+              )
                   : state.searchResults.isEmpty
-                  ? const NoSearchResults(key: ValueKey('search-empty'))
+                  ? const NoSearchResults(
+                key: ValueKey(
+                  'search-empty',
+                ),
+              )
                   : Column(
-                      key: const ValueKey('search-results'),
+                key: const ValueKey(
+                  'search-results',
+                ),
 
-                      children: state.searchResults
-                          .map(
-                            (cafe) => Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-
-                              child: CafeCard(cafe: cafe),
-                            ),
-                          )
-                          .toList(),
+                children: state
+                    .searchResults
+                    .map(
+                      (cafe) => Padding(
+                    padding:
+                    const EdgeInsets
+                        .only(
+                      bottom: 16,
                     ),
+
+                    child: CafeCard(
+                      cafe: cafe,
+                    ),
+                  ),
+                ).toList(),
+              ),
             ),
           ]
-          // ========================================================
-          // NORMAL HOME
-          // ========================================================
           else ...[
             const SizedBox(height: 16),
 
@@ -720,7 +736,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
 
             Text(
-              AppLocale.whatsYourMoodToday.getString(context),
+              AppLocale.whatsYourMoodToday
+                  .getString(context),
 
               style: const TextStyle(
                 fontSize: 16,
@@ -736,7 +753,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 18),
 
             Text(
-              AppLocale.selectedCafesForYou.getString(context),
+              AppLocale.selectedCafesForYou
+                  .getString(context),
 
               style: const TextStyle(
                 fontSize: 17,
@@ -751,10 +769,14 @@ class _HomeScreenState extends State<HomeScreen> {
               const NoFilteredResults()
             else
               ...state.filteredCafes.map(
-                (cafe) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                    (cafe) => Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 16,
+                  ),
 
-                  child: CafeCard(cafe: cafe),
+                  child: CafeCard(
+                    cafe: cafe,
+                  ),
                 ),
               ),
 
@@ -768,60 +790,73 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // ============================================================
-  // BOTTOM NAVIGATION
-  // ============================================================
-
   Widget _buildBottomNavigationBar() {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.surface,
 
-        border: Border(top: BorderSide(color: AppColors.border)),
+        border: Border(
+          top: BorderSide(
+            color: AppColors.border,
+          ),
+        ),
       ),
 
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 6,
+          ),
 
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment:
+            MainAxisAlignment.spaceAround,
 
             children: [
               _buildNavItem(
                 index: 0,
                 icon: Icons.home_outlined,
                 activeIcon: Icons.home_rounded,
-                label: AppLocale.navHome.getString(context),
+                label: AppLocale.navHome
+                    .getString(context),
               ),
 
               _buildNavItem(
                 index: 1,
                 icon: Icons.explore_outlined,
                 activeIcon: Icons.explore,
-                label: AppLocale.navExplore.getString(context),
+                label: AppLocale.navExplore
+                    .getString(context),
               ),
 
               _buildNavItem(
                 index: 2,
-                icon: Icons.shopping_cart_outlined,
-                activeIcon: Icons.shopping_cart_rounded,
+                icon:
+                Icons.shopping_cart_outlined,
+                activeIcon:
+                Icons.shopping_cart_rounded,
                 label: 'السلة',
               ),
 
               _buildNavItem(
                 index: 3,
-                icon: Icons.favorite_border_rounded,
-                activeIcon: Icons.favorite_rounded,
-                label: AppLocale.navFavorites.getString(context),
+                icon:
+                Icons.favorite_border_rounded,
+                activeIcon:
+                Icons.favorite_rounded,
+                label: AppLocale.navFavorites
+                    .getString(context),
               ),
 
               _buildNavItem(
                 index: 4,
-                icon: Icons.person_outline_rounded,
-                activeIcon: Icons.person_rounded,
-                label: AppLocale.navMyAccount.getString(context),
+                icon:
+                Icons.person_outline_rounded,
+                activeIcon:
+                Icons.person_rounded,
+                label: AppLocale.navMyAccount
+                    .getString(context),
               ),
             ],
           ),
@@ -829,18 +864,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // ============================================================
-  // NAV ITEM
-  // ============================================================
-
   Widget _buildNavItem({
     required int index,
     required IconData icon,
     required IconData activeIcon,
     required String label,
   }) {
-    final isSelected = _selectedNavIndex == index;
+    final isSelected =
+        _selectedNavIndex == index;
 
     return GestureDetector(
       onTap: () {
@@ -850,14 +881,22 @@ class _HomeScreenState extends State<HomeScreen> {
       },
 
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(
+          milliseconds: 200,
+        ),
 
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 7,
+        ),
 
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceVariant : Colors.transparent,
+          color: isSelected
+              ? AppColors.surfaceVariant
+              : Colors.transparent,
 
-          borderRadius: BorderRadius.circular(18),
+          borderRadius:
+          BorderRadius.circular(18),
         ),
 
         child: Column(
@@ -865,11 +904,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
           children: [
             Icon(
-              isSelected ? activeIcon : icon,
+              isSelected
+                  ? activeIcon
+                  : icon,
 
               size: 21,
 
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              color: isSelected
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
             ),
 
             const SizedBox(height: 3),
@@ -879,9 +922,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
               style: TextStyle(
                 fontSize: 9,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isSelected
+                    ? FontWeight.bold
+                    : FontWeight.normal,
 
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
               ),
             ),
           ],
@@ -890,11 +937,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// ============================================================================
-// AI PLANNER ENTRY CARD
-// ============================================================================
-
 class _AiPlannerEntryCard extends StatelessWidget {
   const _AiPlannerEntryCard();
 
@@ -908,15 +950,21 @@ class _AiPlannerEntryCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: AlignmentDirectional.topStart,
-
           end: AlignmentDirectional.bottomEnd,
 
-          colors: [Color(0xFFFFEBDD), Color(0xFFFFF5EF)],
+          colors: [
+            Color(0xFFFFEBDD),
+            Color(0xFFFFF5EF),
+          ],
         ),
 
-        borderRadius: BorderRadius.circular(22),
+        borderRadius:
+        BorderRadius.circular(22),
 
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.10)),
+        border: Border.all(
+          color: AppColors.primary
+              .withValues(alpha: 0.10),
+        ),
       ),
 
       child: Row(
@@ -926,9 +974,11 @@ class _AiPlannerEntryCard extends StatelessWidget {
             height: 45,
 
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.10),
+              color: AppColors.primary
+                  .withValues(alpha: 0.10),
 
-              borderRadius: BorderRadius.circular(15),
+              borderRadius:
+              BorderRadius.circular(15),
             ),
 
             child: const Icon(
@@ -944,22 +994,27 @@ class _AiPlannerEntryCard extends StatelessWidget {
 
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment:
+              CrossAxisAlignment.end,
 
               children: [
                 Text(
                   'خطط لي يومي بالذكاء الاصطناعي',
 
-                  textAlign: TextAlign.right,
+                  textAlign:
+                  TextAlign.right,
 
                   maxLines: 1,
 
-                  overflow: TextOverflow.ellipsis,
+                  overflow:
+                  TextOverflow.ellipsis,
 
                   style: const TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    fontWeight:
+                    FontWeight.bold,
+                    color:
+                    AppColors.textPrimary,
                   ),
                 ),
 
@@ -968,54 +1023,77 @@ class _AiPlannerEntryCard extends StatelessWidget {
                 const Text(
                   'تجربة مميزة تناسب مزاجك، وقتك ومكانك.',
 
-                  textAlign: TextAlign.right,
+                  textAlign:
+                  TextAlign.right,
 
                   maxLines: 2,
 
-                  overflow: TextOverflow.ellipsis,
+                  overflow:
+                  TextOverflow.ellipsis,
 
                   style: TextStyle(
                     fontSize: 10.5,
                     height: 1.35,
-                    color: AppColors.textSecondary,
+                    color:
+                    AppColors.textSecondary,
                   ),
                 ),
 
                 const SizedBox(height: 9),
 
                 Align(
-                  alignment: AlignmentDirectional.centerEnd,
+                  alignment:
+                  AlignmentDirectional
+                      .centerEnd,
 
                   child: SizedBox(
                     height: 33,
 
-                    child: ElevatedButton.icon(
+                    child:
+                    ElevatedButton.icon(
                       onPressed: () {
-                        Navigator.pushNamed(context, AppRoutes.aiPlanner);
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.aiPlanner,
+                        );
                       },
 
-                      icon: const Icon(Icons.arrow_back_rounded, size: 14),
+                      icon: const Icon(
+                        Icons.arrow_back_rounded,
+                        size: 14,
+                      ),
 
                       label: const Text(
                         'ابدأ الآن',
 
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                          fontWeight:
+                          FontWeight.bold,
                         ),
                       ),
 
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                      style:
+                      ElevatedButton.styleFrom(
+                        backgroundColor:
+                        AppColors.primary,
 
-                        foregroundColor: Colors.white,
+                        foregroundColor:
+                        Colors.white,
 
                         elevation: 0,
 
-                        padding: const EdgeInsets.symmetric(horizontal: 13),
+                        padding:
+                        const EdgeInsets
+                            .symmetric(
+                          horizontal: 13,
+                        ),
 
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(11),
+                        shape:
+                        RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius
+                              .circular(11),
                         ),
                       ),
                     ),
@@ -1032,7 +1110,8 @@ class _AiPlannerEntryCard extends StatelessWidget {
             height: 42,
 
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.72),
+              color: Colors.white
+                  .withValues(alpha: 0.72),
 
               shape: BoxShape.circle,
             ),
@@ -1050,11 +1129,6 @@ class _AiPlannerEntryCard extends StatelessWidget {
     );
   }
 }
-
-// ============================================================================
-// SEARCH SKELETON
-// ============================================================================
-
 class _SearchSkeleton extends StatelessWidget {
   const _SearchSkeleton();
 
@@ -1072,7 +1146,8 @@ class _SearchSkeleton extends StatelessWidget {
   }
 }
 
-class _SearchResultSkeleton extends StatelessWidget {
+class _SearchResultSkeleton
+    extends StatelessWidget {
   const _SearchResultSkeleton();
 
   @override
@@ -1083,31 +1158,51 @@ class _SearchResultSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
 
-        borderRadius: BorderRadius.circular(18),
+        borderRadius:
+        BorderRadius.circular(18),
 
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: AppColors.border,
+        ),
       ),
 
       child: const Row(
         children: [
-          AppSkeleton(width: 70, height: 70, radius: 14),
+          AppSkeleton(
+            width: 70,
+            height: 70,
+            radius: 14,
+          ),
 
           SizedBox(width: 12),
 
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
 
               children: [
-                AppSkeleton(width: 125, height: 14, radius: 6),
+                AppSkeleton(
+                  width: 125,
+                  height: 14,
+                  radius: 6,
+                ),
 
                 SizedBox(height: 9),
 
-                AppSkeleton(width: 90, height: 10, radius: 5),
+                AppSkeleton(
+                  width: 90,
+                  height: 10,
+                  radius: 5,
+                ),
 
                 SizedBox(height: 9),
 
-                AppSkeleton(width: 65, height: 22, radius: 11),
+                AppSkeleton(
+                  width: 65,
+                  height: 22,
+                  radius: 11,
+                ),
               ],
             ),
           ),

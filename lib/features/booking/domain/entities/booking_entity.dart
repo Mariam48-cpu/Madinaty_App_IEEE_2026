@@ -1,6 +1,8 @@
-enum BookingStatus { pending, approved, rejected, cancelled }
+import 'package:equatable/equatable.dart';
 
-class BookingEntity {
+enum BookingStatus { pending, approved, rejected, cancelled, completed }
+
+class BookingEntity extends Equatable {
   final String id;
   final String userId;
   final String cafeId;
@@ -17,14 +19,31 @@ class BookingEntity {
   const BookingEntity({
     this.id = '',
     this.userId = '',
+    required this.cafeId,
     this.date,
     this.time,
     this.guests = 1,
     this.occasion,
     this.seatingPreference,
     this.status = BookingStatus.pending,
-    this.createdAt, required this.cafeId,
+    this.createdAt,
     this.totalAmount = 50.0,
     this.reservationFee = 50.0,
   });
+
+  @override
+  List<Object?> get props => [
+    id,
+    userId,
+    cafeId,
+    date,
+    time,
+    guests,
+    occasion,
+    seatingPreference,
+    status,
+    createdAt,
+    totalAmount,
+    reservationFee,
+  ];
 }

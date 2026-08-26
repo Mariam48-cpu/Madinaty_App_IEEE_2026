@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
-import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/explore_map_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/map_picker_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
@@ -21,50 +20,33 @@ class LocationPermissionGate extends StatefulWidget {
 class _LocationPermissionGateState extends State<LocationPermissionGate> {
   final LocationService locationService = sl<LocationService>();
 
-  bool? permissionGranted;
+
+  static bool _permissionGateShown = false;
+
+  bool _openMap = false;
 
   @override
   void initState() {
     super.initState();
-    checkPermission();
-  }
 
-  Future<void> checkPermission() async {
-    final permission = await locationService.checkPermission();
-
-    final granted =
-        permission == LocationPermission.always ||
-            permission == LocationPermission.whileInUse;
-
-    if (!mounted) return;
-
-    setState(() {
-      permissionGranted = granted;
-    });
+    if (_permissionGateShown) {
+      _openMap = true;
+    } else {
+      _permissionGateShown = true;
+    }
   }
 
   void openExploreMap() {
     if (!mounted) return;
 
     setState(() {
-      permissionGranted = true;
+      _openMap = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (permissionGranted == null) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
-          child: CircularProgressIndicator(
-            color: AppColors.primary,
-          ),
-        ),
-      );
-    }
-
-    if (permissionGranted == true) {
+    if (_openMap) {
       return ExploreMapScreen(
         cubit: sl<DiscoveryCubit>(),
       );
@@ -72,13 +54,19 @@ class _LocationPermissionGateState extends State<LocationPermissionGate> {
 
     return LocationPermissionScreen(
       locationService: locationService,
+
       onPermissionGranted: openExploreMap,
+
       onChooseManually: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => MapPickerScreen(
-              onLocationSelected: (LatLng selectedLocation) {},
+              onLocationSelected: (LatLng selectedLocation) {
+                Navigator.pop(context);
+
+                openExploreMap();
+              },
             ),
           ),
         );

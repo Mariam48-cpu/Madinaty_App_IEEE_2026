@@ -25,22 +25,14 @@ abstract class AIPlannerDataSource {
 
 @LazySingleton(as: AIPlannerDataSource)
 class AIPlannerDataSourceImpl implements AIPlannerDataSource {
-  // ============================================================
-  // GEMINI CONFIG
-  // ============================================================
 
   static const String _apiKey =
-      'AQ.Ab8RN6LolU0LBFNzB7KvFzoXr_L5B5Gcy32nv5P1SbnKVcGE9Q';
+      'AQ.Ab8RN6LMlccq9zKfCksq39stPTghe4mIxXiTqavQvzJNCw0k9A';
 
   static const String _model = 'gemini-3.5-flash';
 
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta/models';
-
-  // ============================================================
-  // GEMINI REQUEST
-  // ============================================================
-
   Future<String> _generateContent(String prompt) async {
     final uri = Uri.parse('$_baseUrl/$_model:generateContent');
 
@@ -62,10 +54,6 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
           ],
         }),
       );
-
-      // ----------------------------------------------------------
-      // SUCCESS
-      // ----------------------------------------------------------
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final decoded = jsonDecode(response.body);
@@ -103,29 +91,17 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
         return text;
       }
 
-      // ----------------------------------------------------------
-      // AUTH ERROR
-      // ----------------------------------------------------------
-
       if (response.statusCode == 401 || response.statusCode == 403) {
         throw Exception(
           AppLocale.aiAuthError,
         );
       }
 
-      // ----------------------------------------------------------
-      // RATE LIMIT
-      // ----------------------------------------------------------
-
       if (response.statusCode == 429) {
         throw Exception(
           AppLocale.aiRateLimitError
         );
       }
-
-      // ----------------------------------------------------------
-      // OTHER API ERROR
-      // ----------------------------------------------------------
 
       String message = AppLocale.aiServerError;
 
@@ -142,7 +118,6 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
           }
         }
       } catch (_) {
-        // Ignore parsing error.
       }
 
       throw Exception(AppLocale.aiServerError);
@@ -156,10 +131,6 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
       throw Exception(AppLocale.aiErrorGeneric);
     }
   }
-
-  // ============================================================
-  // UNDERSTAND USER REQUEST
-  // ============================================================
 
   @override
   Future<AIPlanIntentDTO> understandRequest({
@@ -254,9 +225,6 @@ Return ONLY valid JSON.
     return AIPlanIntentDTO.fromJson(_decodeObject(rawText));
   }
 
-  // ============================================================
-  // RANK CANDIDATES
-  // ============================================================
 
   @override
   Future<AIPlanFinalDTO> rankCandidates({
@@ -347,10 +315,6 @@ Return ONLY valid JSON.
     return AIPlanFinalDTO.fromJson(_decodeObject(rawText));
   }
 
-  // ============================================================
-  // JSON DECODER
-  // ============================================================
-
   Map<String, dynamic> _decodeObject(String? rawText) {
     if (rawText == null || rawText.trim().isEmpty) {
       throw Exception(AppLocale.aiEmptyResponse);
@@ -358,19 +322,12 @@ Return ONLY valid JSON.
 
     var clean = rawText.trim();
 
-    // إزالة Markdown لو Gemini رجع:
-    //
-    // ```json
-    // {...}
-    // ```
-
     clean = clean
         .replaceAll('```json', '')
         .replaceAll('```JSON', '')
         .replaceAll('```', '')
         .trim();
 
-    // استخراج أول JSON object.
 
     final first = clean.indexOf('{');
     final last = clean.lastIndexOf('}');

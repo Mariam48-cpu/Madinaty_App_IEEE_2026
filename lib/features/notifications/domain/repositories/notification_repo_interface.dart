@@ -4,8 +4,8 @@ import '../entities/notification_entity.dart';
 
 abstract class NotificationRepoInterface {
   Future<Either<Exception, List<NotificationEntity>>> getNotifications(
-    String uid,
-  );
+      String uid,
+      );
 
   Stream<List<NotificationEntity>> watchNotifications(String uid);
 
@@ -14,6 +14,7 @@ abstract class NotificationRepoInterface {
     required String title,
     required String body,
     required String type,
+    String? bookingId,
   });
 
   Future<Either<Exception, void>> markNotificationAsRead({
@@ -22,8 +23,8 @@ abstract class NotificationRepoInterface {
   });
 
   Future<Either<Exception, void>> markAllNotificationsAsRead(
-    String uid,
-  );
+      String uid,
+      );
 
   Future<Either<Exception, void>> deleteNotification({
     required String uid,

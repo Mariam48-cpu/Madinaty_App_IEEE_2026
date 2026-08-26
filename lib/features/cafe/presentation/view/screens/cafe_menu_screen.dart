@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
-import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/cafe_skeletons.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/cart_skeleton.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/cafe_experience_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';

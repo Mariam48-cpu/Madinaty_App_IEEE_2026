@@ -274,7 +274,6 @@ class _PreOrderViewState extends State<_PreOrderView> {
                     Expanded(
                       child: CustomScrollView(
                         slivers: [
-                          // Booking Details Banner
                           SliverToBoxAdapter(
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -440,7 +439,6 @@ class _PreOrderViewState extends State<_PreOrderView> {
                       ),
                     ),
 
-                    // Fixed Bottom Bar
                     PreOrderBottomBar(
                       totalPrice: cartSubtotal,
                       itemCount: cartItemCount,

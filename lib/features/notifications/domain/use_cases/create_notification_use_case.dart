@@ -12,12 +12,14 @@ class CreateNotificationUseCase {
     required String title,
     required String body,
     required String type,
+    String? bookingId,
   }) async {
     return await repository.createNotification(
       uid: uid,
       title: title,
       body: body,
       type: type,
+      bookingId: bookingId,
     );
   }
 }

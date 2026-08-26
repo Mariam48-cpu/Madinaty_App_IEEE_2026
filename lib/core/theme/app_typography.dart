@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 abstract class AppTypography {
-  // Prevent instantiation
   const AppTypography._();
 
   /// Primary font family used across the application.

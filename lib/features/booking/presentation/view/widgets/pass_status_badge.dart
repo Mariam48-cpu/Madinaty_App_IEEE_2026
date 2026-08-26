@@ -47,6 +47,7 @@ class PassStatusBadge extends StatelessWidget {
   _StatusConfig _getStatusConfig(BuildContext context, BookingStatus status) {
     switch (status) {
       case BookingStatus.approved:
+      case BookingStatus.completed:
         return _StatusConfig(
           label: AppLocale.statusConfirmed.getString(context),
           textColor: AppColors.primary,

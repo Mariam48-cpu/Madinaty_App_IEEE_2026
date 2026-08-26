@@ -5,7 +5,6 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
-import 'package:madinaty_app_ieee_2026/core/widgets/loading_widget.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/skeleton_primitives.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/cafe_details_screen.dart';
@@ -166,7 +165,6 @@ CafeEntity _recommendationToCafeEntity(
     id: recommendation.id,
     name: recommendation.name,
 
-    // Convert recommendation coordinates to LatLng.
     location: LatLng(latitude, longitude),
 
     rating: recommendation.rating,

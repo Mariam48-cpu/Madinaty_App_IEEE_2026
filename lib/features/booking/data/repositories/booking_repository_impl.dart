@@ -9,9 +9,8 @@ import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/book
 class BookingRepositoryImpl implements BookingRepositoryInterface {
   final FirebaseFirestore firestore;
 
-  BookingRepositoryImpl({
-    FirebaseFirestore? firestore,
-  }) : firestore = firestore ?? FirebaseFirestore.instance;
+  BookingRepositoryImpl({FirebaseFirestore? firestore})
+      : firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> bookings() {
     return firestore.collection('bookings');
@@ -40,19 +39,17 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
         '${booking.date!.month.toString().padLeft(2, '0')}-'
         '${booking.date!.day.toString().padLeft(2, '0')}';
 
-    final timeKey = booking.time!
-        .replaceAll(' ', '_')
-        .replaceAll(':', '-');
+    final timeKey = booking.time!.replaceAll(' ', '_').replaceAll(':', '-');
 
-    final seatingKey = (booking.seatingPreference ?? 'any')
-        .replaceAll(' ', '_');
+    final seatingKey = (booking.seatingPreference ?? 'any').replaceAll(
+      ' ',
+      '_',
+    );
 
-    final bookingId =
-        '${booking.cafeId}_${dateKey}_${timeKey}_$seatingKey';
+    final bookingId = '${booking.cafeId}_${dateKey}_${timeKey}_$seatingKey';
 
     final bookingRef = bookings().doc(bookingId);
 
-    // Check if this slot is already booked.
     final existingBooking = await bookingRef.get();
 
     if (existingBooking.exists) {
@@ -60,9 +57,7 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       final status = data?['status'];
 
       if (status == 'pending' || status == 'approved') {
-        throw Exception(
-          AppLocale.tableAlreadyBookedError,
-        );
+        throw Exception(AppLocale.tableAlreadyBookedError);
       }
     }
 
@@ -77,11 +72,11 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       seatingPreference: booking.seatingPreference,
       status: BookingStatus.pending,
       createdAt: DateTime.now(),
+      totalAmount: booking.totalAmount,
+      reservationFee: booking.reservationFee,
     );
 
-    await bookingRef.set(
-      bookingModel.toFirestore(),
-    );
+    await bookingRef.set(bookingModel.toFirestore());
 
     return bookingId;
   }
@@ -104,8 +99,6 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
     required String bookingId,
     required BookingStatus status,
   }) async {
-    await bookings().doc(bookingId).update({
-      'status': status.name,
-    });
+    await bookings().doc(bookingId).update({'status': status.name});
   }
 }

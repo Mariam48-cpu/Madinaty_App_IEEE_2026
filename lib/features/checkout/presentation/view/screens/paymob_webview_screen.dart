@@ -49,7 +49,6 @@ class _PaymobWebViewScreenState extends State<PaymobWebViewScreen> {
           _checkTransactionStatus(currentUrl);
         }
 
-        // فحص الـ DOM الداخلي للمحفظة في بيئة الاختبار
         final pageContent = await _controller
             .runJavaScriptReturningResult("document.body.innerText");
         final contentStr = pageContent.toString().toLowerCase();

@@ -20,10 +20,19 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final FlutterLocalization _localization = FlutterLocalization.instance;
+
   @override
   void initState() {
     super.initState();
     context.read<ProfileCubit>().fetchUserProfile(widget.uid);
+
+    // الاستماع لأي تغيير في اللغة وإعادة بناء الشاشة فوراً
+    _localization.onTranslatedLanguage = (locale) {
+      if (mounted) {
+        setState(() {});
+      }
+    };
   }
 
   @override
@@ -70,10 +79,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // App Bar / Header
                   Row(
                     children: [
-                      // Profile Title on start
                       Text(
                         AppLocale.navMyAccount.getString(context),
                         style: const TextStyle(
@@ -83,10 +90,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const Spacer(),
-                      // Language Switcher
-                      const _HeaderLanguageSwitch(),
+                      _HeaderLanguageSwitch(localization: _localization),
                       const SizedBox(width: 8),
-                      // Settings Icon
                       IconButton(
                         icon: const Icon(
                           Icons.settings_outlined,
@@ -121,22 +126,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               radius: 45,
                               backgroundColor: AppColors.surfaceVariant,
                               backgroundImage:
-                                  profileImageUrl != null &&
-                                      profileImageUrl!.isNotEmpty
-                                  ? NetworkImage(profileImageUrl!)
+                              profileImageUrl != null &&
+                                  profileImageUrl.isNotEmpty
+                                  ? NetworkImage(profileImageUrl)
                                   : null,
                               child:
-                                  profileImageUrl == null ||
-                                      profileImageUrl!.isEmpty
+                              profileImageUrl == null ||
+                                  profileImageUrl.isEmpty
                                   ? const Icon(
-                                      Icons.person,
-                                      size: 50,
-                                      color: AppColors.primary,
-                                    )
+                                Icons.person,
+                                size: 50,
+                                color: AppColors.primary,
+                              )
                                   : null,
                             ),
 
-                            // Edit Button
                             InkWell(
                               onTap: () {
                                 Navigator.push(
@@ -339,13 +343,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildMenuCard(
-    BuildContext context,
-    String title,
-    String subtitle,
-    IconData icon,
-    Color bgColor,
-    Color iconColor,
-  ) {
+      BuildContext context,
+      String title,
+      String subtitle,
+      IconData icon,
+      Color bgColor,
+      Color iconColor,
+      ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -418,11 +422,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _HeaderLanguageSwitch extends StatelessWidget {
-  const _HeaderLanguageSwitch();
+  final FlutterLocalization localization;
+
+  const _HeaderLanguageSwitch({required this.localization});
 
   @override
   Widget build(BuildContext context) {
-    final localization = FlutterLocalization.instance;
     final currentCode = localization.currentLocale?.languageCode ?? 'ar';
     final isArabic = currentCode == 'ar';
 

@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:injectable/injectable.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import '../../../personalization/domain/use_cases/get_user_preferences_usecase.dart';
@@ -27,18 +29,62 @@ class HomeCubit extends Cubit<HomeState> {
     @factoryParam required this.currentUserId,
   }) : super(const HomeInitial());
 
-  Future<void> fetchHomeData({String? categoryFilter}) async {
+  Future<void> fetchHomeData({
+    String? categoryFilter,
+    LatLng? userLocation,
+  }) async {
+    if (isClosed) return;
+
     emit(const HomeLoading());
 
     try {
       final preferences = await getUserPreferencesUseCase(currentUserId);
 
-      final interests = preferences?.interests ??
-          [AppLocale.specialtyCoffee, AppLocale.studyPlaces];
+      if (isClosed) return;
+
+      final interests =
+          preferences?.interests ??
+              [AppLocale.specialtyCoffee, AppLocale.studyPlaces];
 
       final mood = preferences?.selectedMood;
       final occasion = preferences?.selectedOccasion;
-      const location = AppLocale.madinatyCairo;
+
+      String location = '';
+
+      if (userLocation != null) {
+        try {
+          final placemarks = await placemarkFromCoordinates(
+            userLocation.latitude,
+            userLocation.longitude,
+          );
+
+          if (isClosed) return;
+
+          if (placemarks.isNotEmpty) {
+            final place = placemarks.first;
+
+            final possibleNames = <String?>[
+              place.subLocality,
+              place.locality,
+              place.subAdministrativeArea,
+              place.administrativeArea,
+            ];
+
+            for (final value in possibleNames) {
+              if (value != null && value.trim().isNotEmpty) {
+                location = value.trim();
+                break;
+              }
+            }
+          }
+        } catch (_) {
+          location = '';
+        }
+      }
+
+      if (location.isEmpty) {
+        location = 'current location';
+      }
 
       final cafes = await getRecommendationsUseCase(
         interests: interests,
@@ -47,13 +93,18 @@ class HomeCubit extends Cubit<HomeState> {
         location: location,
       );
 
+      if (isClosed) return;
+
       if (cafes.isEmpty) {
         emit(const HomeEmpty());
         return;
       }
 
       final selectedCategory = categoryFilter ?? AppLocale.all;
+
       final filtered = _filterCafes(cafes, selectedCategory);
+
+      if (isClosed) return;
 
       emit(
         HomeLoaded(
@@ -65,6 +116,8 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
+
       emit(HomeError(e.toString().replaceAll('Exception: ', '')));
     }
   }
@@ -124,6 +177,7 @@ class HomeCubit extends Cubit<HomeState> {
             ]) ||
             containsAny(cafe.occasions, ['للعمل', 'work', 'study']);
       }
+
       if (category == AppLocale.coffeeCategoryTag ||
           category == 'قهوة' ||
           category == 'Coffee') {
@@ -141,6 +195,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void filterByCategory(String category) {
+    if (isClosed) return;
+
     final currentState = state;
 
     if (currentState is! HomeLoaded) {
@@ -153,6 +209,8 @@ class HomeCubit extends Cubit<HomeState> {
 
     filtered.shuffle();
 
+    if (isClosed) return;
+
     emit(
       currentState.copyWith(
         filteredCafes: filtered,
@@ -162,6 +220,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void searchCafes(String query) {
+    if (isClosed) return;
+
     final searchQuery = query.trim();
 
     _searchDebounce?.cancel();
@@ -176,11 +236,15 @@ class HomeCubit extends Cubit<HomeState> {
     }
 
     _searchDebounce = Timer(const Duration(milliseconds: 800), () async {
+      if (isClosed) return;
+
       await _performSearch(searchQuery);
     });
   }
 
   Future<void> _performSearch(String query) async {
+    if (isClosed) return;
+
     final currentState = state;
 
     if (currentState is! HomeLoaded) {
@@ -199,6 +263,8 @@ class HomeCubit extends Cubit<HomeState> {
     try {
       final results = await searchCafesUseCase(query);
 
+      if (isClosed) return;
+
       final latestState = state;
 
       if (latestState is! HomeLoaded) {
@@ -214,6 +280,8 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
+
       final latestState = state;
 
       if (latestState is! HomeLoaded) {
@@ -228,6 +296,8 @@ class HomeCubit extends Cubit<HomeState> {
         message = message.replaceAll('Exception: ', '');
       }
 
+      if (isClosed) return;
+
       emit(
         latestState.copyWith(
           searchQuery: query,
@@ -240,11 +310,15 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void clearSearch() {
+    if (isClosed) return;
+
     _searchDebounce?.cancel();
     _clearSearch();
   }
 
   void _clearSearch() {
+    if (isClosed) return;
+
     final currentState = state;
 
     if (currentState is HomeLoaded) {
@@ -262,6 +336,7 @@ class HomeCubit extends Cubit<HomeState> {
   @override
   Future<void> close() {
     _searchDebounce?.cancel();
+
     return super.close();
   }
 }

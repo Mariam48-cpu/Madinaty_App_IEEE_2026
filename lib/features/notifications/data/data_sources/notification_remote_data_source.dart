@@ -12,6 +12,7 @@ abstract class NotificationRemoteDataSource {
     required String title,
     required String body,
     required String type,
+    String? bookingId,
   });
 
   Future<void> markNotificationAsRead({
@@ -31,11 +32,11 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   final FirebaseFirestore _firestore;
 
   NotificationRemoteDataSourceImpl({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> _notificationsCollection(
-    String uid,
-  ) {
+      String uid,
+      ) {
     return _firestore.collection('users').doc(uid).collection('notifications');
   }
 
@@ -67,11 +68,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     required String title,
     required String body,
     required String type,
+    String? bookingId,
   }) async {
     await _notificationsCollection(uid).add({
       'title': title,
       'body': body,
       'type': type,
+      'bookingId': bookingId,
       'createdAt': Timestamp.now(),
       'isRead': false,
     });

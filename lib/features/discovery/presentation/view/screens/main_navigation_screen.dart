@@ -40,37 +40,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       return;
     }
 
-    // ============================================================
-    // HOME CUBIT
-    // ============================================================
-
     _homeCubit = sl<HomeCubit>(param1: user.uid);
-
-    // ============================================================
-    // DISCOVERY CUBIT
-    // ============================================================
 
     _discoveryCubit = sl<DiscoveryCubit>();
 
-    // ============================================================
-    // FETCH HOME DATA
-    // ============================================================
-
     _homeCubit!.fetchHomeData();
-
-    // ============================================================
-    // LOAD CURRENT LOCATION
-    // ============================================================
-    //
-    // مهم جدًا:
-    // كان الـ DiscoveryCubit موجود لكن loadNearbyCafes()
-    // مش بتتنده خالص من هنا.
-    //
-    // بالتالي currentLocation كانت null طول الوقت.
-    //
-    // بنشغلها بعد أول frame عشان الـ Cubit يكون جاهز
-    // والـ context/provider يكون موجود.
-    // ============================================================
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _discoveryCubit == null) {
@@ -113,9 +87,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    // ============================================================
-    // USER NOT LOGGED IN
-    // ============================================================
 
     if (user == null || _homeCubit == null || _discoveryCubit == null) {
       return Scaffold(
@@ -137,9 +108,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
     }
 
-    // ============================================================
-    // PROVIDERS
-    // ============================================================
 
     return MultiBlocProvider(
       providers: [

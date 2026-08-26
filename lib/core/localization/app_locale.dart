@@ -1,7 +1,4 @@
 mixin AppLocale {
-  // ==========================================
-  // General & Common
-  // ==========================================
   static const String appTitle = 'appTitle';
   static const String nextButtonText = 'nextButtonText';
   static const String previousButton = 'previousButton';
@@ -50,10 +47,6 @@ mixin AppLocale {
   static const String searchErrorOccurred = 'searchErrorOccurred';
   static const String trySearchingDifferentName = 'trySearchingDifferentName';
   static const String searchRateLimitExceeded = 'searchRateLimitExceeded';
-
-  // ==========================================
-  // Profile & Settings
-  // ==========================================
   static const String editProfileTitle = 'editProfileTitle';
   static const String profileUpdatedSuccess = 'profileUpdatedSuccess';
   static const String profileUpdatedNotifTitle = 'profileUpdatedNotifTitle';
@@ -82,20 +75,12 @@ mixin AppLocale {
   static const String paymentMethods = 'paymentMethods';
   static const String savedAddresses = 'savedAddresses';
   static const String helpAndSupport = 'helpAndSupport';
-
-  // ==========================================
-  // Onboarding
-  // ==========================================
   static const String onboardingTitle1 = 'onboardingTitle1';
   static const String onboardingDesc1 = 'onboardingDesc1';
   static const String onboardingTitle2 = 'onboardingTitle2';
   static const String onboardingDesc2 = 'onboardingDesc2';
   static const String onboardingTitle3 = 'onboardingTitle3';
   static const String onboardingDesc3 = 'onboardingDesc3';
-
-  // ==========================================
-  // Notifications
-  // ==========================================
   static const String notificationsTitle = 'notificationsTitle';
   static const String noNotificationsTitle = 'noNotificationsTitle';
   static const String noNotificationsSubtitle = 'noNotificationsSubtitle';
@@ -106,10 +91,6 @@ mixin AppLocale {
   static const String minutesAgoSuffix = 'minutesAgoSuffix';
   static const String hoursAgoSuffix = 'hoursAgoSuffix';
   static const String daysAgoSuffix = 'daysAgoSuffix';
-
-  // ==========================================
-  // Location & Discovery
-  // ==========================================
   static const String noNearbyCafesFound = 'noNearbyCafesFound';
   static const String determiningLocation = 'determiningLocation';
   static const String myCurrentLocation = 'myCurrentLocation';
@@ -157,10 +138,6 @@ mixin AppLocale {
   static const String searchResultForPrefix = 'searchResultForPrefix';
   static const String failedToLoadCafesError = 'failedToLoadCafesError';
   static const String failedToSearchCafesError = 'failedToSearchCafesError';
-
-  // ==========================================
-  // Authentication & Profile
-  // ==========================================
   static const String welcome = 'welcome';
   static const String subtitle = 'subtitle';
   static const String login = 'login';
@@ -189,8 +166,6 @@ mixin AppLocale {
   static const String resetLinkSentSuccess = 'resetLinkSentSuccess';
   static const String resetPasswordEmailSentDefault = 'resetPasswordEmailSentDefault';
   static const String loginRequiredToProceed = 'loginRequiredToProceed';
-
-  // Auth Validation & Errors
   static const String enterNameError = 'enterNameError';
   static const String enterEmailError = 'enterEmailError';
   static const String passwordMinLengthError = 'passwordMinLengthError';
@@ -200,18 +175,12 @@ mixin AppLocale {
   static const String noLoggedInUserError = 'noLoggedInUserError';
   static const String googleSignInCancelled = 'googleSignInCancelled';
   static const String verificationCodeNotFound = 'verificationCodeNotFound';
-
-  // ==========================================
-  // Navigation
-  // ==========================================
   static const String navHome = 'navHome';
   static const String navExplore = 'navExplore';
   static const String navFavorites = 'navFavorites';
   static const String navMap = 'navMap';
   static const String navMyLists = 'navMyLists';
   static const String navMyAccount = 'navMyAccount';
-
-  // Days of Week
   static const String monday = 'monday';
   static const String tuesday = 'tuesday';
   static const String wednesday = 'wednesday';
@@ -219,10 +188,6 @@ mixin AppLocale {
   static const String friday = 'friday';
   static const String saturday = 'saturday';
   static const String sunday = 'sunday';
-
-  // ==========================================
-  // Booking & Seating
-  // ==========================================
   static const String bookTable = 'bookTable';
   static const String bookYourPlaceTitle = 'bookYourPlaceTitle';
   static const String selectSeatingArea = 'selectSeatingArea';
@@ -241,7 +206,6 @@ mixin AppLocale {
   static const String bookingTwoHoursNotice = 'bookingTwoHoursNotice';
   static const String selectFirstTableError = 'selectFirstTableError';
 
-  // Seating Map & Filters
   static const String seatingMapTitle = 'seatingMapTitle';
   static const String filterAll = 'filterAll';
   static const String filterNileView = 'filterNileView';
@@ -253,16 +217,12 @@ mixin AppLocale {
   static const String legendAvailable = 'legendAvailable';
   static const String legendSelected = 'legendSelected';
   static const String legendBooked = 'legendBooked';
-
-  // Occasions (General)
   static const String occasionBirthday = 'occasionBirthday';
   static const String occasionAnniversary = 'occasionAnniversary';
   static const String occasionFriendsOuting = 'occasionFriendsOuting';
   static const String occasionWork = 'occasionWork';
   static const String occasionCasualCoffee = 'occasionCasualCoffee';
   static const String occasionOther = 'occasionOther';
-
-  // Digital Pass
   static const String statusConfirmed = 'statusConfirmed';
   static const String statusPending = 'statusPending';
   static const String statusCancelled = 'statusCancelled';
@@ -278,15 +238,11 @@ mixin AppLocale {
   static const String time = 'time';
   static const String seating = 'seating';
   static const String guests = 'guests';
-
-  // Calendar & Map Helpers
   static const String calendarTableBookingPrefix = 'calendarTableBookingPrefix';
   static const String calendarBookingForPrefix = 'calendarBookingForPrefix';
   static const String calendarBookingNumberPrefix = 'calendarBookingNumberPrefix';
   static const String defaultMapLocationName = 'defaultMapLocationName';
   static const String defaultMapFallbackCafe = 'defaultMapFallbackCafe';
-
-  // Repository Exceptions & Cubit Messages
   static const String selectDateError = 'selectDateError';
   static const String selectTimeError = 'selectTimeError';
   static const String cafeDataNotFoundError = 'cafeDataNotFoundError';
@@ -294,10 +250,6 @@ mixin AppLocale {
   static const String tableAlreadyBookedError = 'tableAlreadyBookedError';
   static const String completeBookingDataError = 'complete_booking_data_error';
   static const String loginRequiredBookingError = 'login_required_booking_error';
-
-  // ==========================================
-  // Cart & Checkout
-  // ==========================================
   static const String cartTitle = 'cartTitle';
   static const String clearCart = 'clearCart';
   static const String cartSubtotal = 'cartSubtotal';
@@ -322,8 +274,6 @@ mixin AppLocale {
   static const String taxes = 'taxes';
   static const String inclusiveOfTaxes = 'inclusiveOfTaxes';
   static const String reservationSuccessDesc = 'reservationSuccessDesc';
-
-  // Pre-Order Menu
   static const String preOrderMenuTitle = 'preOrderMenuTitle';
   static const String searchMenuPlaceholder = 'searchMenuPlaceholder';
   static const String allCategories = 'allCategories';
@@ -331,8 +281,6 @@ mixin AppLocale {
   static const String proceedToCart = 'proceedToCart';
   static const String temporaryTotal = 'temporaryTotal';
   static const String itemsCount = 'itemsCount';
-
-  // Reviews & Ratings
   static const String reviewsAndRatings = 'reviewsAndRatings';
   static const String ratingsCountSuffix = 'ratingsCountSuffix';
   static const String basedOn = 'basedOn';
@@ -349,13 +297,9 @@ mixin AppLocale {
   static const String commentRequired = 'commentRequired';
   static const String reviewSubmittedSuccess = 'reviewSubmittedSuccess';
   static const String helpful = 'helpful';
-
-  // Favorites
   static const String places = 'places';
   static const String products = 'products';
   static const String noFavoritesYet = 'noFavoritesYet';
-
-  // Personalization & Preferences
   static const String step2Of3 = 'step2Of3';
   static const String whatDoYouLikeTitle = 'whatDoYouLikeTitle';
   static const String whatDoYouLikeSubtitle = 'whatDoYouLikeSubtitle';
@@ -387,8 +331,6 @@ mixin AppLocale {
   static const String selectAtLeastOneInterest = 'selectAtLeastOneInterest';
   static const String selectFavoriteInterests = 'selectFavoriteInterests';
   static const String selectGoingOutReason = 'selectGoingOutReason';
-
-  // AI Planner & Weather
   static const String weatherUnavailable = 'weatherUnavailable';
   static const String weatherRainyIndoorPreferred = 'weatherRainyIndoorPreferred';
   static const String weatherSuitableOutdoor = 'weatherSuitableOutdoor';
@@ -432,19 +374,13 @@ mixin AppLocale {
   static const String quickPickHangout = 'quickPickHangout';
   static const String iWantPrefix = 'iWantPrefix';
 
-  // AI Planner Exceptions & Errors
   static const String aiEmptyResponse = 'aiEmptyResponse';
   static const String aiInvalidResponseFormat = 'aiInvalidResponseFormat';
   static const String aiAuthError = 'aiAuthError';
   static const String aiRateLimitError = 'aiRateLimitError';
   static const String aiServerError = 'aiServerError';
   static const String aiNetworkConnectionError = 'aiNetworkConnectionError';
-
-  // ==========================================
-  // ARABIC TRANSLATIONS
-  // ==========================================
   static const Map<String, dynamic> AR = {
-    // General
     appTitle: 'مدينتي',
     nextButtonText: 'التالي',
     previousButton: 'السابق',
@@ -494,7 +430,6 @@ mixin AppLocale {
     trySearchingDifferentName: 'جرب البحث باسم كافيه أو منطقة أخرى',
     searchRateLimitExceeded: 'تم الوصول للحد اليومي للبحث. جرب مرة أخرى لاحقًا.',
 
-    // Profile & Settings
     editProfileTitle: 'تعديل الحساب',
     profileUpdatedSuccess: 'تم تحديث البيانات بنجاح',
     profileUpdatedNotifTitle: 'تم تحديث الملف الشخصي',
@@ -524,7 +459,6 @@ mixin AppLocale {
     savedAddresses: 'العناوين المحفوظة',
     helpAndSupport: 'المساعدة والدعم',
 
-    // Onboarding
     onboardingTitle1: 'اكتشف المكان المناسب ليك',
     onboardingDesc1: 'اكتشف أفضل الكافيهات والأماكن اللي تناسب ذوقك واهتماماتك.',
     onboardingTitle2: 'احجز تجربتك بسهولة',
@@ -532,7 +466,6 @@ mixin AppLocale {
     onboardingTitle3: 'جهز طلبك قبل ما توصل',
     onboardingDesc3: 'اختار قهوتك وحلوياتك من المنيو وخلي طلبك جاهز وقت وصولك.',
 
-    // Notifications
     notificationsTitle: 'الإشعارات',
     noNotificationsTitle: 'لا توجد إشعارات',
     noNotificationsSubtitle: 'ستظهر هنا تأكيدات الحجوزات والتحديثات والعروض.',
@@ -544,7 +477,6 @@ mixin AppLocale {
     hoursAgoSuffix: 'ساعة',
     daysAgoSuffix: 'يوم',
 
-    // Location & Discovery
     noNearbyCafesFound: 'لم يتم العثور على كافيهات قريبة.',
     determiningLocation: 'جاري تحديد الموقع...',
     myCurrentLocation: 'موقعي الحالي',
@@ -593,7 +525,6 @@ mixin AppLocale {
     failedToLoadCafesError: 'فشل في تحميل الكافيهات',
     failedToSearchCafesError: 'فشل في البحث عن الكافيهات',
 
-    // Authentication
     welcome: 'أهلاً بك',
     subtitle: 'سجل الدخول أو أنشئ حساباً للاستمتاع بكل الخدمات',
     login: 'تسجيل الدخول',
@@ -623,7 +554,6 @@ mixin AppLocale {
     resetPasswordEmailSentDefault: 'تم إرسال البريد بنجاح',
     loginRequiredToProceed: 'يجب تسجيل الدخول أولاً',
 
-    // Auth Validation & Errors
     enterNameError: 'يرجى إدخال الاسم',
     enterEmailError: 'يرجى إدخال البريد الإلكتروني أو الهاتف',
     passwordMinLengthError: 'كلمة المرور يجب ألا تقل عن 6 أحرف',
@@ -634,7 +564,6 @@ mixin AppLocale {
     googleSignInCancelled: 'تم إلغاء تسجيل الدخول عبر Google',
     verificationCodeNotFound: 'لم يتم العثور على معرّف التحقق، يرجى المحاولة ثانية',
 
-    // Navigation
     navHome: 'الرئيسية',
     navExplore: 'استكشف',
     navFavorites: 'المفضلة',
@@ -642,7 +571,6 @@ mixin AppLocale {
     navMyLists: 'قوائمي',
     navMyAccount: 'حسابي',
 
-    // Days of Week
     monday: 'الإثنين',
     tuesday: 'الثلاثاء',
     wednesday: 'الأربعاء',
@@ -651,7 +579,6 @@ mixin AppLocale {
     saturday: 'السبت',
     sunday: 'الأحد',
 
-    // Booking Screen
     bookTable: 'حجز طاولة',
     bookYourPlaceTitle: 'احجز مكانك',
     selectSeatingArea: 'اختر مكان الجلوس',
@@ -670,7 +597,6 @@ mixin AppLocale {
     bookingTwoHoursNotice: 'مدة الحجز ساعتين من وقت الوصول المحدد',
     selectFirstTableError: 'من فضلك اختر طاولة أولاً قبل المتابعة',
 
-    // Seating Map
     seatingMapTitle: 'خريطة الجلسات',
     filterAll: 'الكل',
     filterNileView: 'إطلالة النيل',
@@ -683,7 +609,6 @@ mixin AppLocale {
     legendSelected: 'محدد',
     legendBooked: 'محجوز',
 
-    // Occasions (General)
     occasionBirthday: 'عيد ميلاد',
     occasionAnniversary: 'ذكرى سنوية',
     occasionFriendsOuting: 'خروجة صحاب',
@@ -691,7 +616,6 @@ mixin AppLocale {
     occasionCasualCoffee: 'قهوة سريعة',
     occasionOther: 'أخرى',
 
-    // Digital Pass
     statusConfirmed: 'مؤكد',
     statusPending: 'قيد الانتظار',
     statusCancelled: 'ملغي',
@@ -708,14 +632,12 @@ mixin AppLocale {
     seating: 'الجلسة',
     guests: 'الضيوف',
 
-    // Calendar & Map Helpers
     calendarTableBookingPrefix: 'حجز طاولة',
     calendarBookingForPrefix: 'حجز لـ',
     calendarBookingNumberPrefix: 'رقم الحجز',
     defaultMapLocationName: 'مدينتي',
     defaultMapFallbackCafe: 'كافيه مدينتي',
 
-    // Repository Exceptions & Cubit Messages
     selectDateError: 'يرجى اختيار تاريخ الحجز',
     selectTimeError: 'يرجى اختيار وقت الحجز',
     cafeDataNotFoundError: 'بيانات الكافيه غير متوفرة',
@@ -724,7 +646,6 @@ mixin AppLocale {
     completeBookingDataError: 'من فضلك كملي كل بيانات الحجز',
     loginRequiredBookingError: 'يجب تسجيل الدخول أولاً لإتمام الحجز',
 
-    // Cart & Checkout
     cartTitle: 'سلة الطلبات',
     clearCart: 'مسح السلة',
     cartSubtotal: 'مجموع المنتجات',
@@ -750,7 +671,6 @@ mixin AppLocale {
     inclusiveOfTaxes: 'شامل كافة الضرائب والرسوم',
     reservationSuccessDesc: 'تم تأكيد حجزك وطلبك بنجاح',
 
-    // Pre-Order Menu
     preOrderMenuTitle: 'طلب مسبق للمشروبات',
     searchMenuPlaceholder: 'ابحث في قائمة المشروبات والمأكولات...',
     allCategories: 'الكل',
@@ -759,7 +679,6 @@ mixin AppLocale {
     temporaryTotal: 'المجموع المؤقت',
     itemsCount: 'عناصر',
 
-    // Reviews & Ratings
     reviewsAndRatings: 'التقييمات والمراجعات',
     ratingsCountSuffix: 'تقييم',
     basedOn: 'بناءً على',
@@ -777,12 +696,10 @@ mixin AppLocale {
     reviewSubmittedSuccess: 'تم إرسال تقييمك بنجاح، شكراً لمشاركتك!',
     helpful: 'مفيد',
 
-    // Favorites
     places: 'الأماكن والكافيهات',
     products: 'المنتجات',
     noFavoritesYet: 'لم تقم بإضافة أي عناصر إلى مفضلتك بعد',
 
-    // Personalization & Preferences
     step2Of3: 'الخطوة 2 من 3',
     whatDoYouLikeTitle: 'إيه اللي بتفضله في الكافيه؟',
     whatDoYouLikeSubtitle: 'اختر اهتماماتك لنرشحلك الأماكن الأنسب لذوقك',
@@ -814,7 +731,6 @@ mixin AppLocale {
     selectFavoriteInterests: 'يرجى تحديد اهتماماتك المفضلة',
     selectGoingOutReason: 'يرجى تحديد سبب الخروجة أو المود',
 
-    // AI Planner & Weather
     weatherUnavailable: 'بيانات الطقس غير متاحة حالياً',
     weatherRainyIndoorPreferred: 'احتمال أمطار، يفضل الجلوس في الأماكن المغلقة',
     weatherSuitableOutdoor: 'الطقس مناسب جداً للجلسات الخارجية المفتوحة',
@@ -858,7 +774,6 @@ mixin AppLocale {
     quickPickHangout: 'لمة صحاب',
     iWantPrefix: 'أريد',
 
-    // AI Planner Exceptions & Errors
     aiEmptyResponse: 'لم يرجع المساعد الذكي أي نتيجة، حاول مرة أخرى.',
     aiInvalidResponseFormat: 'تعذر معالجة رد المساعد الذكي بالشكل الصحيح.',
     aiAuthError: 'مفتاح خدمة الذكاء الاصطناعي غير صالح أو غير مصرح به.',
@@ -867,11 +782,7 @@ mixin AppLocale {
     aiNetworkConnectionError: 'تعذر الاتصال بالإنترنت، يرجى التحقق من الشبكة.',
   };
 
-  // ==========================================
-  // ENGLISH TRANSLATIONS
-  // ==========================================
   static const Map<String, dynamic> EN = {
-    // General
     appTitle: 'Madinaty',
     nextButtonText: 'Next',
     previousButton: 'Previous',
@@ -921,7 +832,6 @@ mixin AppLocale {
     trySearchingDifferentName: 'Try searching for another cafe name or area',
     searchRateLimitExceeded: 'Daily search limit reached. Please try again later.',
 
-    // Profile & Settings
     editProfileTitle: 'Edit Profile',
     profileUpdatedSuccess: 'Profile updated successfully',
     profileUpdatedNotifTitle: 'Profile Updated',
@@ -951,7 +861,6 @@ mixin AppLocale {
     savedAddresses: 'Saved Addresses',
     helpAndSupport: 'Help & Support',
 
-    // Onboarding
     onboardingTitle1: 'Discover the right place for you',
     onboardingDesc1: 'Discover the best cafes and spots that match your taste and interests.',
     onboardingTitle2: 'Book your experience easily',
@@ -959,7 +868,6 @@ mixin AppLocale {
     onboardingTitle3: 'Get your order ready in advance',
     onboardingDesc3: 'Pick your drinks and desserts from the menu to have them ready upon arrival.',
 
-    // Notifications
     notificationsTitle: 'Notifications',
     noNotificationsTitle: 'No Notifications',
     noNotificationsSubtitle: 'Booking confirmations, updates, and offers will appear here.',
@@ -971,7 +879,6 @@ mixin AppLocale {
     hoursAgoSuffix: 'hours ago',
     daysAgoSuffix: 'days ago',
 
-    // Location & Discovery
     noNearbyCafesFound: 'No nearby cafes found.',
     determiningLocation: 'Determining location...',
     myCurrentLocation: 'My Current Location',
@@ -1020,7 +927,6 @@ mixin AppLocale {
     failedToLoadCafesError: 'Failed to load cafes',
     failedToSearchCafesError: 'Failed to search cafes',
 
-    // Authentication
     welcome: 'Welcome',
     subtitle: 'Sign in or create an account to enjoy all services',
     login: 'Login',
@@ -1050,7 +956,6 @@ mixin AppLocale {
     resetPasswordEmailSentDefault: 'Email sent successfully',
     loginRequiredToProceed: 'Please log in first',
 
-    // Auth Validation & Errors
     enterNameError: 'Please enter your name',
     enterEmailError: 'Please enter your email or phone',
     passwordMinLengthError: 'Password must be at least 6 characters',
@@ -1061,7 +966,6 @@ mixin AppLocale {
     googleSignInCancelled: 'Google sign-in was cancelled',
     verificationCodeNotFound: 'Verification ID not found, please try again',
 
-    // Navigation
     navHome: 'Home',
     navExplore: 'Explore',
     navFavorites: 'Favorites',
@@ -1069,7 +973,6 @@ mixin AppLocale {
     navMyLists: 'My Lists',
     navMyAccount: 'Profile',
 
-    // Days of Week
     monday: 'Mon',
     tuesday: 'Tue',
     wednesday: 'Wed',
@@ -1078,7 +981,6 @@ mixin AppLocale {
     saturday: 'Sat',
     sunday: 'Sun',
 
-    // Booking Screen
     bookTable: 'Book Table',
     bookYourPlaceTitle: 'Book Your Spot',
     selectSeatingArea: 'Select Seating Area',
@@ -1097,7 +999,6 @@ mixin AppLocale {
     bookingTwoHoursNotice: 'Reservation duration is 2 hours from specified arrival time',
     selectFirstTableError: 'Please select a table before continuing',
 
-    // Seating Map
     seatingMapTitle: 'Seating Map',
     filterAll: 'All',
     filterNileView: 'Nile View',
@@ -1110,7 +1011,6 @@ mixin AppLocale {
     legendSelected: 'Selected',
     legendBooked: 'Booked',
 
-    // Occasions (General)
     occasionBirthday: 'Birthday',
     occasionAnniversary: 'Anniversary',
     occasionFriendsOuting: 'Friends Outing',
@@ -1118,7 +1018,6 @@ mixin AppLocale {
     occasionCasualCoffee: 'Casual Coffee',
     occasionOther: 'Other',
 
-    // Digital Pass
     statusConfirmed: 'Confirmed',
     statusPending: 'Pending',
     statusCancelled: 'Cancelled',
@@ -1135,14 +1034,12 @@ mixin AppLocale {
     seating: 'Seating',
     guests: 'Guests',
 
-    // Calendar & Map Helpers
     calendarTableBookingPrefix: 'Table Booking',
     calendarBookingForPrefix: 'Booking for',
     calendarBookingNumberPrefix: 'Booking #',
     defaultMapLocationName: 'Madinaty',
     defaultMapFallbackCafe: 'Madinaty Cafe',
 
-    // Repository Exceptions & Cubit Messages
     selectDateError: 'Please select a booking date',
     selectTimeError: 'Please select a booking time',
     cafeDataNotFoundError: 'Cafe information is unavailable',
@@ -1151,7 +1048,6 @@ mixin AppLocale {
     completeBookingDataError: 'Please complete all booking details',
     loginRequiredBookingError: 'Please log in first to complete your booking',
 
-    // Cart & Checkout
     cartTitle: 'Your Cart',
     clearCart: 'Clear Cart',
     cartSubtotal: 'Subtotal',
@@ -1177,7 +1073,6 @@ mixin AppLocale {
     inclusiveOfTaxes: 'Includes all taxes and fees',
     reservationSuccessDesc: 'Your reservation and order have been confirmed',
 
-    // Pre-Order Menu
     preOrderMenuTitle: 'Pre-Order Drinks & Food',
     searchMenuPlaceholder: 'Search drinks, desserts, and items...',
     allCategories: 'All',
@@ -1186,7 +1081,6 @@ mixin AppLocale {
     temporaryTotal: 'Estimated Total',
     itemsCount: 'items',
 
-    // Reviews & Ratings
     reviewsAndRatings: 'Reviews & Ratings',
     ratingsCountSuffix: 'reviews',
     basedOn: 'Based on',
@@ -1204,12 +1098,10 @@ mixin AppLocale {
     reviewSubmittedSuccess: 'Your review was submitted successfully!',
     helpful: 'Helpful',
 
-    // Favorites
     places: 'Cafes & Places',
     products: 'Products',
     noFavoritesYet: 'No favorites saved yet',
 
-    // Personalization & Preferences
     step2Of3: 'Step 2 of 3',
     whatDoYouLikeTitle: 'What do you love in a cafe?',
     whatDoYouLikeSubtitle: 'Choose your interests to get personalized recommendations',
@@ -1241,7 +1133,6 @@ mixin AppLocale {
     selectFavoriteInterests: 'Please select your favorite interests',
     selectGoingOutReason: 'Please select your mood or reason for going out',
 
-    // AI Planner & Weather
     weatherUnavailable: 'Weather information is currently unavailable',
     weatherRainyIndoorPreferred: 'Chance of rain, indoor seating recommended',
     weatherSuitableOutdoor: 'Weather is great for outdoor seating',
@@ -1285,7 +1176,6 @@ mixin AppLocale {
     quickPickHangout: 'Friends Hangout',
     iWantPrefix: 'I want',
 
-    // AI Planner Exceptions & Errors
     aiEmptyResponse: 'AI assistant returned an empty response. Please try again.',
     aiInvalidResponseFormat: 'Failed to process AI assistant response correctly.',
     aiAuthError: 'AI service key is invalid or unauthorized.',

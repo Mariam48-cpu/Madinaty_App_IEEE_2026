@@ -1,13 +1,10 @@
 /// Centralized asset path constants for the Madinaty application.
 abstract class AppAssets {
-  // Prevent instantiation
   const AppAssets._();
 
-  // --- Base Paths ---
   static const String _imagesPath = 'assets/images';
   static const String _iconsPath = 'assets/icons';
 
-  // --- Images ---
   static const String appLogo = '$_imagesPath/logo.png';
   static const String splashBackground = '$_imagesPath/splash_bg.png';
   static const String defaultAvatar = '$_imagesPath/default_avatar.png';
@@ -18,7 +15,6 @@ abstract class AppAssets {
   static const String onboardingImage2 = '$_imagesPath/onbording image2.png';
   static const String onboardingImage3 = '$_imagesPath/onbording image3.png';
 
-  // --- Icons ---
   static const String animalIcon = '$_iconsPath/animal icon.svg';
   static const String backIcon = '$_iconsPath/back icon.svg';
   static const String bagIcon = '$_iconsPath/bag icon.svg';
@@ -55,7 +51,6 @@ abstract class AppAssets {
   static const String wheelchairIcon = '$_iconsPath/wheelchair icon.svg';
   static const String workIcon = '$_iconsPath/work icon.svg';
 
-  // --- Aliases for Navigation and Legacy Names ---
   static const String filterIcon = '$_iconsPath/ic_filter.svg';
   static const String heartIcon = favoriteIcon;
   static const String heartFilledIcon = favoriteIcon;
@@ -63,7 +58,6 @@ abstract class AppAssets {
   static const String calendarIcon = dateIcon;
   static const String clockIcon = '$_iconsPath/ic_clock.svg';
 
-  // --- Bottom Navigation Icons ---
   static const String navHome = homeIcon;
   static const String navMap = mapIcon;
   static const String navLists = listIcon;

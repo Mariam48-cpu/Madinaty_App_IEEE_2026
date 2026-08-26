@@ -38,7 +38,6 @@ class FavoriteProductCard extends StatelessWidget {
             padding: const EdgeInsets.all(12.0),
             child: Row(
               children: [
-                // Product Thumbnail
                 ClipRRect(
                   borderRadius: BorderRadius.circular(14),
                   child: Container(
@@ -55,8 +54,6 @@ class FavoriteProductCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-
-                // Details
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,8 +93,6 @@ class FavoriteProductCard extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // Favorite Heart Button
                 IconButton(
                   onPressed: onFavoriteToggle,
                   icon: const Icon(

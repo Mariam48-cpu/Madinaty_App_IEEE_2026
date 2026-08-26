@@ -37,10 +37,6 @@ import 'package:madinaty_app_ieee_2026/features/pre_order/presentation/view/scre
 abstract class AppRoutes {
   const AppRoutes._();
 
-  // ================================================================
-  // ROUTES
-  // ================================================================
-
   static const String initial = '/';
   static const String splash = '/splash';
   static const String home = '/home';
@@ -56,18 +52,11 @@ abstract class AppRoutes {
   static const String cart = '/cart';
   static const String preOrder = '/pre_order';
 
-  // AI Planner
   static const String aiPlanner = '/ai_planner';
 
-  // ================================================================
-  // ROUTE GENERATOR
-  // ================================================================
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      // ============================================================
-      // APP START
-      // ============================================================
 
       case initial:
       case splash:
@@ -76,19 +65,12 @@ abstract class AppRoutes {
           settings: settings,
         );
 
-      // ============================================================
-      // AUTH
-      // ============================================================
 
       case auth:
         return MaterialPageRoute(
           builder: (_) => const AuthScreen(),
           settings: settings,
         );
-
-      // ============================================================
-      // HOME
-      // ============================================================
 
       case home:
         final user = FirebaseAuth.instance.currentUser;
@@ -114,20 +96,6 @@ abstract class AppRoutes {
           );
         }
 
-        /*
-         * IMPORTANT
-         *
-         * default = 0
-         * 0 = Home
-         *
-         * لو عايزة تفتحي Explore:
-         * Navigator.pushNamed(
-         *   context,
-         *   AppRoutes.home,
-         *   arguments: 1,
-         * );
-         */
-
         final initialIndex = settings.arguments is int
             ? settings.arguments as int
             : 0;
@@ -139,32 +107,13 @@ abstract class AppRoutes {
           settings: settings,
         );
 
-      // ============================================================
-      // AI PLANNER
-      // ============================================================
-
       case aiPlanner:
         return MaterialPageRoute(
           builder: (_) => const AIPlannerPage(),
           settings: settings,
         );
 
-      // ============================================================
-      // PERSONALIZATION
-      // ============================================================
-
       case personalization:
-        /*
-         * DON'T DO THIS:
-         *
-         * context.read<DiscoveryCubit>()
-         *
-         * because the route itself doesn't have
-         * DiscoveryCubit above its BuildContext.
-         *
-         * Instead, create the cubit here through GetIt.
-         */
-
         final discoveryCubit = sl<DiscoveryCubit>();
 
         return MaterialPageRoute(
@@ -176,10 +125,6 @@ abstract class AppRoutes {
           ),
           settings: settings,
         );
-
-      // ============================================================
-      // PROFILE
-      // ============================================================
 
       case profile:
         final user = FirebaseAuth.instance.currentUser;
@@ -216,10 +161,6 @@ abstract class AppRoutes {
           settings: settings,
         );
 
-      // ============================================================
-      // CART
-      // ============================================================
-
       case cart:
         final cafeNameArg = settings.arguments is String
             ? settings.arguments as String
@@ -232,16 +173,8 @@ abstract class AppRoutes {
           settings: settings,
         );
 
-      // ============================================================
-      // PRE ORDER
-      // ============================================================
-
       case preOrder:
         final args = settings.arguments;
-
-        // -------------------------
-        // BookingEntity
-        // -------------------------
 
         if (args is BookingEntity) {
           return MaterialPageRoute(
@@ -252,11 +185,6 @@ abstract class AppRoutes {
             settings: settings,
           );
         }
-
-        // -------------------------
-        // Map arguments
-        // -------------------------
-
         if (args is Map<String, dynamic>) {
           return MaterialPageRoute(
             builder: (_) => PreOrderScreen(
@@ -270,19 +198,10 @@ abstract class AppRoutes {
           );
         }
 
-        // -------------------------
-        // Default
-        // -------------------------
-
         return MaterialPageRoute(
           builder: (_) => const PreOrderScreen(),
           settings: settings,
         );
-
-      // ============================================================
-      // CHECKOUT
-      // ============================================================
-
       case checkout:
         final bookingArg = settings.arguments is BookingEntity
             ? settings.arguments as BookingEntity
@@ -295,10 +214,6 @@ abstract class AppRoutes {
           settings: settings,
         );
 
-      // ============================================================
-      // DIGITAL PASS
-      // ============================================================
-
       case digitalPass:
         final bookingArg = settings.arguments is BookingEntity
             ? settings.arguments as BookingEntity
@@ -310,11 +225,6 @@ abstract class AppRoutes {
           ),
           settings: settings,
         );
-
-      // ============================================================
-      // NOTIFICATIONS
-      // ============================================================
-
       case notifications:
         final user = FirebaseAuth.instance.currentUser;
 
@@ -350,10 +260,6 @@ abstract class AppRoutes {
           settings: settings,
         );
 
-      // ============================================================
-      // UNKNOWN ROUTE
-      // ============================================================
-
       default:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
@@ -376,10 +282,6 @@ abstract class AppRoutes {
     }
   }
 }
-
-// ================================================================
-// DUMMY BOOKING
-// ================================================================
 
 final dummyBooking = BookingEntity(
   id: 'booking_dummy_001',

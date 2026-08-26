@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/create_booking_usecase.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/get_booking_usecase.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/update_booking_status_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/notifications/domain/use_cases/create_notification_use_case.dart';
 
 import 'booking_state.dart';
 
@@ -13,11 +15,13 @@ class BookingCubit extends Cubit<BookingState> {
   final CreateBookingUseCase createBookingUseCase;
   final GetBookingUseCase getBookingUseCase;
   final UpdateBookingStatusUseCase updateBookingStatusUseCase;
+  final CreateNotificationUseCase createNotificationUseCase;
 
   BookingCubit(
       this.createBookingUseCase,
       this.getBookingUseCase,
       this.updateBookingStatusUseCase,
+      this.createNotificationUseCase,
       ) : super(BookingInitial());
 
   String? cafeId;
@@ -75,7 +79,9 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   bool validateDateTime() {
-    return date != null && time != null && guests > 0;
+    return date != null &&
+        time != null &&
+        guests > 0;
   }
 
   bool validateBooking() {
@@ -94,16 +100,21 @@ class BookingCubit extends Cubit<BookingState> {
   Future<void> createBooking() async {
     if (!validateBooking()) {
       emit(
-         BookingFailure('complete_booking_data_error'),
+        BookingFailure(
+          'complete_booking_data_error',
+        ),
       );
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user =
+        FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       emit(
-         BookingFailure('login_required_booking_error'),
+        BookingFailure(
+          'login_required_booking_error',
+        ),
       );
       return;
     }
@@ -124,7 +135,8 @@ class BookingCubit extends Cubit<BookingState> {
         createdAt: DateTime.now(),
       );
 
-      bookingId = await createBookingUseCase(booking);
+      bookingId =
+      await createBookingUseCase(booking);
 
       emit(
         BookingSuccess(bookingId!),
@@ -141,7 +153,9 @@ class BookingCubit extends Cubit<BookingState> {
     }
   }
 
-  Future<BookingEntity?> getBooking(String id) async {
+  Future<BookingEntity?> getBooking(
+      String id,
+      ) async {
     try {
       return await getBookingUseCase(id);
     } catch (e) {
@@ -169,6 +183,30 @@ class BookingCubit extends Cubit<BookingState> {
         bookingId: id,
         status: status,
       );
+
+      if (status == BookingStatus.completed) {
+        final booking =
+        await getBookingUseCase(id);
+
+        if (booking != null &&
+            booking.userId.isNotEmpty) {
+          final notificationResult =
+          await createNotificationUseCase(
+            uid: booking.userId,
+            title: 'Booking Completed',
+            body:
+            'Your booking has been completed successfully.',
+            type: 'booking_completed',
+            bookingId: id,
+          );
+
+          notificationResult.fold(
+                (failure) {
+            },
+                (_) {},
+          );
+        }
+      }
 
       emit(
         BookingSuccess(id),
