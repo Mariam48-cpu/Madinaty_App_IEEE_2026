@@ -370,7 +370,7 @@ mixin AppLocale {
   static const String multiSelect = 'multiSelect';
   static const String singleSelect = 'singleSelect';
   static const String whatsYourMoodToday = 'whatsYourMoodToday';
-  static const String chooseGeneralVibe = 'chooseGeneralVibe';
+  static const dynamic chooseGeneralVibe = 'chooseGeneralVibe';
   static const String whatIsYourOccasion = 'whatIsYourOccasion';
   static const String selectOccasionType = 'selectOccasionType';
   static const String specialtyCoffee = 'specialtyCoffee';
@@ -431,6 +431,14 @@ mixin AppLocale {
   static const String quickPickDate = 'quickPickDate';
   static const String quickPickHangout = 'quickPickHangout';
   static const String iWantPrefix = 'iWantPrefix';
+
+  // AI Planner Exceptions & Errors
+  static const String aiEmptyResponse = 'aiEmptyResponse';
+  static const String aiInvalidResponseFormat = 'aiInvalidResponseFormat';
+  static const String aiAuthError = 'aiAuthError';
+  static const String aiRateLimitError = 'aiRateLimitError';
+  static const String aiServerError = 'aiServerError';
+  static const String aiNetworkConnectionError = 'aiNetworkConnectionError';
 
   // ==========================================
   // ARABIC TRANSLATIONS
@@ -849,6 +857,14 @@ mixin AppLocale {
     quickPickDate: 'خروجة مميزة',
     quickPickHangout: 'لمة صحاب',
     iWantPrefix: 'أريد',
+
+    // AI Planner Exceptions & Errors
+    aiEmptyResponse: 'لم يرجع المساعد الذكي أي نتيجة، حاول مرة أخرى.',
+    aiInvalidResponseFormat: 'تعذر معالجة رد المساعد الذكي بالشكل الصحيح.',
+    aiAuthError: 'مفتاح خدمة الذكاء الاصطناعي غير صالح أو غير مصرح به.',
+    aiRateLimitError: 'تم الوصول للحد الأقصى للاستخدام. يرجى المحاولة بعد قليل.',
+    aiServerError: 'حدث خطأ في خادم الذكاء الاصطناعي، يرجى إعادة المحاولة.',
+    aiNetworkConnectionError: 'تعذر الاتصال بالإنترنت، يرجى التحقق من الشبكة.',
   };
 
   // ==========================================
@@ -1268,5 +1284,13 @@ mixin AppLocale {
     quickPickDate: 'Special Outing',
     quickPickHangout: 'Friends Hangout',
     iWantPrefix: 'I want',
+
+    // AI Planner Exceptions & Errors
+    aiEmptyResponse: 'AI assistant returned an empty response. Please try again.',
+    aiInvalidResponseFormat: 'Failed to process AI assistant response correctly.',
+    aiAuthError: 'AI service key is invalid or unauthorized.',
+    aiRateLimitError: 'Usage limit reached. Please try again in a few moments.',
+    aiServerError: 'An AI server error occurred. Please try again.',
+    aiNetworkConnectionError: 'Unable to connect to the internet. Please check your network.',
   };
 }

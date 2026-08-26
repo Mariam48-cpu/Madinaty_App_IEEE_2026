@@ -119,8 +119,10 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
         throw Exception('فشل طلب الدفع بالمحفظة: ${walletPayResponse.body}');
       }
       final walletData = jsonDecode(walletPayResponse.body);
-      final String? redirectUrl =
-          walletData['redirect_url'] ?? walletData['iframe_redirection_url'];
+      final String? redirectUrl = walletData['redirection_url'] ??
+          walletData['redirect_url'] ??
+          walletData['iframe_redirection_url'] ??
+          walletData['url'];
 
       if (redirectUrl == null || redirectUrl.isEmpty) {
         throw Exception('لم يتم استلام رابط الدفع للمحفظة من Paymob');

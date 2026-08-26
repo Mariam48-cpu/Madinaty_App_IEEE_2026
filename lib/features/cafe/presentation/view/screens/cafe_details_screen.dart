@@ -135,12 +135,14 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                             physics: BouncingScrollPhysics(),
                             child: Column(
                               children: [
-                                CafeImage(
-                                  photos: cafe.photos,
-                                  isFavorite: _isFavorite,
-                                  onFavorite: () => _toggleFavorite(cafe),
-                                  onShare: () {},
-                                  onBack: () => Navigator.pop(context),
+                                SafeArea(
+                                  child: CafeImage(
+                                    photos: cafe.photos,
+                                    isFavorite: _isFavorite,
+                                    onFavorite: () => _toggleFavorite(cafe),
+                                    onShare: () {},
+                                    onBack: () => Navigator.pop(context),
+                                  ),
                                 ),
 
                                 Transform.translate(

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import '../models/ai_plan_dto.dart';
 
@@ -72,7 +73,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
         final candidates = decoded['candidates'];
 
         if (candidates is! List || candidates.isEmpty) {
-          throw Exception('Gemini لم يرجع أي نتيجة.');
+          throw Exception(AppLocale.aiEmptyResponse);
         }
 
         final firstCandidate = candidates.first;
@@ -80,13 +81,13 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
         final content = firstCandidate['content'];
 
         if (content is! Map) {
-          throw Exception('Gemini رجع Response غير متوقع.');
+          throw Exception(AppLocale.aiInvalidResponseFormat);
         }
 
         final parts = content['parts'];
 
         if (parts is! List || parts.isEmpty) {
-          throw Exception('Gemini لم يرجع نصًا.');
+          throw Exception(AppLocale.aiEmptyResponse);
         }
 
         final text = parts
@@ -96,7 +97,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
             .join();
 
         if (text.trim().isEmpty) {
-          throw Exception('Gemini رجع نصًا فارغًا.');
+          throw Exception(AppLocale.aiEmptyResponse);
         }
 
         return text;
@@ -108,7 +109,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
 
       if (response.statusCode == 401 || response.statusCode == 403) {
         throw Exception(
-          'مفتاح Gemini غير صالح أو غير مصرح له باستخدام Gemini API.',
+          AppLocale.aiAuthError,
         );
       }
 
@@ -118,7 +119,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
 
       if (response.statusCode == 429) {
         throw Exception(
-          'تم الوصول لحد استخدام Gemini API. حاول مرة أخرى بعد قليل.',
+          AppLocale.aiRateLimitError
         );
       }
 
@@ -126,7 +127,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
       // OTHER API ERROR
       // ----------------------------------------------------------
 
-      String message = 'حدث خطأ أثناء الاتصال بـ Gemini.';
+      String message = AppLocale.aiServerError;
 
       try {
         final errorBody = jsonDecode(response.body);
@@ -144,15 +145,15 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
         // Ignore parsing error.
       }
 
-      throw Exception('Gemini API Error (${response.statusCode}): $message');
+      throw Exception(AppLocale.aiServerError);
     } on http.ClientException catch (e) {
-      throw Exception('تعذر الاتصال بالإنترنت. ${e.message}');
+      throw Exception(AppLocale.aiNetworkConnectionError);
     } catch (e) {
       if (e is Exception) {
         rethrow;
       }
 
-      throw Exception('حدث خطأ غير متوقع أثناء الاتصال بالذكاء الاصطناعي.');
+      throw Exception(AppLocale.aiErrorGeneric);
     }
   }
 
@@ -352,7 +353,7 @@ Return ONLY valid JSON.
 
   Map<String, dynamic> _decodeObject(String? rawText) {
     if (rawText == null || rawText.trim().isEmpty) {
-      throw Exception('لم يرجع الذكاء الاصطناعي أي نتيجة.');
+      throw Exception(AppLocale.aiEmptyResponse);
     }
 
     var clean = rawText.trim();
@@ -387,7 +388,7 @@ Return ONLY valid JSON.
 
       return Map<String, dynamic>.from(decoded);
     } catch (_) {
-      throw Exception('تعذر قراءة رد الذكاء الاصطناعي. حاول مرة أخرى.');
+      throw Exception(AppLocale.aiInvalidResponseFormat);
     }
   }
 }

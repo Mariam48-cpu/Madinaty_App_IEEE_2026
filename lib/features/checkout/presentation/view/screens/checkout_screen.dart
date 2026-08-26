@@ -117,7 +117,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
         ),
       ),
       body: BlocConsumer<CheckoutCubit, CheckoutState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is CheckoutErrorState) {
             AppToast.showToast(
               context: context,
@@ -128,20 +128,26 @@ class _CheckoutViewState extends State<_CheckoutView> {
           }
 
           if (state is CheckoutPaymobReadyState) {
-            Navigator.push(
+            final isSuccess = await Navigator.push<bool>(
               context,
               MaterialPageRoute(
                 builder: (_) => PaymobWebViewScreen(
                   paymentUrl: state.paymentUrl,
                   booking: state.booking,
-                  onPaymentSuccess: (confirmedBooking) {
-                    context.read<CheckoutCubit>().finalizePaymobSuccess(
-                      confirmedBooking,
-                    );
-                  },
                 ),
               ),
             );
+
+            if (isSuccess == true && context.mounted) {
+              context.read<CheckoutCubit>().finalizePaymobSuccess(state.booking);
+            } else if (isSuccess == false && context.mounted) {
+              AppToast.showToast(
+                context: context,
+                title: 'فشلت عملية الدفع',
+                description: 'يرجى المحاولة مرة أخرى أو اختيار طريقة دفع أخرى',
+                type: ToastificationType.error,
+              );
+            }
           }
 
           if (state is CheckoutSuccessState) {

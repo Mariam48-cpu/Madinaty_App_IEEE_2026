@@ -140,7 +140,13 @@ class _CartViewState extends State<_CartView> {
           if (state is CartLoaded) {
             if (state.isEmpty) {
               return CartEmptyView(
-                onExplore: () => Navigator.of(context).pop(),
+                onExplore: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.home,
+                        (route) => false,
+                  );
+                }
               );
             }
 

@@ -96,7 +96,7 @@ class PreOrderTableBanner extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 1),
                 Text(
                   _formatBookingInfo(context),
                   style: AppTypography.bodySmall.copyWith(
