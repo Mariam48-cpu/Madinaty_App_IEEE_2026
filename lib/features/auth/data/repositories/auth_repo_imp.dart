@@ -15,10 +15,6 @@ class AuthRepoImpl implements AuthRepoInterface {
   bool get isAuthenticated =>
       _remoteDataSource.currentUser != null;
 
-  // ==================================================
-  // REGISTER
-  // ==================================================
-
   @override
   Future<UserEntity> register({
     required String email,
@@ -45,10 +41,6 @@ class AuthRepoImpl implements AuthRepoInterface {
     }
   }
 
-  // ==================================================
-  // LOGIN
-  // ==================================================
-
   @override
   Future<UserEntity> login({
     required String email,
@@ -71,10 +63,6 @@ class AuthRepoImpl implements AuthRepoInterface {
     }
   }
 
-  // ==================================================
-  // RESET PASSWORD
-  // ==================================================
-
   @override
   Future<void> resetPassword(
     String email,
@@ -92,10 +80,6 @@ class AuthRepoImpl implements AuthRepoInterface {
       );
     }
   }
-
-  // ==================================================
-  // SEND OTP
-  // ==================================================
 
   @override
   Future<void> sendOtp({
@@ -120,10 +104,6 @@ class AuthRepoImpl implements AuthRepoInterface {
     );
   }
 
-  // ==================================================
-  // VERIFY OTP
-  // ==================================================
-
   @override
   Future<UserEntity> verifyOtp({
     required String verificationId,
@@ -146,18 +126,11 @@ class AuthRepoImpl implements AuthRepoInterface {
     }
   }
 
-  // ==================================================
-  // LOGOUT
-  // ==================================================
-
   @override
   Future<void> logout() async {
     await _remoteDataSource.signOut();
   }
 
-  // ==================================================
-  // DELETE ACCOUNT
-  // ==================================================
 
   @override
   Future<void> deleteAccount() async {
@@ -176,10 +149,6 @@ class AuthRepoImpl implements AuthRepoInterface {
       );
     }
   }
-
-  // ==================================================
-  // FIREBASE ERROR HANDLER
-  // ==================================================
 
   String _handleFirebaseAuthException(
     FirebaseAuthException e,
@@ -213,10 +182,6 @@ class AuthRepoImpl implements AuthRepoInterface {
             'حدث خطأ في عملية تسجيل الدخول';
     }
   }
-
-  // ==================================================
-  // GOOGLE SIGN IN
-  // ==================================================
 
   @override
   Future<UserEntity> signInWithGoogle() async {

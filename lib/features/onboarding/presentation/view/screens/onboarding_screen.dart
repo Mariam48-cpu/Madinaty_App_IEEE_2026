@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/onboarding_skeleton.dart';
 import '../../../../auth/presentation/view/screens/auth_screen.dart';
 import '../../view_model/onboarding_bloc.dart';
 import '../../view_model/onboarding_event.dart';
@@ -21,12 +25,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-
     _pageController = PageController();
-
-    context.read<OnboardingBloc>().add(
-          OnboardingStartedEvent(),
-        );
+    context.read<OnboardingBloc>().add(OnboardingStartedEvent());
   }
 
   @override
@@ -37,7 +37,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _goToPage(int page) {
     _isProgrammaticChange = true;
-
     _pageController.animateToPage(
       page,
       duration: const Duration(milliseconds: 300),
@@ -48,29 +47,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: BlocConsumer<OnboardingBloc, OnboardingState>(
           listener: (context, state) {
             if (state is OnboardingCompleted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AuthScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const AuthScreen()),
               );
             }
           },
           builder: (context, state) {
-            if (state is OnboardingLoading ||
-                state is OnboardingInitial) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+            if (state is OnboardingLoading || state is OnboardingInitial) {
+              return const OnboardingSkeleton();
             }
 
             if (state is OnboardingError) {
               return Center(
-                child: Text(state.message),
+                child: Text(
+                  state.message,
+                  style: const TextStyle(color: AppColors.textPrimary),
+                ),
               );
             }
 
@@ -79,23 +77,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   // Skip Button
                   Align(
-                    alignment: Alignment.topRight,
+                    alignment: AlignmentDirectional.topEnd,
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 4,
-                        right: 20,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 20,
                       ),
                       child: TextButton(
                         onPressed: () {
                           context.read<OnboardingBloc>().add(
-                                OnboardingSkipPressed(),
-                              );
+                            OnboardingSkipPressed(),
+                          );
                         },
-                        child: const Text(
-                          'تخطي',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocale.skip.getString(context),
+                          style: const TextStyle(
                             fontSize: 16,
-                            color: Color(0xFF825429),
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -115,18 +113,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                         if (index > state.currentPage) {
                           context.read<OnboardingBloc>().add(
-                                OnboardingNextPressed(),
-                              );
+                            OnboardingNextPressed(),
+                          );
                         } else if (index < state.currentPage) {
                           context.read<OnboardingBloc>().add(
-                                OnboardingPreviousPressed(),
-                              );
+                            OnboardingPreviousPressed(),
+                          );
                         }
                       },
                       itemBuilder: (context, index) {
-                        return OnboardingPage(
-                          page: state.pages[index],
-                        );
+                        return OnboardingPage(page: state.pages[index]);
                       },
                     ),
                   ),
@@ -136,40 +132,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Page Indicator
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      state.pages.length,
-                      (index) {
-                        final isSelected =
-                            index == state.currentPage;
+                    children: List.generate(state.pages.length, (index) {
+                      final isSelected = index == state.currentPage;
 
-                        return AnimatedContainer(
-                          duration: const Duration(
-                            milliseconds: 250,
-                          ),
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                          ),
-                          width: isSelected ? 24 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.circular(10),
-                            color: isSelected
-                                ? const Color(0xFF825429)
-                                : Colors.grey.shade300,
-                          ),
-                        );
-                      },
-                    ),
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: isSelected ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.border,
+                        ),
+                      );
+                    }),
                   ),
 
                   const SizedBox(height: 24),
 
                   // Buttons
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         // Previous Button
@@ -177,36 +162,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           Expanded(
                             child: OutlinedButton(
                               onPressed: () {
-                                context
-                                    .read<OnboardingBloc>()
-                                    .add(
-                                      OnboardingPreviousPressed(),
-                                    );
-
-                                _goToPage(
-                                  state.currentPage - 1,
+                                context.read<OnboardingBloc>().add(
+                                  OnboardingPreviousPressed(),
                                 );
+                                _goToPage(state.currentPage - 1);
                               },
                               style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(
-                                  double.infinity,
-                                  52,
-                                ),
-                                backgroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 52),
+                                backgroundColor: AppColors.surface,
                                 side: const BorderSide(
-                                  color: Color(0xFFD0CCC8),
+                                  color: AppColors.border,
                                   width: 1.2,
                                 ),
-                                shape:
-                                    RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(28),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28),
                                 ),
                               ),
-                              child: const Text(
-                                'السابق',
-                                style: TextStyle(
-                                  color: Color(0xFF8C8884),
+                              child: Text(
+                                AppLocale.previousButton.getString(context),
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -223,47 +198,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               final isLastPage =
-                                  state.currentPage ==
-                                      state.pages.length - 1;
+                                  state.currentPage == state.pages.length - 1;
 
                               if (isLastPage) {
-                                context
-                                    .read<OnboardingBloc>()
-                                    .add(
-                                      OnboardingStartedPressed(),
-                                    );
-                              } else {
-                                context
-                                    .read<OnboardingBloc>()
-                                    .add(
-                                      OnboardingNextPressed(),
-                                    );
-
-                                _goToPage(
-                                  state.currentPage + 1,
+                                context.read<OnboardingBloc>().add(
+                                  OnboardingStartedPressed(),
                                 );
+                              } else {
+                                context.read<OnboardingBloc>().add(
+                                  OnboardingNextPressed(),
+                                );
+                                _goToPage(state.currentPage + 1);
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(
-                                double.infinity,
-                                52,
-                              ),
-                              backgroundColor:
-                                  const Color(0xFF252A32),
-                              foregroundColor: Colors.white,
+                              minimumSize: const Size(double.infinity, 52),
+                              backgroundColor: AppColors.darkButton,
+                              foregroundColor: AppColors.onDarkButton,
                               elevation: 0,
-                              shape:
-                                  RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(28),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(28),
                               ),
                             ),
                             child: Text(
-                              state.currentPage ==
-                                      state.pages.length - 1
-                                  ? 'ابدأ الآن'
-                                  : 'التالي',
+                              state.currentPage == state.pages.length - 1
+                                  ? AppLocale.getStarted.getString(context)
+                                  : AppLocale.nextButtonText.getString(context),
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,

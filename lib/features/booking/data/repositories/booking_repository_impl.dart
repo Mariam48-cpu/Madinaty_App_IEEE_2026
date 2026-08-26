@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/data/models/booking_model.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/booking_repository_interface.dart';
@@ -8,9 +9,8 @@ import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/book
 class BookingRepositoryImpl implements BookingRepositoryInterface {
   final FirebaseFirestore firestore;
 
-  BookingRepositoryImpl({
-    FirebaseFirestore? firestore,
-  }) : firestore = firestore ?? FirebaseFirestore.instance;
+  BookingRepositoryImpl({FirebaseFirestore? firestore})
+      : firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> bookings() {
     return firestore.collection('bookings');
@@ -19,19 +19,19 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
   @override
   Future<String> createBooking(BookingEntity booking) async {
     if (booking.date == null) {
-      throw Exception('من فضلك اختار تاريخ الحجز');
+      throw Exception(AppLocale.selectDateError);
     }
 
     if (booking.time == null || booking.time!.isEmpty) {
-      throw Exception('من فضلك اختار وقت الحجز');
+      throw Exception(AppLocale.selectTimeError);
     }
 
     if (booking.cafeId.isEmpty) {
-      throw Exception('بيانات الكافيه غير موجودة');
+      throw Exception(AppLocale.cafeDataNotFoundError);
     }
 
     if (booking.userId.isEmpty) {
-      throw Exception('المستخدم غير مسجل الدخول');
+      throw Exception(AppLocale.userNotLoggedInError);
     }
 
     final dateKey =
@@ -39,19 +39,17 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
         '${booking.date!.month.toString().padLeft(2, '0')}-'
         '${booking.date!.day.toString().padLeft(2, '0')}';
 
-    final timeKey = booking.time!
-        .replaceAll(' ', '_')
-        .replaceAll(':', '-');
+    final timeKey = booking.time!.replaceAll(' ', '_').replaceAll(':', '-');
 
-    final seatingKey = (booking.seatingPreference ?? 'any')
-        .replaceAll(' ', '_');
+    final seatingKey = (booking.seatingPreference ?? 'any').replaceAll(
+      ' ',
+      '_',
+    );
 
-    final bookingId =
-        '${booking.cafeId}_${dateKey}_${timeKey}_$seatingKey';
+    final bookingId = '${booking.cafeId}_${dateKey}_${timeKey}_$seatingKey';
 
     final bookingRef = bookings().doc(bookingId);
 
-    // Check if this slot is already booked.
     final existingBooking = await bookingRef.get();
 
     if (existingBooking.exists) {
@@ -59,9 +57,7 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       final status = data?['status'];
 
       if (status == 'pending' || status == 'approved') {
-        throw Exception(
-          'الطاولة دي محجوزة بالفعل في الوقت والتاريخ المحددين',
-        );
+        throw Exception(AppLocale.tableAlreadyBookedError);
       }
     }
 
@@ -76,11 +72,11 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       seatingPreference: booking.seatingPreference,
       status: BookingStatus.pending,
       createdAt: DateTime.now(),
+      totalAmount: booking.totalAmount,
+      reservationFee: booking.reservationFee,
     );
 
-    await bookingRef.set(
-      bookingModel.toFirestore(),
-    );
+    await bookingRef.set(bookingModel.toFirestore());
 
     return bookingId;
   }
@@ -103,8 +99,6 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
     required String bookingId,
     required BookingStatus status,
   }) async {
-    await bookings().doc(bookingId).update({
-      'status': status.name,
-    });
+    await bookings().doc(bookingId).update({'status': status.name});
   }
 }

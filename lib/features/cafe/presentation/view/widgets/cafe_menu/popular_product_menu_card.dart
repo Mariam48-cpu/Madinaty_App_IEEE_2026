@@ -45,7 +45,7 @@ class PopularProductMenuCard extends StatelessWidget {
                 height: 160,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (_, _, _) => Container(
                   height: 160,
                   color: Colors.grey.shade200,
                   child: Icon(Icons.coffee, size: 50, color: Colors.grey),

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/onboarding/presentation/view_model/onboarding_bloc.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
+import 'package:toastification/toastification.dart';
 
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
@@ -14,7 +16,6 @@ import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterLocalization.instance.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseService.init();
@@ -39,13 +40,11 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
     _localization.onTranslatedLanguage = _onTranslatedLanguage;
-
     _initializeLocalization();
   }
 
-  Future<void> _initializeLocalization() async {
+  void _initializeLocalization() {
     _localization.init(
       initLanguageCode: 'ar',
       mapLocales: [
@@ -61,8 +60,6 @@ class _MyAppState extends State<MyApp> {
           countryCode: 'US',
           fontFamily: 'Cairo',
         ),
-        const MapLocale('km', AppLocale.KM, countryCode: 'KH'),
-        const MapLocale('ja', AppLocale.JA, countryCode: 'JP'),
       ],
     );
   }
@@ -75,28 +72,24 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final isArabic = _localization.currentLocale?.languageCode == 'ar';
 
-    return MaterialApp(
-      title: 'Madinaty',
-      debugShowCheckedModeBanner: false,
-
-      supportedLocales: _localization.supportedLocales,
-
-      localizationsDelegates: _localization.localizationsDelegates,
-
-      initialRoute: AppRoutes.splash,
-
-      onGenerateRoute: AppRoutes.onGenerateRoute,
-
-      theme: AppTheme.lightTheme.copyWith(
-        scaffoldBackgroundColor: const Color(0xFFF9F6F0),
+    return ToastificationWrapper(
+      child: MaterialApp(
+        title: 'Madinaty',
+        debugShowCheckedModeBanner: false,
+        supportedLocales: _localization.supportedLocales,
+        localizationsDelegates: _localization.localizationsDelegates,
+        initialRoute: AppRoutes.splash,
+        onGenerateRoute: AppRoutes.onGenerateRoute,
+        theme: AppTheme.lightTheme.copyWith(
+          scaffoldBackgroundColor: AppColors.background,
+        ),
+        builder: (context, child) {
+          return Directionality(
+            textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
       ),
-
-      builder: (context, child) {
-        return Directionality(
-          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
     );
   }
 }

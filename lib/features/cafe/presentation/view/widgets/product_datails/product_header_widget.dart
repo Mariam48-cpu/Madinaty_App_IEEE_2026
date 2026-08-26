@@ -23,7 +23,7 @@ class ProductHeaderWidget extends StatelessWidget {
           height: 280,
           width: double.infinity,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(
+          errorBuilder: (_, _, _) => Container(
             height: 280,
             color: const Color(0xFFF7F4F2),
             child: const Icon(Icons.fastfood, size: 50, color: Colors.grey),

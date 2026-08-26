@@ -10,6 +10,7 @@ import 'package:madinaty_app_ieee_2026/features/cafe/domain/repositories/cafe_re
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/repositories/cafe_repository_interface.dart';
 
+import '../../../../core/localization/app_locale.dart';
 import '../../domain/entities/ai_plan_entity.dart';
 import '../../domain/repositories/ai_planner_repository.dart';
 import '../datasources/ai_planner_data_source.dart';
@@ -38,7 +39,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
         : await _getLocation();
 
     if (position == null) {
-      throw Exception('We need your location to build a nearby plan.');
+      throw Exception(AppLocale.locationError);
     }
 
     final intent = await aiDataSource.understandRequest(
@@ -54,6 +55,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
       latitude: position.latitude,
       longitude: position.longitude,
     );
+    final weatherText = AppLocale.AR[weather.summaryKey] ?? AppLocale.weatherUnavailable;
 
 
     final nearby = await discoveryRepository.getNearbyCafes(
@@ -62,7 +64,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
     );
 
     if (nearby.isEmpty) {
-      throw Exception('No nearby places were found for your plan.');
+      throw Exception(AppLocale.noNearbyPlacesAvailable);
     }
 
 
@@ -75,7 +77,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
 
     if (candidates.isEmpty) {
       throw Exception(
-        'I could not find enough real places to build this plan.',
+          AppLocale.noMatchingCafesFound
       );
     }
 
@@ -85,7 +87,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
       candidates: candidates,
       weatherSummary:
           '${weather.temperature.toStringAsFixed(0)}°C. '
-          '${weather.summary}',
+          '${weatherText}',
     );
 
 
@@ -148,8 +150,8 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
 
       activities.add(
         AIPlanActivityEntity(
-          title: 'Best nearby match',
-          purpose: intent.mood.isEmpty ? 'relax' : intent.mood,
+          title: AppLocale.suitableCafeForYou,
+          purpose: intent.mood.isEmpty ? AppLocale.chillSitting : intent.mood,
           category: 'cafe',
           requirements: intent.requirements,
           durationMinutes: request.durationHours * 60 < 45
@@ -170,8 +172,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
             estimatedCost: fallbackCost,
             matchScore: 80,
             reason:
-                'Best available real place near you '
-                'matching your request.',
+            AppLocale.nearbyRecommendation
           ),
         ),
       );
@@ -197,7 +198,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
       budget: request.budget,
       weatherSummary:
           '${weather.temperature.toStringAsFixed(0)}°C '
-          '• ${weather.summary}',
+          '• ${weatherText}',
       activities: activities,
     );
   }

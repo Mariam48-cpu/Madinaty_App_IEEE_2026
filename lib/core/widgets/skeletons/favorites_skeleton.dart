@@ -1,0 +1,6 @@
+import 'package:flutter/material.dart';
+import 'skeleton_primitives.dart';
+import '../../theme/app_colors.dart';
+
+class FavoritesSkeleton extends StatelessWidget { const FavoritesSkeleton({super.key}); @override Widget build(BuildContext context)=>ListView(padding:const EdgeInsets.all(18),physics:const NeverScrollableScrollPhysics(),children:const[SkeletonText(widthFactor:.48,height:25),SizedBox(height:18),AppSkeleton(height:48,radius:16),SizedBox(height:16),FavoritePlaceSkeleton(),FavoritePlaceSkeleton(),FavoritePlaceSkeleton()]); }
+class FavoritePlaceSkeleton extends StatelessWidget { const FavoritePlaceSkeleton({super.key}); @override Widget build(BuildContext context)=>Container(margin:const EdgeInsets.only(bottom:13),padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:AppColors.surface,borderRadius:BorderRadius.circular(20),border:Border.all(color:AppColors.border)),child:const Row(children:[AppSkeleton(width:105,height:105,radius:16),SizedBox(width:13),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[SkeletonText(widthFactor:.72,height:16),SizedBox(height:10),SkeletonText(widthFactor:.5,height:11),SizedBox(height:10),SkeletonText(widthFactor:.95,height:10),SizedBox(height:8),SkeletonChip(width:70,height:24)]))])); }

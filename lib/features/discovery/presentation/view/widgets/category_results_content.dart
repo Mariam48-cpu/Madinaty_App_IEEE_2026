@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:toastification/toastification.dart';
+
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/skeletons.dart';
+
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_results_card.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_empty_view.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/discovery_error_view.dart';
@@ -29,22 +36,29 @@ class CategoryResultsContent extends StatelessWidget {
 
     if (selectedFilterIndex == 1) {
       final LatLng? userLocation = state.currentLocation;
-      if (userLocation == null) return cafes;
+
+      if (userLocation == null) {
+        return cafes;
+      }
 
       const Distance distanceCalculator = Distance();
+
       cafes.sort((a, b) {
         final double distanceA = distanceCalculator.as(
           LengthUnit.Kilometer,
           userLocation,
           a.location,
         );
+
         final double distanceB = distanceCalculator.as(
           LengthUnit.Kilometer,
           userLocation,
           b.location,
         );
+
         return distanceA.compareTo(distanceB);
       });
+
       return cafes;
     }
 
@@ -60,14 +74,17 @@ class CategoryResultsContent extends StatelessWidget {
     return BlocConsumer<DiscoveryCubit, DiscoveryState>(
       listener: (context, state) {
         if (state is DiscoveryError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          AppToast.showToast(
+            context: context,
+            title: AppLocale.toastError.getString(context),
+            description: state.message,
+            type: ToastificationType.error,
           );
         }
       },
       builder: (context, state) {
         if (state is DiscoveryInitial || state is DiscoveryLoading) {
-          return Center(child: CircularProgressIndicator());
+          return const DiscoverySkeleton();
         }
 
         if (state is DiscoveryError) {
@@ -76,8 +93,8 @@ class CategoryResultsContent extends StatelessWidget {
 
         if (state is DiscoveryEmpty) {
           return DiscoveryEmptyView(
-            title: 'لم يتم العثور على كافيهات',
-            subtitle: 'جربي تصنيفًا آخر أو ابحثي عن كافيه مختلف.',
+            title: AppLocale.noNearbyCafesFound.getString(context),
+            subtitle: AppLocale.tryAnotherCategorySubtitle.getString(context),
           );
         }
 
@@ -86,14 +103,14 @@ class CategoryResultsContent extends StatelessWidget {
 
           if (cafes.isEmpty) {
             final String emptyMsg = selectedFilterIndex == 2
-                ? 'لا توجد أماكن مفتوحة الآن.'
+                ? AppLocale.noOpenPlacesNow.getString(context)
                 : selectedFilterIndex == 1
-                ? 'لا توجد أماكن قريبة متاحة.'
-                : 'لم يتم العثور على كافيهات.';
+                ? AppLocale.noNearbyPlacesAvailable.getString(context)
+                : AppLocale.noNearbyCafesFound.getString(context);
 
             return DiscoveryEmptyView(
               title: emptyMsg,
-              subtitle: 'جربي اختيار فلتر آخر.',
+              subtitle: AppLocale.tryAnotherFilterSubtitle.getString(context),
             );
           }
 

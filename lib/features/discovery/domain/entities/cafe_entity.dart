@@ -17,7 +17,7 @@ class CafeEntity {
   const CafeEntity({
     this.id = '',
     this.name = '',
-    required this.location,
+    required this.location ,
     this.rating = 0.0,
     this.photos = const [],
     this.address = '',
@@ -27,4 +27,7 @@ class CafeEntity {
     this.openingHours = '',
     this.attributes = const [],
   });
+
+  double get latitude => location.latitude;
+  double get longitude => location.longitude;
 }

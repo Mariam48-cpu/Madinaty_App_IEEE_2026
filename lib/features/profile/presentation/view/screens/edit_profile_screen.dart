@@ -2,8 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:toastification/toastification.dart';
 
+import '../../../../../core/utils/app_toast.dart';
 import '../../view_model/profile_cubit.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -42,23 +47,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
 
     _nameController = TextEditingController(text: widget.currentName);
-
     _phoneController = TextEditingController(text: widget.currentPhone);
-
     _emailController = TextEditingController(text: widget.currentEmail);
 
     String formattedDate = '';
-
     if (widget.currentBirthDate != null &&
         widget.currentBirthDate!.isNotEmpty) {
       try {
         final parsedDate = DateTime.parse(widget.currentBirthDate!);
-
         formattedDate =
-            "${parsedDate.day} / "
-            "${parsedDate.month} / "
-            "${parsedDate.year}";
-
+        "${parsedDate.day} / ${parsedDate.month} / ${parsedDate.year}";
         _selectedBirthDate = parsedDate;
       } catch (_) {
         formattedDate = widget.currentBirthDate!;
@@ -74,14 +72,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController.dispose();
     _emailController.dispose();
     _birthDateController.dispose();
-
     super.dispose();
   }
 
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
-
       final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 80,
@@ -95,12 +91,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('حدث خطأ أثناء اختيار الصورة: $e'),
-          backgroundColor: Colors.red,
-        ),
+      AppToast.showToast(
+        context: context,
+        title: AppLocale.toastError.getString(context),
+        description: e.toString(),
+        type: ToastificationType.error,
       );
     }
   }
@@ -114,8 +109,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Colors.brown,
-            colorScheme: const ColorScheme.light(primary: Colors.brown),
+            primaryColor: AppColors.primary,
+            colorScheme: const ColorScheme.light(primary: AppColors.primary),
             buttonTheme: const ButtonThemeData(
               textTheme: ButtonTextTheme.primary,
             ),
@@ -128,11 +123,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (picked != null) {
       setState(() {
         _selectedBirthDate = picked;
-
         _birthDateController.text =
-            "${picked.day} / "
-            "${picked.month} / "
-            "${picked.year}";
+        "${picked.day} / ${picked.month} / ${picked.year}";
       });
     }
   }
@@ -143,41 +135,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          title: const Text(
-            'حذف الحساب',
+          title: Text(
+            AppLocale.deleteAccountTitle.getString(context),
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
-          content: const Text(
-            'هل أنت متأكد من حذف الحساب؟\n'
-            'لا يمكن التراجع عن هذا الإجراء.',
+          content: Text(
+            AppLocale.deleteAccountConfirmMessage.getString(context),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15),
+            style: const TextStyle(
+              fontSize: 15,
+              color: AppColors.textSecondary,
+            ),
           ),
           actionsAlignment: MainAxisAlignment.spaceEvenly,
           actions: [
-            // NO
             TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              child: const Text(
-                'لا',
-                style: TextStyle(
-                  color: Colors.grey,
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                AppLocale.dialogNo.getString(context),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-
-            // YES
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -185,12 +177,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               onPressed: () {
                 Navigator.pop(dialogContext);
-
                 context.read<ProfileCubit>().deleteAccount();
               },
-              child: const Text(
-                'نعم',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              child: Text(
+                AppLocale.dialogYes.getString(context),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -202,29 +193,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF7F2),
-
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          "تعديل الحساب",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocale.editProfileTitle.getString(context),
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-
       body: BlocConsumer<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdateSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("تم تحديث البيانات بنجاح"),
-                backgroundColor: Colors.green,
-              ),
+            AppToast.showToast(
+              context: context,
+              title: AppLocale.toastSuccess.getString(context),
+              description: AppLocale.profileUpdatedSuccess.getString(context),
+              type: ToastificationType.success,
             );
-
             Navigator.pop(context);
           }
 
@@ -232,80 +223,72 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Navigator.pushNamedAndRemoveUntil(
               context,
               '/auth',
-              (route) => false,
+                  (route) => false,
             );
           }
 
           if (state is ProfileError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
+            AppToast.showToast(
+              context: context,
+              title: AppLocale.toastError.getString(context),
+              description: state.message,
+              type: ToastificationType.error,
             );
           }
         },
-
         builder: (context, state) {
           final bool isUpdating = state is ProfileUpdating;
-
           final bool isDeleting = state is ProfileDeleting;
-
           final bool isBusy = isUpdating || isDeleting;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-
             child: Column(
               children: [
                 const SizedBox(height: 10),
-
                 Center(
                   child: Column(
                     children: [
                       Stack(
-                        alignment: Alignment.bottomRight,
+                        alignment: AlignmentDirectional.bottomEnd,
                         children: [
                           CircleAvatar(
                             radius: 50,
-                            backgroundColor: Colors.brown.shade100,
+                            backgroundColor: AppColors.surfaceVariant,
                             backgroundImage: _selectedImage != null
                                 ? FileImage(_selectedImage!)
                                 : (widget.currentImageUrl != null &&
-                                      widget.currentImageUrl!.isNotEmpty)
+                                widget.currentImageUrl!.isNotEmpty)
                                 ? NetworkImage(widget.currentImageUrl!)
                                 : const NetworkImage(
-                                    'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-                                  ),
+                              'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+                            ),
                           ),
-
                           InkWell(
                             onTap: isBusy ? null : _pickImage,
                             borderRadius: BorderRadius.circular(30),
                             child: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: const BoxDecoration(
-                                color: Colors.black87,
+                                color: AppColors.darkButton,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
                                 Icons.edit,
                                 size: 16,
-                                color: Colors.white,
+                                color: AppColors.onDarkButton,
                               ),
                             ),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 8),
-
                       TextButton(
                         onPressed: isBusy ? null : _pickImage,
-                        child: const Text(
-                          "تغيير الصورة",
-                          style: TextStyle(
-                            color: Colors.brown,
+                        child: Text(
+                          AppLocale.changePhoto.getString(context),
+                          style: const TextStyle(
+                            color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                           ),
@@ -314,74 +297,64 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.border),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.03),
                         blurRadius: 10,
                         spreadRadius: 2,
                       ),
                     ],
                   ),
-
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // NAME
-                      const Text(
-                        "الاسم الكامل",
-                        style: TextStyle(
+                      Text(
+                        AppLocale.name.getString(context),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
                       TextField(
                         controller: _nameController,
                         enabled: !isBusy,
-                        textDirection: TextDirection.rtl,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: const Color(0xFFF9F9F9),
+                          fillColor: AppColors.surfaceVariant,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 16),
 
-                      // EMAIL
-                      const Text(
-                        "البريد الإلكتروني",
-                        style: TextStyle(
+                      Text(
+                        AppLocale.emailOrPhone.getString(context),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
                       TextField(
                         controller: _emailController,
                         enabled: false,
                         textDirection: TextDirection.ltr,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.grey.shade100,
+                          fillColor: AppColors.border.withValues(alpha: 0.3),
                           prefixIcon: const Icon(
                             Icons.lock,
-                            color: Colors.grey,
+                            color: AppColors.textSecondary,
                             size: 18,
                           ),
                           border: OutlineInputBorder(
@@ -390,20 +363,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 16),
 
-                      // PHONE
-                      const Text(
-                        "رقم الهاتف",
-                        style: TextStyle(
+                      Text(
+                        AppLocale.phoneNumberLabel.getString(context),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
                       TextField(
                         controller: _phoneController,
                         enabled: !isBusy,
@@ -411,27 +380,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         textDirection: TextDirection.ltr,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: const Color(0xFFF9F9F9),
+                          fillColor: AppColors.surfaceVariant,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 16),
 
-                      // BIRTH DATE
-                      const Text(
-                        "تاريخ الميلاد",
-                        style: TextStyle(
+                      Text(
+                        AppLocale.birthDateLabel.getString(context),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
                       TextField(
                         controller: _birthDateController,
                         readOnly: true,
@@ -441,15 +406,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           suffixIcon: IconButton(
                             icon: const Icon(
                               Icons.calendar_today,
-                              color: Colors.brown,
+                              color: AppColors.primary,
                               size: 20,
                             ),
-                            onPressed: isBusy
-                                ? null
-                                : () => _selectDate(context),
+                            onPressed:
+                            isBusy ? null : () => _selectDate(context),
                           ),
                           filled: true,
-                          fillColor: const Color(0xFFF9F9F9),
+                          fillColor: AppColors.surfaceVariant,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -459,16 +423,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown.shade800,
-                      disabledBackgroundColor: Colors.brown.shade300,
+                      backgroundColor: AppColors.darkButton,
+                      foregroundColor: AppColors.onDarkButton,
+                      disabledBackgroundColor:
+                      AppColors.darkButton.withValues(alpha: 0.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -476,56 +440,55 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     onPressed: isBusy
                         ? null
                         : () {
-                            final name = _nameController.text.trim();
+                      final name = _nameController.text.trim();
+                      final phone = _phoneController.text.trim();
 
-                            final phone = _phoneController.text.trim();
+                      if (name.isEmpty) {
+                        AppToast.showToast(
+                          context: context,
+                          title: AppLocale.toastError.getString(context),
+                          description: AppLocale.enterNameError
+                              .getString(context),
+                          type: ToastificationType.error,
+                        );
+                        return;
+                      }
 
-                            if (name.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("من فضلك أدخل الاسم"),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                              return;
-                            }
-
-                            context.read<ProfileCubit>().updateProfile(
-                              uid: widget.uid,
-                              name: name,
-                              phone: phone,
-                              birthDate: _selectedBirthDate,
-                              imageFile: _selectedImage,
-                            );
-                          },
+                      context.read<ProfileCubit>().updateProfile(
+                        uid: widget.uid,
+                        name: name,
+                        phone: phone,
+                        birthDate: _selectedBirthDate,
+                        imageFile: _selectedImage,
+                      );
+                    },
                     child: isUpdating
                         ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
-                        : const Text(
-                            "حفظ التغييرات",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                        : Text(
+                      AppLocale.saveChanges.getString(context),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    // CHANGE PASSWORD
                     Expanded(
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: BorderSide(color: Colors.brown.shade200),
+                          side: const BorderSide(color: AppColors.border),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -533,24 +496,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         onPressed: isBusy ? null : () {},
                         icon: const Icon(
                           Icons.vpn_key,
-                          color: Colors.brown,
+                          color: AppColors.primary,
                           size: 18,
                         ),
-                        label: const Text(
-                          "تغيير كلمة المرور",
-                          style: TextStyle(color: Colors.brown, fontSize: 13),
+                        label: Text(
+                          AppLocale.changePasswordBtn.getString(context),
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
 
-                    // DELETE ACCOUNT
                     Expanded(
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: Colors.redAccent),
+                          side: const BorderSide(color: AppColors.error),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -558,12 +522,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         onPressed: isBusy ? null : _showDeleteAccountDialog,
                         icon: const Icon(
                           Icons.delete_outline,
-                          color: Colors.red,
+                          color: AppColors.error,
                           size: 18,
                         ),
-                        label: const Text(
-                          "حذف الحساب",
-                          style: TextStyle(color: Colors.red, fontSize: 13),
+                        label: Text(
+                          AppLocale.deleteAccountBtn.getString(context),
+                          style: const TextStyle(
+                            color: AppColors.error,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
@@ -571,30 +538,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 if (isDeleting) ...[
                   const SizedBox(height: 16),
-
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.red,
+                          color: AppColors.error,
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(
-                        "جاري حذف الحساب...",
-                        style: TextStyle(
-                          color: Colors.red,
+                        AppLocale.deletingAccountProgress.getString(context),
+                        style: const TextStyle(
+                          color: AppColors.error,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ],
-
                 const SizedBox(height: 20),
               ],
             ),

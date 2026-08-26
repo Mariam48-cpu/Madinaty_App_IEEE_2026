@@ -6,6 +6,7 @@ import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/cart_skeleton.dart';
 import '../../view_model/cubit/cart_cubit.dart';
 import '../../view_model/cubit/cart_state.dart';
 import '../widgets/cart_empty_view.dart';
@@ -110,10 +111,8 @@ class _CartViewState extends State<_CartView> {
           }
         },
         builder: (context, state) {
-          if (state is CartLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
+          if (state is CartInitial || state is CartLoading) {
+            return const CartSkeleton();
           }
 
           if (state is CartError) {
@@ -141,7 +140,13 @@ class _CartViewState extends State<_CartView> {
           if (state is CartLoaded) {
             if (state.isEmpty) {
               return CartEmptyView(
-                onExplore: () => Navigator.of(context).pop(),
+                onExplore: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.home,
+                        (route) => false,
+                  );
+                }
               );
             }
 
@@ -158,7 +163,8 @@ class _CartViewState extends State<_CartView> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: state.items.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 12),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final item = state.items[index];
                           return CartItemCard(
@@ -218,10 +224,7 @@ class _CartViewState extends State<_CartView> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.shopping_cart_outlined,
-                              size: 20,
-                            ),
+                            const Icon(Icons.shopping_cart_outlined, size: 20),
                             const SizedBox(width: 8),
                             Text(
                               AppLocale.proceedToCheckout.getString(context),

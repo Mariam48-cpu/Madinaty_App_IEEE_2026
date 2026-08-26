@@ -43,8 +43,6 @@ class FavoritesCubit extends Cubit<FavoritesState> {
         }
       },
       onError: (error, stackTrace) {
-        // ignore: avoid_print
-        print('[FavoritesCubit] Watch error: $error\n$stackTrace');
         emit(FavoritesError(message: error.toString()));
       },
     );
@@ -59,9 +57,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   Future<void> toggleFavorite(FavoriteItemEntity item) async {
     try {
       await toggleFavoriteUseCase(item);
-    } catch (e, stackTrace) {
-      // ignore: avoid_print
-      print('[FavoritesCubit] Toggle favorite error: $e\n$stackTrace');
+    } catch (e) {
       emit(FavoritesError(message: e.toString()));
     }
   }
@@ -69,9 +65,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   Future<void> removeFavorite(String favoriteId) async {
     try {
       await removeFavoriteUseCase(favoriteId);
-    } catch (e, stackTrace) {
-      // ignore: avoid_print
-      print('[FavoritesCubit] Remove favorite error: $e\n$stackTrace');
+    } catch (e) {
       emit(FavoritesError(message: e.toString()));
     }
   }

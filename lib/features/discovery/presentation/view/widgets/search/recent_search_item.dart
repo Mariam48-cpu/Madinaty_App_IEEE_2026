@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class RecentSearchItem extends StatelessWidget {
   final String search;
@@ -6,6 +7,7 @@ class RecentSearchItem extends StatelessWidget {
   final VoidCallback onRemoved;
 
   const RecentSearchItem({
+    super.key,
     required this.search,
     required this.onSelected,
     required this.onRemoved,
@@ -14,9 +16,9 @@ class RecentSearchItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: Color(0xFFF4ECE8),
+        color: AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -24,21 +26,31 @@ class RecentSearchItem extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: onRemoved,
-            child: Icon(Icons.close, size: 15, color: Colors.grey),
+            child: const Icon(
+              Icons.close,
+              size: 15,
+              color: AppColors.textSecondary,
+            ),
           ),
-
-          SizedBox(width: 5),
-
+          const SizedBox(width: 5),
           GestureDetector(
             onTap: onSelected,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.history, size: 14, color: Colors.grey),
-
-                SizedBox(width: 5),
-
-                Text(search, style: TextStyle(fontSize: 11)),
+                const Icon(
+                  Icons.history,
+                  size: 14,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  search,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
               ],
             ),
           ),

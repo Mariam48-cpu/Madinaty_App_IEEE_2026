@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'seating_table.dart';
 
 class SeatingMap extends StatelessWidget {
@@ -13,32 +16,38 @@ class SeatingMap extends StatelessWidget {
     required this.filterCategory,
   });
 
-  bool isTableMatchingFilter(String? category) {
+  bool isTableMatchingFilter(BuildContext context, String? category) {
     if (category == null) return false;
-    if (filterCategory == 'الكل') return true;
+    if (filterCategory == AppLocale.filterAll.getString(context)) return true;
     return filterCategory == category;
   }
 
   @override
   Widget build(BuildContext context) {
+    final nileView = AppLocale.filterNileView.getString(context);
+    final quietCorner = AppLocale.filterQuietCorner.getString(context);
+    final nextToWindow = AppLocale.filterNextToWindow.getString(context);
+    final barText = AppLocale.barAreaTitle.getString(context);
+    final allFilter = AppLocale.filterAll.getString(context);
+
     final Map<String, String> tableCategories = {
-      'T1': 'إطلالة النيل',
-      'T2': 'إطلالة النيل',
-      'T3': 'بجوار النافذة',
-      'T4': 'ركن هادئ',
-      'T5': 'ركن هادئ',
-      'T6': 'بجوار النافذة',
-      'T7': 'إطلالة النيل',
-      'BAR': 'البار',
+      'T1': nileView,
+      'T2': nileView,
+      'T3': nextToWindow,
+      'T4': quietCorner,
+      'T5': quietCorner,
+      'T6': nextToWindow,
+      'T7': nileView,
+      'BAR': barText,
     };
 
     return Container(
       height: 320,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Color(0xFFE0EDF4)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Stack(
         children: [
@@ -48,17 +57,18 @@ class SeatingMap extends StatelessWidget {
             right: 0,
             child: Center(
               child: Text(
-                filterCategory == 'الكل' ? 'خريطة الجلسات' : filterCategory,
-                style: TextStyle(
-                  color: Color(0xFF6C9BB8),
+                filterCategory == allFilter
+                    ? AppLocale.seatingMapTitle.getString(context)
+                    : filterCategory,
+                style: const TextStyle(
+                  color: AppColors.primary,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
-
-          if (isTableMatchingFilter(tableCategories['T1']))
+          if (isTableMatchingFilter(context, tableCategories['T1']))
             Positioned(
               top: 42,
               right: 28,
@@ -69,7 +79,7 @@ class SeatingMap extends StatelessWidget {
                 onTap: () => onTableSelected('T1'),
               ),
             ),
-          if (isTableMatchingFilter(tableCategories['T2']))
+          if (isTableMatchingFilter(context, tableCategories['T2']))
             Positioned(
               top: 42,
               left: 105,
@@ -81,7 +91,7 @@ class SeatingMap extends StatelessWidget {
                 onTap: () => onTableSelected('T2'),
               ),
             ),
-          if (isTableMatchingFilter(tableCategories['T3']))
+          if (isTableMatchingFilter(context, tableCategories['T3']))
             Positioned(
               top: 42,
               left: 25,
@@ -92,7 +102,7 @@ class SeatingMap extends StatelessWidget {
                 onTap: () => onTableSelected('T3'),
               ),
             ),
-          if (isTableMatchingFilter(tableCategories['T4']))
+          if (isTableMatchingFilter(context, tableCategories['T4']))
             Positioned(
               top: 125,
               right: 60,
@@ -103,8 +113,7 @@ class SeatingMap extends StatelessWidget {
                 onTap: () => onTableSelected('T4'),
               ),
             ),
-
-          if (isTableMatchingFilter(tableCategories['T5']))
+          if (isTableMatchingFilter(context, tableCategories['T5']))
             Positioned(
               top: 115,
               left: 65,
@@ -116,7 +125,7 @@ class SeatingMap extends StatelessWidget {
                 onTap: () => onTableSelected('T5'),
               ),
             ),
-          if (isTableMatchingFilter(tableCategories['T6']))
+          if (isTableMatchingFilter(context, tableCategories['T6']))
             Positioned(
               top: 215,
               left: 120,
@@ -127,7 +136,7 @@ class SeatingMap extends StatelessWidget {
                 onTap: () {},
               ),
             ),
-          if (isTableMatchingFilter(tableCategories['T7']))
+          if (isTableMatchingFilter(context, tableCategories['T7']))
             Positioned(
               top: 215,
               right: 110,
@@ -138,32 +147,32 @@ class SeatingMap extends StatelessWidget {
                 onTap: () => onTableSelected('T7'),
               ),
             ),
-          if (isTableMatchingFilter(tableCategories['BAR']))
+          if (isTableMatchingFilter(context, tableCategories['BAR']))
             Positioned(
               bottom: 18,
               right: 20,
               child: GestureDetector(
                 onTap: () => onTableSelected('BAR'),
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   decoration: BoxDecoration(
                     color: selectedTable == 'BAR'
-                        ? Color(0xFF6E4027)
-                        : Color(0xFFECE5DF),
+                        ? AppColors.primaryDark
+                        : AppColors.surfaceVariant,
                     borderRadius: BorderRadius.circular(10),
                     border: selectedTable == 'BAR'
-                        ? Border.all(color: Colors.brown, width: 1.5)
+                        ? Border.all(color: AppColors.primary, width: 1.5)
                         : null,
                   ),
                   child: Text(
-                    'البار',
+                    barText,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: selectedTable == 'BAR'
-                          ? Colors.white
-                          : Colors.grey.shade700,
+                          ? AppColors.textWhite
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),

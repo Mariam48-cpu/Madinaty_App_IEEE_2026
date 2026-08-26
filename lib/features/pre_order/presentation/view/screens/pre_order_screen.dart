@@ -6,6 +6,7 @@ import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/pre_order_skeleton.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/book_table_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view_model/cubit/booking_cubit.dart';
@@ -54,8 +55,8 @@ class PreOrderScreen extends StatelessWidget {
             ),
         ),
         BlocProvider(
-          create: (_) => getIt<CartCubit>()
-            ..initCartWatcher(cafeName: effectiveCafeName),
+          create: (_) =>
+              getIt<CartCubit>()..initCartWatcher(cafeName: effectiveCafeName),
         ),
       ],
       child: _PreOrderView(
@@ -104,8 +105,10 @@ class _PreOrderViewState extends State<_PreOrderView> {
   int _getProductQuantity(CartState cartState, ProductEntity product) {
     if (cartState is CartLoaded) {
       return cartState.items
-          .where((item) =>
-              item.id == product.id || item.id.startsWith('${product.id}_'))
+          .where(
+            (item) =>
+                item.id == product.id || item.id.startsWith('${product.id}_'),
+          )
           .fold(0, (sum, item) => sum + item.quantity);
     }
     return 0;
@@ -212,10 +215,9 @@ class _PreOrderViewState extends State<_PreOrderView> {
       ),
       body: BlocBuilder<PreOrderCubit, PreOrderState>(
         builder: (context, preOrderState) {
-          if (preOrderState is PreOrderLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
+          if (preOrderState is PreOrderInitial ||
+              preOrderState is PreOrderLoading) {
+            return const PreOrderSkeleton();
           }
 
           if (preOrderState is PreOrderError) {
@@ -260,17 +262,18 @@ class _PreOrderViewState extends State<_PreOrderView> {
 
             return BlocBuilder<CartCubit, CartState>(
               builder: (context, cartState) {
-                final double cartSubtotal =
-                    cartState is CartLoaded ? cartState.subtotal : 0.0;
-                final int cartItemCount =
-                    cartState is CartLoaded ? cartState.totalItemsCount : 0;
+                final double cartSubtotal = cartState is CartLoaded
+                    ? cartState.subtotal
+                    : 0.0;
+                final int cartItemCount = cartState is CartLoaded
+                    ? cartState.totalItemsCount
+                    : 0;
 
                 return Column(
                   children: [
                     Expanded(
                       child: CustomScrollView(
                         slivers: [
-                          // Booking Details Banner
                           SliverToBoxAdapter(
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -278,11 +281,15 @@ class _PreOrderViewState extends State<_PreOrderView> {
                                 booking: widget.booking,
                                 cafeName: widget.cafeName,
                                 onEdit: () {
-                                  final cafeEntity = widget.cafe ??
+                                  final cafeEntity =
+                                      widget.cafe ??
                                       CafeEntity(
                                         id: widget.cafeId,
                                         name: widget.cafeName,
-                                        location: const LatLng(30.0131, 31.4913),
+                                        location: const LatLng(
+                                          30.0131,
+                                          31.4913,
+                                        ),
                                         address: '',
                                         description: '',
                                         rating: 4.5,
@@ -293,12 +300,14 @@ class _PreOrderViewState extends State<_PreOrderView> {
                                     ..setCafeId(cafeEntity.id);
                                   if (widget.booking != null) {
                                     if (widget.booking!.date != null) {
-                                      bookingCubit
-                                          .selectDate(widget.booking!.date!);
+                                      bookingCubit.selectDate(
+                                        widget.booking!.date!,
+                                      );
                                     }
                                     if (widget.booking!.time != null) {
-                                      bookingCubit
-                                          .selectTime(widget.booking!.time!);
+                                      bookingCubit.selectTime(
+                                        widget.booking!.time!,
+                                      );
                                     }
                                     bookingCubit.guests =
                                         widget.booking!.guests;
@@ -352,7 +361,9 @@ class _PreOrderViewState extends State<_PreOrderView> {
                               hasScrollBody: false,
                               child: Center(
                                 child: Text(
-                                  AppLocale.emptyCartSubtitle.getString(context),
+                                  AppLocale.emptyCartSubtitle.getString(
+                                    context,
+                                  ),
                                   style: AppTypography.bodyMedium.copyWith(
                                     color: AppColors.textMuted,
                                   ),
@@ -365,70 +376,69 @@ class _PreOrderViewState extends State<_PreOrderView> {
                               sliver: SliverGrid(
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 0.65,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 12,
-                                ),
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    final product = products[index];
-                                    final quantity = _getProductQuantity(
-                                      cartState,
-                                      product,
-                                    );
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 0.65,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                    ),
+                                delegate: SliverChildBuilderDelegate((
+                                  context,
+                                  index,
+                                ) {
+                                  final product = products[index];
+                                  final quantity = _getProductQuantity(
+                                    cartState,
+                                    product,
+                                  );
 
-                                    return PreOrderProductGridCard(
-                                      product: product,
-                                      quantity: quantity,
-                                      onAdd: () {
-                                        cartCubit.addToCart(
-                                          CartItemEntity(
-                                            id: product.id,
-                                            title: product.name,
-                                            price: product.price,
-                                            quantity: 1,
-                                            imageUrl: product.image.isNotEmpty
-                                                ? product.image
-                                                : null,
-                                          ),
-                                        );
-                                      },
-                                      onRemove: () {
-                                        if (cartState is CartLoaded) {
-                                          final itemToRemove =
-                                              _findItemForRemoval(
-                                            cartState.items,
-                                            product.id,
-                                          );
-                                          if (itemToRemove != null) {
-                                            cartCubit.decrementQuantity(
-                                              itemToRemove,
+                                  return PreOrderProductGridCard(
+                                    product: product,
+                                    quantity: quantity,
+                                    onAdd: () {
+                                      cartCubit.addToCart(
+                                        CartItemEntity(
+                                          id: product.id,
+                                          title: product.name,
+                                          price: product.price,
+                                          quantity: 1,
+                                          imageUrl: product.image.isNotEmpty
+                                              ? product.image
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                    onRemove: () {
+                                      if (cartState is CartLoaded) {
+                                        final itemToRemove =
+                                            _findItemForRemoval(
+                                              cartState.items,
+                                              product.id,
                                             );
-                                          }
+                                        if (itemToRemove != null) {
+                                          cartCubit.decrementQuantity(
+                                            itemToRemove,
+                                          );
                                         }
-                                      },
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => ProductDetailsScreen(
-                                              product: product,
-                                            ),
+                                      }
+                                    },
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => ProductDetailsScreen(
+                                            product: product,
                                           ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  childCount: products.length,
-                                ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }, childCount: products.length),
                               ),
                             ),
                         ],
                       ),
                     ),
 
-                    // Fixed Bottom Bar
                     PreOrderBottomBar(
                       totalPrice: cartSubtotal,
                       itemCount: cartItemCount,
@@ -437,9 +447,8 @@ class _PreOrderViewState extends State<_PreOrderView> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => CheckoutScreen(
-                                booking: widget.booking!,
-                              ),
+                              builder: (_) =>
+                                  CheckoutScreen(booking: widget.booking!),
                             ),
                           );
                         } else {

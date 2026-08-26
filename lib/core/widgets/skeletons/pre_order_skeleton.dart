@@ -1,0 +1,6 @@
+import 'package:flutter/material.dart';
+import 'skeleton_primitives.dart';
+import '../../theme/app_colors.dart';
+
+class PreOrderSkeleton extends StatelessWidget { const PreOrderSkeleton({super.key}); @override Widget build(BuildContext context)=>ListView(padding:const EdgeInsets.fromLTRB(18,14,18,24),physics:const NeverScrollableScrollPhysics(),children:const[SkeletonText(widthFactor:.5,height:24),SizedBox(height:18),AppSkeleton(height:48,radius:16),SizedBox(height:18),Row(children:[Expanded(child:ProductGridSkeletonCard()),SizedBox(width:12),Expanded(child:ProductGridSkeletonCard())]),SizedBox(height:12),Row(children:[Expanded(child:ProductGridSkeletonCard()),SizedBox(width:12),Expanded(child:ProductGridSkeletonCard())])]); }
+class ProductGridSkeletonCard extends StatelessWidget { const ProductGridSkeletonCard({super.key}); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:AppColors.surface,borderRadius:BorderRadius.circular(18),border:Border.all(color:AppColors.border)),child:const Column(crossAxisAlignment:CrossAxisAlignment.start,children:[AppSkeleton(height:145,radius:14),SizedBox(height:10),SkeletonText(widthFactor:.75,height:14),SizedBox(height:8),SkeletonText(widthFactor:.45,height:12),SizedBox(height:10),SkeletonChip(width:78,height:28)])); }

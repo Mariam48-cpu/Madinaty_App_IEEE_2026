@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class CafeHeaderCard extends StatelessWidget {
   final String cafeName;
@@ -16,9 +17,9 @@ class CafeHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Color(0xFFFAEFE7),
+        color: AppColors.primaryContainer,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -30,22 +31,26 @@ class CafeHeaderCard extends StatelessWidget {
               height: 56,
               child: cafeImageUrl != null && cafeImageUrl!.isNotEmpty
                   ? Image.network(
-                      cafeImageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Color(0xFFE4D2C3),
-                        child: Icon(Icons.coffee, color: Color(0xFF6E4027)),
-                      ),
-                    )
+                cafeImageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: AppColors.chipBackground,
+                  child: const Icon(
+                    Icons.coffee,
+                    color: AppColors.primaryDark,
+                  ),
+                ),
+              )
                   : Container(
-                      color: Color(0xFFE4D2C3),
-                      child: Icon(Icons.coffee, color: Color(0xFF6E4027)),
-                    ),
+                color: AppColors.chipBackground,
+                child: const Icon(
+                  Icons.coffee,
+                  color: AppColors.primaryDark,
+                ),
+              ),
             ),
           ),
-
-          SizedBox(width: 10),
-
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,24 +59,31 @@ class CafeHeaderCard extends StatelessWidget {
                   cafeName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 if (cafeAddress != null && cafeAddress!.isNotEmpty) ...[
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.location_on_outlined,
                         size: 13,
-                        color: Colors.grey,
+                        color: AppColors.textSecondary,
                       ),
-                      SizedBox(width: 3),
+                      const SizedBox(width: 3),
                       Expanded(
                         child: Text(
                           cafeAddress!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -80,8 +92,11 @@ class CafeHeaderCard extends StatelessWidget {
               ],
             ),
           ),
-
-          Icon(Icons.arrow_forward_ios, size: 13, color: Colors.grey),
+          const Icon(
+            Icons.arrow_forward_ios,
+            size: 13,
+            color: AppColors.textSecondary,
+          ),
         ],
       ),
     );

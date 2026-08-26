@@ -2,40 +2,76 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:latlong2/latlong.dart';
+
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/home_skeleton.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/skeleton_primitives.dart';
 
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_state.dart';
+
 import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view/screens/favorites_screen.dart';
-import '../../../../../features/favorites/presentation/view_model/cubit/favorites_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view_model/cubit/favorites_cubit.dart';
+
+import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
+
 import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/profile_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/profile/presentation/view_model/profile_cubit.dart';
+
+import 'package:madinaty_app_ieee_2026/features/cart/presentation/view/screens/cart_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/cart/presentation/view_model/cubit/cart_cubit.dart';
 
 import '../../view_model/home_cubit.dart';
 import '../../view_model/home_state.dart';
 import '../widgets/home_widgets.dart';
 
-import '../../../../../core/di/injection_container.dart';
-import '../../../../../features/notifications/presentation/view/screens/notifications_screen.dart';
-import '../../../../../features/notifications/presentation/view_model/notification_cubit.dart';
-
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int initialIndex;
+
+  const HomeScreen({super.key, this.initialIndex = 0});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedNavIndex = 0;
+  late int _selectedNavIndex;
 
-  String _userName = 'مستخدم';
+  String _userName = '';
   bool _isLoadingUser = true;
+
+  String _locationName = '';
+  bool _isLoadingLocation = true;
 
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+
+    _selectedNavIndex = widget.initialIndex.clamp(0, 4);
+
     _loadUserName();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final discoveryCubit = context.read<DiscoveryCubit>();
+
+      final location = discoveryCubit.currentLocation;
+
+      if (location != null) {
+        _resolveLocationName(location);
+      }
+    });
   }
 
   @override
@@ -43,17 +79,19 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchController.dispose();
     super.dispose();
   }
+
   Future<void> _loadUserName() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
 
       if (user == null) {
-        if (mounted) {
-          setState(() {
-            _userName = 'مستخدم';
-            _isLoadingUser = false;
-          });
-        }
+        if (!mounted) return;
+
+        setState(() {
+          _userName = '';
+          _isLoadingUser = false;
+        });
+
         return;
       }
 
@@ -78,95 +116,188 @@ class _HomeScreenState extends State<HomeScreen> {
         name = user.displayName?.trim() ?? '';
       }
 
-      if (name.isEmpty) {
-        name = 'مستخدم';
+      if (!mounted) return;
+
+      setState(() {
+        _userName = name;
+        _isLoadingUser = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _userName = '';
+        _isLoadingUser = false;
+      });
+    }
+  }
+  Future<void> _resolveLocationName(LatLng location) async {
+    try {
+      if (mounted) {
+        setState(() {
+          _isLoadingLocation = true;
+        });
       }
 
-      if (mounted) {
+      final placemarks = await placemarkFromCoordinates(
+        location.latitude,
+        location.longitude,
+      );
+
+      if (!mounted) return;
+
+      if (placemarks.isEmpty) {
         setState(() {
-          _userName = name;
-          _isLoadingUser = false;
+          _locationName = '';
+          _isLoadingLocation = false;
         });
+
+        return;
       }
+
+      final place = placemarks.first;
+
+      String locationName = '';
+
+      final possibleNames = <String?>[
+        place.subLocality,
+        place.locality,
+        place.subAdministrativeArea,
+        place.administrativeArea,
+      ];
+
+      for (final value in possibleNames) {
+        if (value != null && value.trim().isNotEmpty) {
+          locationName = value.trim();
+          break;
+        }
+      }
+
+      setState(() {
+        _locationName = locationName;
+        _isLoadingLocation = false;
+      });
     } catch (_) {
-      if (mounted) {
-        setState(() {
-          _userName = 'مستخدم';
-          _isLoadingUser = false;
-        });
-      }
+      if (!mounted) return;
+
+      setState(() {
+        _locationName = '';
+        _isLoadingLocation = false;
+      });
     }
   }
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFAF8F4),
-        body: SafeArea(child: _buildCurrentPage()),
-        bottomNavigationBar: _buildBottomNavigationBar(),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: _buildCurrentPage(),
       ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
-
   Widget _buildCurrentPage() {
     switch (_selectedNavIndex) {
       case 0:
         return _buildHomePage();
+
       case 1:
         return const LocationPermissionGate();
+
       case 2:
-        return const FavoritesScreen();
+        return _buildCartPage();
+
       case 3:
+        return const FavoritesScreen();
+
+      case 4:
         return _buildProfilePage();
+
       default:
         return _buildHomePage();
     }
   }
-
   Widget _buildHomePage() {
-    return BlocProvider<FavoritesCubit>(
-      create: (_) => sl<FavoritesCubit>()..initFavoritesWatcher(),
-      child: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) {
-          if (state is HomeLoading || state is HomeInitial) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF8B6B4A)),
-            );
+    return BlocListener<DiscoveryCubit, DiscoveryState>(
+      listenWhen: (previous, current) {
+        return current is DiscoverySuccess;
+      },
+
+      listener: (context, state) async {
+        if (state is DiscoverySuccess) {
+          final location = state.currentLocation;
+
+          if (location != null) {
+            await _resolveLocationName(location);
           }
+        }
+      },
 
-          if (state is HomeError) {
-            return ErrorStateWidget(state: state);
-          }
+      child: BlocProvider<FavoritesCubit>(
+        create: (_) => sl<FavoritesCubit>()..initFavoritesWatcher(),
 
-          if (state is HomeEmpty) {
-            return const EmptyStateWidget();
-          }
+        child: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, state) {
 
-          if (state is HomeLoaded) {
-            return RefreshIndicator(
-              color: const Color(0xFF8B6B4A),
-              onRefresh: () async {
-                _searchController.clear();
+            if (state is HomeLoading || state is HomeInitial) {
+              return const HomeSkeleton();
+            }
+            if (state is HomeError) {
+              return ErrorStateWidget(state: state);
+            }
 
-                await context.read<HomeCubit>().fetchHomeData();
+            if (state is HomeEmpty) {
+              return const EmptyStateWidget();
+            }
 
-                await _loadUserName();
-              },
-              child: _buildHomeContent(context, state),
-            );
-          }
+            if (state is HomeLoaded) {
+              return RefreshIndicator(
+                color: AppColors.primary,
 
-          return const SizedBox.shrink();
-        },
+                onRefresh: () async {
+                  _searchController.clear();
+
+                  await context.read<HomeCubit>().fetchHomeData();
+
+                  await _loadUserName();
+
+                  final discoveryCubit = context.read<DiscoveryCubit>();
+
+                  final location = discoveryCubit.currentLocation;
+
+                  if (location != null) {
+                    await _resolveLocationName(location);
+                  }
+                },
+
+                child: _buildHomeContent(context, state),
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
       ),
+    );
+  }
+  Widget _buildCartPage() {
+    return BlocProvider(
+      create: (_) => sl<CartCubit>()..initCartWatcher(),
+      child: const CartScreen(),
     );
   }
   Widget _buildProfilePage() {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return const Center(child: Text('يجب تسجيل الدخول أولاً'));
+      return Center(
+        child: Text(
+          AppLocale.loginRequiredToProceed.getString(context),
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      );
     }
 
     return BlocProvider(
@@ -174,68 +305,97 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ProfileScreen(uid: user.uid),
     );
   }
+  Widget _buildHomeContent(
+      BuildContext context,
+      HomeLoaded state,
+      ) {
+    final effectiveUserName = _userName.isNotEmpty
+        ? _userName
+        : AppLocale.defaultUser.getString(context);
 
-  Widget _buildHomeContent(BuildContext context, HomeLoaded state) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
+
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 20),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+
             children: [
               BlocProvider(
                 create: (_) {
                   final cubit = sl<NotificationCubit>();
+
                   final user = FirebaseAuth.instance.currentUser;
+
                   if (user != null) {
                     cubit.watchNotifications(user.uid);
                   }
+
                   return cubit;
                 },
+
                 child: BlocBuilder<NotificationCubit, NotificationState>(
                   builder: (context, notificationState) {
                     int unreadCount = 0;
+
                     if (notificationState is NotificationLoaded) {
                       unreadCount = notificationState.unreadCount;
                     }
+
                     return Stack(
                       clipBehavior: Clip.none,
+
                       children: [
                         Container(
                           width: 40,
                           height: 40,
+
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             shape: BoxShape.circle,
-                            border: Border.all(color: const Color(0xFFE8E1D8)),
+                            border: Border.all(
+                              color: AppColors.border,
+                            ),
                           ),
+
                           child: IconButton(
                             padding: EdgeInsets.zero,
+
                             icon: const Icon(
                               Icons.notifications_none_rounded,
                               size: 22,
-                              color: Color(0xFF5E5146),
+                              color: AppColors.textSecondary,
                             ),
+
                             onPressed: () {
-                              final user = FirebaseAuth.instance.currentUser;
+                              final user =
+                                  FirebaseAuth.instance.currentUser;
 
                               if (user == null) {
                                 return;
                               }
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => BlocProvider(
                                     create: (_) {
-                                      final cubit = sl<NotificationCubit>();
+                                      final cubit =
+                                      sl<NotificationCubit>();
 
                                       cubit.fetchNotifications(user.uid);
 
                                       return cubit;
                                     },
-                                    child: NotificationsScreen(uid: user.uid),
+
+                                    child: NotificationsScreen(
+                                      uid: user.uid,
+                                    ),
                                   ),
                                 ),
                               );
@@ -244,26 +404,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
 
                         if (unreadCount > 0)
-                          Positioned(
+                          PositionedDirectional(
                             top: -5,
-                            right: -5,
+                            end: -5,
+
                             child: Container(
                               constraints: const BoxConstraints(
                                 minWidth: 18,
                                 minHeight: 18,
                               ),
+
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 4,
                               ),
+
                               decoration: const BoxDecoration(
-                                color: Colors.red,
+                                color: AppColors.error,
                                 shape: BoxShape.circle,
                               ),
+
                               child: Center(
                                 child: Text(
                                   unreadCount > 99
                                       ? '99+'
                                       : unreadCount.toString(),
+
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
@@ -280,40 +445,59 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(width: 10),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
+
                   children: [
                     Text(
                       _isLoadingUser
-                          ? 'صباح الخير...'
-                          : 'صباح الخير، $_userName',
+                          ? AppLocale.goodMorningLoading
+                          .getString(context)
+                          : '${AppLocale.goodMorningPrefix.getString(context)} $effectiveUserName',
+
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+
+                      textAlign: TextAlign.right,
+
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF3F3934),
+                        color: AppColors.textPrimary,
                       ),
                     ),
 
-                    const SizedBox(height: 3),
-
-                    const Row(
+                    const SizedBox(height: 5),
+                    Row(
                       mainAxisSize: MainAxisSize.min,
+
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.location_on_outlined,
-                          size: 14,
-                          color: Color(0xFF7A7068),
+                          size: 15,
+                          color: AppColors.primary,
                         ),
-                        SizedBox(width: 3),
-                        Text(
-                          'مدينتي، القاهرة',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF81776E),
+
+                        const SizedBox(width: 3),
+
+                        Flexible(
+                          child: Text(
+                            _isLoadingLocation
+                                ? 'جاري تحديد موقعك...'
+                                : _locationName.isNotEmpty
+                                ? _locationName
+                                : 'الموقع غير متاح',
+
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+
+                            textAlign: TextAlign.right,
+
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
                       ],
@@ -327,45 +511,116 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 18),
           Container(
             height: 52,
+
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(17),
-              border: Border.all(color: const Color(0xFFEDE7DF)),
+              border: Border.all(
+                color: AppColors.border,
+              ),
             ),
+
             child: TextField(
               controller: _searchController,
-              textDirection: TextDirection.rtl,
+
               textInputAction: TextInputAction.search,
+
               onSubmitted: (query) {
                 context.read<HomeCubit>().searchCafes(query);
               },
+
               decoration: InputDecoration(
-                hintText: 'ابحث بالاسم، المنطقة، أو نوع القهوة',
+                hintText:
+                AppLocale.homeSearchBarHint.getString(context),
+
                 hintStyle: const TextStyle(
-                  color: Color(0xFF9A9189),
+                  color: AppColors.textSecondary,
                   fontSize: 12,
                 ),
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                  color: Color(0xFF70675F),
-                  size: 22,
-                ),
-                suffixIcon: state.isSearchActive
-                    ? IconButton(
-                        icon: const Icon(
-                          Icons.close_rounded,
-                          color: Color(0xFF70675F),
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          _searchController.clear();
 
-                          context.read<HomeCubit>().clearSearch();
-                        },
-                      )
-                    : null,
+                prefixIcon: AnimatedSwitcher(
+                  duration: const Duration(
+                    milliseconds: 220,
+                  ),
+
+                  transitionBuilder: (
+                      child,
+                      animation,
+                      ) {
+                    return ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
+                    );
+                  },
+
+                  child: Icon(
+                    state.isSearchActive
+                        ? Icons.manage_search_rounded
+                        : Icons.search_rounded,
+
+                    key: ValueKey(
+                      state.isSearchActive,
+                    ),
+
+                    color: AppColors.textSecondary,
+
+                    size: 22,
+                  ),
+                ),
+
+                suffixIcon: AnimatedSwitcher(
+                  duration: const Duration(
+                    milliseconds: 220,
+                  ),
+
+                  transitionBuilder: (
+                      child,
+                      animation,
+                      ) {
+                    return ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
+                    );
+                  },
+
+                  child: state.isSearchActive
+                      ? IconButton(
+                    key: const ValueKey(
+                      'clear-search',
+                    ),
+
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color:
+                      AppColors.textSecondary,
+                      size: 20,
+                    ),
+
+                    onPressed: () {
+                      _searchController.clear();
+
+                      context
+                          .read<HomeCubit>()
+                          .clearSearch();
+                    },
+                  )
+                      : const SizedBox.shrink(
+                    key: ValueKey(
+                      'no-clear',
+                    ),
+                  ),
+                ),
+
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
+
+                contentPadding:
+                const EdgeInsets.symmetric(
                   horizontal: 15,
                   vertical: 15,
                 ),
@@ -375,49 +630,119 @@ class _HomeScreenState extends State<HomeScreen> {
           if (state.isSearchActive) ...[
             const SizedBox(height: 18),
 
-            const Text(
-              'نتائج البحث',
-              style: TextStyle(
+            Text(
+              AppLocale.searchResultsTitle
+                  .getString(context),
+
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF443D38),
+                color: AppColors.textPrimary,
               ),
             ),
 
             const SizedBox(height: 11),
 
-            if (state.isSearching)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 30),
-                  child: CircularProgressIndicator(color: Color(0xFF8B6B4A)),
+            AnimatedSwitcher(
+              duration: const Duration(
+                milliseconds: 320,
+              ),
+
+              switchInCurve:
+              Curves.easeOutCubic,
+
+              switchOutCurve:
+              Curves.easeInCubic,
+
+              transitionBuilder: (
+                  child,
+                  animation,
+                  ) {
+                return FadeTransition(
+                  opacity: animation,
+
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, .04),
+                      end: Offset.zero,
+                    ).animate(animation),
+
+                    child: child,
+                  ),
+                );
+              },
+
+              child: state.isSearching
+                  ? const Padding(
+                key: ValueKey(
+                  'search-loading',
+                ),
+
+                padding:
+                EdgeInsets.symmetric(
+                  vertical: 8,
+                ),
+
+                child: _SearchSkeleton(),
+              )
+                  : state.searchError != null
+                  ? SearchErrorWidget(
+                key: const ValueKey(
+                  'search-error',
+                ),
+                message:
+                state.searchError!,
+              )
+                  : state.searchResults.isEmpty
+                  ? const NoSearchResults(
+                key: ValueKey(
+                  'search-empty',
                 ),
               )
-            else if (state.searchError != null)
-              SearchErrorWidget(message: state.searchError!)
-            else if (state.searchResults.isEmpty)
-              const NoSearchResults()
-            else
-              ...state.searchResults.map(
-                (cafe) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: CafeCard(cafe: cafe),
+                  : Column(
+                key: const ValueKey(
+                  'search-results',
                 ),
+
+                children: state
+                    .searchResults
+                    .map(
+                      (cafe) => Padding(
+                    padding:
+                    const EdgeInsets
+                        .only(
+                      bottom: 16,
+                    ),
+
+                    child: CafeCard(
+                      cafe: cafe,
+                    ),
+                  ),
+                ).toList(),
               ),
+            ),
           ]
           else ...[
             const SizedBox(height: 16),
 
-            if (state.activeMoodOrOccasion != null) MoodCard(state: state),
+            const _AiPlannerEntryCard(),
 
             const SizedBox(height: 18),
 
-            const Text(
-              'على مزاجك إيه النهارده؟',
-              style: TextStyle(
+            if (state.activeMoodOrOccasion != null) ...[
+              MoodCard(state: state),
+
+              const SizedBox(height: 18),
+            ],
+
+            Text(
+              AppLocale.whatsYourMoodToday
+                  .getString(context),
+
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF443D38),
+                color: AppColors.textPrimary,
               ),
             ),
 
@@ -427,12 +752,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 18),
 
-            const Text(
-              'المقاهي المختارة لك',
-              style: TextStyle(
+            Text(
+              AppLocale.selectedCafesForYou
+                  .getString(context),
+
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF443D38),
+                color: AppColors.textPrimary,
               ),
             ),
 
@@ -442,9 +769,14 @@ class _HomeScreenState extends State<HomeScreen> {
               const NoFilteredResults()
             else
               ...state.filteredCafes.map(
-                (cafe) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: CafeCard(cafe: cafe),
+                    (cafe) => Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 16,
+                  ),
+
+                  child: CafeCard(
+                    cafe: cafe,
+                  ),
                 ),
               ),
 
@@ -458,45 +790,73 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
   Widget _buildBottomNavigationBar() {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFEDE7DF))),
+        color: AppColors.surface,
+
+        border: Border(
+          top: BorderSide(
+            color: AppColors.border,
+          ),
+        ),
       ),
+
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 6,
+          ),
+
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment:
+            MainAxisAlignment.spaceAround,
+
             children: [
               _buildNavItem(
                 index: 0,
                 icon: Icons.home_outlined,
                 activeIcon: Icons.home_rounded,
-                label: 'الرئيسية',
+                label: AppLocale.navHome
+                    .getString(context),
               ),
 
               _buildNavItem(
                 index: 1,
                 icon: Icons.explore_outlined,
                 activeIcon: Icons.explore,
-                label: 'استكشف',
+                label: AppLocale.navExplore
+                    .getString(context),
               ),
 
               _buildNavItem(
                 index: 2,
-                icon: Icons.favorite_border_rounded,
-                activeIcon: Icons.favorite_rounded,
-                label: 'المفضلة',
+                icon:
+                Icons.shopping_cart_outlined,
+                activeIcon:
+                Icons.shopping_cart_rounded,
+                label: 'السلة',
               ),
 
               _buildNavItem(
                 index: 3,
-                icon: Icons.person_outline_rounded,
-                activeIcon: Icons.person_rounded,
-                label: 'حسابي',
+                icon:
+                Icons.favorite_border_rounded,
+                activeIcon:
+                Icons.favorite_rounded,
+                label: AppLocale.navFavorites
+                    .getString(context),
+              ),
+
+              _buildNavItem(
+                index: 4,
+                icon:
+                Icons.person_outline_rounded,
+                activeIcon:
+                Icons.person_rounded,
+                label: AppLocale.navMyAccount
+                    .getString(context),
               ),
             ],
           ),
@@ -504,14 +864,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
   Widget _buildNavItem({
     required int index,
     required IconData icon,
     required IconData activeIcon,
     required String label,
   }) {
-    final isSelected = _selectedNavIndex == index;
+    final isSelected =
+        _selectedNavIndex == index;
 
     return GestureDetector(
       onTap: () {
@@ -519,38 +879,334 @@ class _HomeScreenState extends State<HomeScreen> {
           _selectedNavIndex = index;
         });
       },
+
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFF0D9BC) : Colors.transparent,
-          borderRadius: BorderRadius.circular(18),
+        duration: const Duration(
+          milliseconds: 200,
         ),
+
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 7,
+        ),
+
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.surfaceVariant
+              : Colors.transparent,
+
+          borderRadius:
+          BorderRadius.circular(18),
+        ),
+
         child: Column(
           mainAxisSize: MainAxisSize.min,
+
           children: [
             Icon(
-              isSelected ? activeIcon : icon,
+              isSelected
+                  ? activeIcon
+                  : icon,
+
               size: 21,
+
               color: isSelected
-                  ? const Color(0xFF8B6545)
-                  : const Color(0xFF81776E),
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
             ),
 
             const SizedBox(height: 3),
 
             Text(
               label,
+
               style: TextStyle(
                 fontSize: 9,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isSelected
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+
                 color: isSelected
-                    ? const Color(0xFF8B6545)
-                    : const Color(0xFF81776E),
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+class _AiPlannerEntryCard extends StatelessWidget {
+  const _AiPlannerEntryCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+
+      padding: const EdgeInsets.all(15),
+
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+
+          colors: [
+            Color(0xFFFFEBDD),
+            Color(0xFFFFF5EF),
+          ],
+        ),
+
+        borderRadius:
+        BorderRadius.circular(22),
+
+        border: Border.all(
+          color: AppColors.primary
+              .withValues(alpha: 0.10),
+        ),
+      ),
+
+      child: Row(
+        children: [
+          Container(
+            width: 45,
+            height: 45,
+
+            decoration: BoxDecoration(
+              color: AppColors.primary
+                  .withValues(alpha: 0.10),
+
+              borderRadius:
+              BorderRadius.circular(15),
+            ),
+
+            child: const Icon(
+              Icons.auto_awesome_rounded,
+
+              color: AppColors.primary,
+
+              size: 23,
+            ),
+          ),
+
+          const SizedBox(width: 11),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.end,
+
+              children: [
+                Text(
+                  'خطط لي يومي بالذكاء الاصطناعي',
+
+                  textAlign:
+                  TextAlign.right,
+
+                  maxLines: 1,
+
+                  overflow:
+                  TextOverflow.ellipsis,
+
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight:
+                    FontWeight.bold,
+                    color:
+                    AppColors.textPrimary,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                const Text(
+                  'تجربة مميزة تناسب مزاجك، وقتك ومكانك.',
+
+                  textAlign:
+                  TextAlign.right,
+
+                  maxLines: 2,
+
+                  overflow:
+                  TextOverflow.ellipsis,
+
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    height: 1.35,
+                    color:
+                    AppColors.textSecondary,
+                  ),
+                ),
+
+                const SizedBox(height: 9),
+
+                Align(
+                  alignment:
+                  AlignmentDirectional
+                      .centerEnd,
+
+                  child: SizedBox(
+                    height: 33,
+
+                    child:
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.aiPlanner,
+                        );
+                      },
+
+                      icon: const Icon(
+                        Icons.arrow_back_rounded,
+                        size: 14,
+                      ),
+
+                      label: const Text(
+                        'ابدأ الآن',
+
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight:
+                          FontWeight.bold,
+                        ),
+                      ),
+
+                      style:
+                      ElevatedButton.styleFrom(
+                        backgroundColor:
+                        AppColors.primary,
+
+                        foregroundColor:
+                        Colors.white,
+
+                        elevation: 0,
+
+                        padding:
+                        const EdgeInsets
+                            .symmetric(
+                          horizontal: 13,
+                        ),
+
+                        shape:
+                        RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius
+                              .circular(11),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 10),
+
+          Container(
+            width: 42,
+            height: 42,
+
+            decoration: BoxDecoration(
+              color: Colors.white
+                  .withValues(alpha: 0.72),
+
+              shape: BoxShape.circle,
+            ),
+
+            child: const Icon(
+              Icons.auto_awesome_rounded,
+
+              color: AppColors.primary,
+
+              size: 21,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class _SearchSkeleton extends StatelessWidget {
+  const _SearchSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        _SearchResultSkeleton(),
+
+        SizedBox(height: 10),
+
+        _SearchResultSkeleton(),
+      ],
+    );
+  }
+}
+
+class _SearchResultSkeleton
+    extends StatelessWidget {
+  const _SearchResultSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+
+        borderRadius:
+        BorderRadius.circular(18),
+
+        border: Border.all(
+          color: AppColors.border,
+        ),
+      ),
+
+      child: const Row(
+        children: [
+          AppSkeleton(
+            width: 70,
+            height: 70,
+            radius: 14,
+          ),
+
+          SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+
+              children: [
+                AppSkeleton(
+                  width: 125,
+                  height: 14,
+                  radius: 6,
+                ),
+
+                SizedBox(height: 9),
+
+                AppSkeleton(
+                  width: 90,
+                  height: 10,
+                  radius: 5,
+                ),
+
+                SizedBox(height: 9),
+
+                AppSkeleton(
+                  width: 65,
+                  height: 22,
+                  radius: 11,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

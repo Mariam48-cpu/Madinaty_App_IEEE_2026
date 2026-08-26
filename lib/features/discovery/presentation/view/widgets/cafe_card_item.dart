@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/store_icon.dart.dart';
 
@@ -6,7 +9,11 @@ class CafeCardItem extends StatelessWidget {
   final CafeEntity cafe;
   final VoidCallback onTap;
 
- const CafeCardItem({super.key, required this.cafe, required this.onTap});
+  const CafeCardItem({
+    super.key,
+    required this.cafe,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,38 +21,49 @@ class CafeCardItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: 260,
-        margin: EdgeInsets.symmetric(horizontal: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 8,
+            ),
+          ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                   child: cafe.photos.isNotEmpty
                       ? Image.network(
-                          cafe.photos.first,
-                          height: 95,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return StoreIcon();
-                          },
-                        )
-                      : StoreIcon(),
+                    cafe.photos.first,
+                    height: 95,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const StoreIcon();
+                    },
+                  )
+                      : const StoreIcon(),
                 ),
-                Positioned(
+                PositionedDirectional(
                   top: 8,
-                  right: 8,
+                  end: 8,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: AppColors.surface.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -53,65 +71,73 @@ class CafeCardItem extends StatelessWidget {
                       children: [
                         Text(
                           cafe.rating.toString(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                         ),
-                        SizedBox(width: 2),
-                        Icon(Icons.star, color: Colors.amber, size: 14),
+                        const SizedBox(width: 2),
+                        const Icon(Icons.star, color: Colors.amber, size: 14),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-
             Expanded(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.bookmark_border,
                           size: 20,
-                          color: Colors.black54,
+                          color: AppColors.textSecondary,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             cafe.name,
-                            textAlign: TextAlign.right,
+                            textAlign: TextAlign.start,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
                       ],
                     ),
-
                     Text(
                       cafe.address,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
-                      style: TextStyle(color: Colors.grey, fontSize: 11),
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                      ),
                     ),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          cafe.isOpen ? 'مفتوح الآن' : 'مغلق',
+                          cafe.isOpen
+                              ? AppLocale.openNow.getString(context)
+                              : AppLocale.closed.getString(context),
                           style: TextStyle(
                             fontSize: 10,
+                            fontWeight: FontWeight.bold,
                             color: cafe.isOpen
                                 ? Colors.green
                                 : Colors.redAccent,

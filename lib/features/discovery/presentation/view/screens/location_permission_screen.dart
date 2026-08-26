@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
+import 'package:toastification/toastification.dart';
 
 class LocationPermissionScreen extends StatefulWidget {
   final LocationService locationService;
@@ -31,8 +35,8 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
     });
 
     try {
-      final serviceEnabled = await widget.locationService
-          .isLocationServiceEnabled();
+      final serviceEnabled =
+      await widget.locationService.isLocationServiceEnabled();
 
       if (!serviceEnabled) {
         await widget.locationService.openLocationSettings();
@@ -79,9 +83,12 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
         isLoading = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء تحديد الموقع')));
+      AppToast.showToast(
+        context: context,
+        title: AppLocale.toastError.getString(context),
+        description: AppLocale.locationError.getString(context),
+        type: ToastificationType.error,
+      );
     }
   }
 
@@ -90,25 +97,35 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('السماح بالموقع', textAlign: TextAlign.right),
+          backgroundColor: AppColors.surface,
+          title: Text(
+            AppLocale.locationPermissionDialogTitle.getString(context),
+            textAlign: TextAlign.start,
+          ),
           content: Text(
-            'تم رفض صلاحية الموقع نهائيًا. يمكنك السماح بها من إعدادات الجهاز.',
-            textAlign: TextAlign.right,
+            AppLocale.locationPermissionDialogContent.getString(context),
+            textAlign: TextAlign.start,
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('إلغاء'),
+              child: Text(
+                AppLocale.cancel.getString(context),
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
                 Navigator.pop(context);
-
                 await widget.locationService.openAppSettings();
               },
-              child: Text('فتح الإعدادات'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.darkButton,
+                foregroundColor: AppColors.onDarkButton,
+              ),
+              child: Text(AppLocale.openSettings.getString(context)),
             ),
           ],
         );
@@ -125,117 +142,107 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFDF8F5),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
             child: Column(
               children: [
                 Align(
-                  alignment: Alignment.topRight,
+                  alignment: AlignmentDirectional.topEnd,
                   child: IconButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close, color: AppColors.textPrimary),
                   ),
                 ),
-
-                SizedBox(height: 15),
-
+                const SizedBox(height: 15),
                 Container(
                   width: 180,
                   height: 180,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Color(0xFFEBD8CC), width: 2),
+                    color: AppColors.surface,
+                    border: Border.all(color: AppColors.border, width: 2),
                   ),
                   child: Image.asset('assets/images/location image.png'),
                 ),
-
-                SizedBox(height: 40),
-
+                const SizedBox(height: 40),
                 Text(
-                  'خلي مدينتي أقرب ليك',
+                  AppLocale.locationPermissionTitle.getString(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF24150F),
+                    color: AppColors.textDark,
                   ),
                 ),
-
-                SizedBox(height: 10),
-
+                const SizedBox(height: 10),
                 Text(
-                  'استخدم موقعك عشان نساعدك تلاقي\nأماكن قريبة منك.',
+                  AppLocale.locationPermissionDescription.getString(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.grey,
+                    color: AppColors.textSecondary,
                     height: 1.6,
                   ),
                 ),
-
-                SizedBox(height: 35),
-
+                const SizedBox(height: 35),
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
                     onPressed: isLoading ? null : requestLocation,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF170D09),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.darkButton,
+                      foregroundColor: AppColors.onDarkButton,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                     child: isLoading
-                        ? SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
+                        ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.textWhite,
+                      ),
+                    )
                         : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'السماح بالموقع',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Icon(Icons.navigation, size: 18),
-                            ],
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppLocale.allowLocation.getString(context),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.navigation, size: 18),
+                      ],
+                    ),
                   ),
                 ),
-
-                SizedBox(height: 10),
-
+                const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: OutlinedButton(
                     onPressed: widget.onChooseManually,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Color(0xFF9B6F58),
-                      side: BorderSide(color: Color(0xFFD7B8A4)),
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.border),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                     child: Text(
-                      'اختيار المنطقة يدوياً',
-                      style: TextStyle(fontSize: 14),
+                      AppLocale.chooseLocationManually.getString(context),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class SeatingFilterChip extends StatelessWidget {
   final String title;
@@ -18,19 +19,19 @@ class SeatingFilterChip extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? Color(0xFF6E4027) : Colors.white,
+          color: selected ? AppColors.primaryDark : AppColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: selected ? Color(0xFF6E4027) : Color(0xFFE1D8D1),
+            color: selected ? AppColors.primaryDark : AppColors.border,
           ),
         ),
         child: Text(
           title,
           style: TextStyle(
             fontSize: 10,
-            color: selected ? Colors.white : Colors.black87,
+            color: selected ? AppColors.textWhite : AppColors.textPrimary,
             fontWeight: selected ? FontWeight.bold : FontWeight.normal,
           ),
         ),

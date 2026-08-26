@@ -1,12 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:get_it/get_it.dart';
-import '../../../../discovery/presentation/view_model/cubit/discovery_cubit.dart';
-import '../../../domain/use_cases/is_onboarding_seen.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import '../../../../../core/di/injection_container.dart';
 import '../../../../auth/presentation/view/screens/auth_screen.dart';
-import 'onboarding_screen.dart';
+import '../../../../discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import '../../../../personalization/presentation/view/screens/personalization_screen.dart';
+import '../../../domain/use_cases/is_onboarding_seen.dart';
+import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +22,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-
   late Animation<double> _logoAnimation;
   late Animation<double> _textAnimation;
 
@@ -60,7 +63,6 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         MaterialPageRoute(builder: (_) => const OnboardingScreen()),
       );
-
       return;
     }
 
@@ -71,7 +73,11 @@ class _SplashScreenState extends State<SplashScreen>
     if (currentUser != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) =>  PersonalizationScreen(userLocation: context.read<DiscoveryCubit>().currentLocation,)),
+        MaterialPageRoute(
+          builder: (_) => PersonalizationScreen(
+            userLocation: sl<DiscoveryCubit>().currentLocation,
+          ),
+        ),
       );
     } else {
       Navigator.pushReplacement(
@@ -90,7 +96,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -107,31 +113,27 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
             ),
-
             const SizedBox(height: 28),
-
             FadeTransition(
               opacity: _textAnimation,
               child: Column(
                 children: [
-                  const Text(
-                    'مدينتي',
-                    style: TextStyle(
+                  Text(
+                    AppLocale.appTitle.getString(context),
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF3D2B24),
+                      color: AppColors.textPrimary,
                     ),
                   ),
-
                   const SizedBox(height: 4),
-
                   const Text(
                     'MADINATY',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 1.2,
-                      color: Color(0xFF9A6A4F),
+                      color: AppColors.primary,
                     ),
                   ),
                 ],

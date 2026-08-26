@@ -22,7 +22,7 @@ class MenuCategoryChips extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         reverse: true,
         itemCount: categories.length + 1,
-        separatorBuilder: (_, __) => SizedBox(width: 8),
+        separatorBuilder: (_, _) => SizedBox(width: 8),
         itemBuilder: (context, index) {
           final isAll = index == 0;
           final categoryId = isAll ? 'all' : categories[index - 1].id;

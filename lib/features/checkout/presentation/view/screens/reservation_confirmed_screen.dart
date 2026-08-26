@@ -131,7 +131,6 @@ class ReservationConfirmedScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
 
-                // زر عرض التذكرة الرقمية (الأساسي)
                 SizedBox(
                   width: double.infinity,
                   height: 52,

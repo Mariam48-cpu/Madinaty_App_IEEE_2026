@@ -20,8 +20,20 @@ class CafeDto {
     this.isOpen = false,
   });
 
-  factory CafeDto.fromJson(Map<String, dynamic> json) {
+  factory CafeDto.fromJson(
+      Map<String, dynamic> json, {
+        String apiKey = 'AIzaSyAUyp5BGoG23a36VGYfbxyC_Dg7P9jDmY4',
+      }) {
     final location = json['location'] as Map<String, dynamic>?;
+    final photosList = json['photos'] as List? ?? [];
+
+    final parsedPhotos = photosList.map((photo) {
+      final name = photo['name'] as String? ?? '';
+      if (name.isNotEmpty) {
+        return 'https://places.googleapis.com/v1/$name/media?maxHeightPx=600&maxWidthPx=800&key=$apiKey';
+      }
+      return '';
+    }).where((url) => url.isNotEmpty).toList();
 
     return CafeDto(
       id: json['id'] ?? '',
@@ -31,7 +43,7 @@ class CafeDto {
         (location?['longitude'] ?? 0.0).toDouble(),
       ),
       rating: (json['rating'] ?? 0.0).toDouble(),
-      photos: [],
+      photos: parsedPhotos,
       address: json['formattedAddress'] ?? '',
       isOpen: json['currentOpeningHours']?['openNow'] ?? false,
     );

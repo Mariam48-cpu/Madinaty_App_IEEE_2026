@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/cafe_skeletons.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/book_table_screen.dart';
-import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/booking_date_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view_model/cubit/booking_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_bottom_buttons.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_features.dart';
@@ -21,6 +21,7 @@ import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_e
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/entities/favorite_item_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/is_favorite_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
+import 'package:madinaty_app_ieee_2026/features/pre_order/presentation/view/screens/pre_order_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/reviews/presentation/view/screens/reviews_screen.dart';
 
 class CafeDetailsScreen extends StatefulWidget {
@@ -69,9 +70,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
         body: BlocBuilder<CafeCubit, CafeState>(
           builder: (context, state) {
             if (state is CafeLoading) {
-              return Center(
-                child: CircularProgressIndicator(color: Color(0xFF8D6654)),
-              );
+              return CafeDetailsSkeleton();
             }
 
             if (state is CafeError) {
@@ -135,12 +134,14 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                             physics: BouncingScrollPhysics(),
                             child: Column(
                               children: [
-                                CafeImage(
-                                  photos: cafe.photos,
-                                  isFavorite: _isFavorite,
-                                  onFavorite: () => _toggleFavorite(cafe),
-                                  onShare: () {},
-                                  onBack: () => Navigator.pop(context),
+                                SafeArea(
+                                  child: CafeImage(
+                                    photos: cafe.photos,
+                                    isFavorite: _isFavorite,
+                                    onFavorite: () => _toggleFavorite(cafe),
+                                    onShare: () {},
+                                    onBack: () => Navigator.pop(context),
+                                  ),
                                 ),
 
                                 Transform.translate(
@@ -185,9 +186,10 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                       MaterialPageRoute(
                                                         builder: (_) =>
                                                             ReviewsScreen(
-                                                          cafeId: cafe.id,
-                                                          cafeName: cafe.name,
-                                                        ),
+                                                              cafeId: cafe.id,
+                                                              cafeName:
+                                                                  cafe.name,
+                                                            ),
                                                       ),
                                                     );
                                                   },
@@ -273,8 +275,9 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                               ),
                                             );
                                           },
-                                          borderRadius:
-                                              BorderRadius.circular(16),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
                                           child: Container(
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 16,
@@ -316,8 +319,9 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                         fontSize: 15,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF2D2521),
+                                                        color: Color(
+                                                          0xFF2D2521,
+                                                        ),
                                                       ),
                                                     ),
                                                     const SizedBox(height: 2),
@@ -325,8 +329,9 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                       '${cafe.rating.toStringAsFixed(1)} ★  (${cafe.reviewsCount} ${AppLocale.ratingsCountSuffix.getString(context)})',
                                                       style: const TextStyle(
                                                         fontSize: 12,
-                                                        color:
-                                                            Color(0xFF8A5A36),
+                                                        color: Color(
+                                                          0xFF8A5A36,
+                                                        ),
                                                         fontWeight:
                                                             FontWeight.w600,
                                                       ),
@@ -335,14 +340,17 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                 ),
                                                 const SizedBox(width: 12),
                                                 Container(
-                                                  padding:
-                                                      const EdgeInsets.all(8),
+                                                  padding: const EdgeInsets.all(
+                                                    8,
+                                                  ),
                                                   decoration: BoxDecoration(
                                                     color: const Color(
-                                                        0xFFFFF3EB),
+                                                      0xFFFFF3EB,
+                                                    ),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            10),
+                                                          10,
+                                                        ),
                                                   ),
                                                   child: const Icon(
                                                     Icons.rate_review_outlined,
@@ -377,6 +385,18 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                             create: (_) =>
                                 sl<BookingCubit>()..setCafeId(cafe.id),
                             child: BookTableScreen(cafe: cafe),
+                          ),
+                        ),
+                      );
+                    },
+                    onDirectionPreOrder: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider(
+                            create: (_) =>
+                                sl<BookingCubit>()..setCafeId(cafe.id),
+                            child: PreOrderScreen(cafe: cafe),
                           ),
                         ),
                       );

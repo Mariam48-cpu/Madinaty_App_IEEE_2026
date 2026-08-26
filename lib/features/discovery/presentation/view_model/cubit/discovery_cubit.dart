@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:latlong2/latlong.dart';
-
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/repositories/cafe_repository_interface.dart';
@@ -15,7 +15,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   final LocationService locationService;
 
   DiscoveryCubit({required this.repository, required this.locationService})
-    : super(DiscoveryInitial());
+      : super(DiscoveryInitial());
 
   List<CafeEntity> allCafes = [];
   bool isManualLocation = false;
@@ -42,7 +42,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       final position = await locationService.getCurrentLocation();
 
       if (position == null) {
-        emit(DiscoveryError('Unable to get your current location'));
+        emit(DiscoveryError(AppLocale.locationError));
         return;
       }
 
@@ -139,8 +139,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   }
 
   Future<List<CafeEntity>> addRandomPhotosToCafes(
-    List<CafeEntity> cafes,
-  ) async {
+      List<CafeEntity> cafes,
+      ) async {
     final photos = await repository.getRandomCafePhotos();
 
     if (photos.isEmpty) {

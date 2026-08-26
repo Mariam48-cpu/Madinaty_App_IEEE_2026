@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localization/flutter_localization.dart';
-import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+
 
 class CafeBottomButtons extends StatelessWidget {
   final VoidCallback? onDirections;
+  final VoidCallback? onDirectionPreOrder;
+
   final VoidCallback? onCall;
 
-  const CafeBottomButtons({super.key, this.onDirections, this.onCall});
+  const CafeBottomButtons({
+    super.key,
+    this.onDirections,
+    this.onCall,
+    required this.onDirectionPreOrder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,21 +31,22 @@ class CafeBottomButtons extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
+            flex: 1,
             child: SizedBox(
               height: 48,
-              child: OutlinedButton(
-                onPressed: onCall,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF8D6654),
-                  backgroundColor: Colors.white,
-                  side: const BorderSide(color: Color(0xFF8D6654), width: 1.2),
+              child: ElevatedButton(
+                onPressed: onDirectionPreOrder,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF17120F),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
-                  AppLocale.preOrder.getString(context),
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                child: const Text(
+                  ' طلب مسبق ',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

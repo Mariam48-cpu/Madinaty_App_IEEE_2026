@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 import 'cafe_card.dart';
@@ -18,32 +21,38 @@ class CafeResultsSection extends StatelessWidget {
     final displayedCafes = cafes.take(10).toList();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${cafes.length} نتيجة',
-              style: TextStyle(color: Colors.grey, fontSize: 12),
+              '${cafes.length} ${AppLocale.resultsCountSuffix.getString(context)}',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
             ),
-
             Text(
-              query.isEmpty ? 'شائع الآن في منطقتك' : 'نتائج "$query"',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              query.isEmpty
+                  ? AppLocale.popularNowInYourArea.getString(context)
+                  : '${AppLocale.resultsForPrefix.getString(context)} "$query"',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
           ],
         ),
-
-        SizedBox(height: 14),
-
+        const SizedBox(height: 14),
         if (displayedCafes.isEmpty)
           SizedBox(
             height: 80,
             child: Center(
               child: Text(
-                'لم يتم العثور على كافيهات',
-                style: TextStyle(color: Colors.grey),
+                AppLocale.noNearbyCafesFound.getString(context),
+                style: const TextStyle(color: AppColors.textSecondary),
               ),
             ),
           )
@@ -52,7 +61,6 @@ class CafeResultsSection extends StatelessWidget {
             height: 225,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              reverse: true,
               itemCount: displayedCafes.length,
               itemBuilder: (_, index) {
                 return CafeCard(cafe: displayedCafes[index]);

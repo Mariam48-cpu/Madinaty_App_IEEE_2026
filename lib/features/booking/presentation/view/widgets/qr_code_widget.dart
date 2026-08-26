@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../../domain/entities/booking_entity.dart';
 import '../../utils/qr_data_builder.dart';
 
@@ -29,7 +31,7 @@ class QrCodeWidget extends StatelessWidget {
             color: AppColors.background,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.border.withValues(alpha: 0.5),
+              color: AppColors.border.withOpacity(0.5),
               width: 1,
             ),
           ),
@@ -57,7 +59,7 @@ class QrCodeWidget extends StatelessWidget {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                         child: Container(
-                          color: AppColors.surface.withValues(alpha: 0.7),
+                          color: AppColors.surface.withOpacity(0.7),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -68,7 +70,7 @@ class QrCodeWidget extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'في انتظار التأكيد',
+                                AppLocale.waitingForConfirmation.getString(context),
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.textSecondary,
                                   fontWeight: FontWeight.bold,
@@ -87,7 +89,7 @@ class QrCodeWidget extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Text(
-          'اعرض الـ QR Code عند الوصول',
+          AppLocale.showQrOnArrival.getString(context),
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.textSecondary,
           ),

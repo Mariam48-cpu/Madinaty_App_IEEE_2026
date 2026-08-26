@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/booking_entity.dart';
 
 class BookingModel extends BookingEntity {
@@ -13,6 +14,8 @@ class BookingModel extends BookingEntity {
     super.seatingPreference,
     super.status,
     super.createdAt,
+    super.totalAmount,
+    super.reservationFee,
   });
 
   factory BookingModel.fromEntity(BookingEntity entity) {
@@ -27,10 +30,14 @@ class BookingModel extends BookingEntity {
       seatingPreference: entity.seatingPreference,
       status: entity.status,
       createdAt: entity.createdAt,
+      totalAmount: entity.totalAmount,
+      reservationFee: entity.reservationFee,
     );
   }
 
-  factory BookingModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory BookingModel.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc,
+      ) {
     final map = doc.data() ?? {};
     return BookingModel.fromMap(map, doc.id);
   }
@@ -38,27 +45,35 @@ class BookingModel extends BookingEntity {
   factory BookingModel.fromMap(Map<String, dynamic> map, String docId) {
     return BookingModel(
       id: docId,
-      userId: map['userId'] ?? '',
-      cafeId: map['cafeId'] ?? '',
-      date: map['date'] != null
-          ? (map['date'] is Timestamp
-          ? (map['date'] as Timestamp).toDate()
-          : DateTime.tryParse(map['date'].toString()))
-          : null,
-      time: map['time'],
+      userId: map['userId'] as String? ?? '',
+      cafeId: map['cafeId'] as String? ?? '',
+      date: _parseDate(map['date']),
+      time: map['time'] as String?,
       guests: (map['guests'] ?? 1).toInt(),
-      occasion: map['occasion'],
-      seatingPreference: map['seatingPreference'],
+      occasion: map['occasion'] as String?,
+      seatingPreference: map['seatingPreference'] as String?,
       status: BookingStatus.values.firstWhere(
             (e) => e.name == (map['status'] ?? 'pending'),
         orElse: () => BookingStatus.pending,
       ),
-      createdAt: map['createdAt'] != null
-          ? (map['createdAt'] is Timestamp
-          ? (map['createdAt'] as Timestamp).toDate()
-          : DateTime.tryParse(map['createdAt'].toString()))
-          : null,
+      createdAt: _parseDate(map['createdAt']),
+      totalAmount: (map['totalAmount'] ?? 50.0).toDouble(),
+      reservationFee: (map['reservationFee'] ?? 50.0).toDouble(),
     );
+  }
+
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    return DateTime.tryParse(value.toString());
   }
 
   Map<String, dynamic> toMap() {
@@ -72,6 +87,8 @@ class BookingModel extends BookingEntity {
       'seatingPreference': seatingPreference,
       'status': status.name,
       'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
+      'totalAmount': totalAmount,
+      'reservationFee': reservationFee,
     };
   }
 
@@ -86,6 +103,8 @@ class BookingModel extends BookingEntity {
       'seatingPreference': seatingPreference,
       'status': status.name,
       'createdAt': Timestamp.fromDate(createdAt ?? DateTime.now()),
+      'totalAmount': totalAmount,
+      'reservationFee': reservationFee,
     };
   }
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/domain/repositories/auth_repo_interface.dart';
@@ -21,16 +22,16 @@ class ProfileCubit extends Cubit<ProfileState> {
     required this.updateProfileUseCase,
     required this.authRepository,
     required this.createNotificationUseCase,
-  }) : super(ProfileInitial());
+  }) : super( ProfileInitial());
 
   Future<void> fetchUserProfile(String uid) async {
-    emit(ProfileLoading());
+    emit( ProfileLoading());
 
     final result = await getUserProfileUseCase(uid);
 
     result.fold(
-      (failure) => emit(ProfileError(failure.toString())),
-      (user) => emit(ProfileLoaded(user)),
+          (failure) => emit(ProfileError(failure.toString())),
+          (user) => emit(ProfileLoaded(user)),
     );
   }
 
@@ -41,7 +42,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     DateTime? birthDate,
     File? imageFile,
   }) async {
-    emit(ProfileUpdating());
+    emit( ProfileUpdating());
 
     final result = await updateProfileUseCase(
       uid: uid,
@@ -51,27 +52,30 @@ class ProfileCubit extends Cubit<ProfileState> {
       imageFile: imageFile,
     );
 
-    result.fold((failure) => emit(ProfileError(failure.toString())), (_) async {
-      await createNotificationUseCase(
-        uid: uid,
-        title: 'تم تحديث الملف الشخصي',
-        body: 'تم تحديث بيانات ملفك الشخصي بنجاح.',
-        type: 'profile_update',
-      );
+    result.fold(
+          (failure) => emit(ProfileError(failure.toString())),
+          (_) async {
+        await createNotificationUseCase(
+          uid: uid,
+          title: AppLocale.profileUpdatedNotifTitle,
+          body: AppLocale.profileUpdatedNotifBody,
+          type: 'profile_update',
+        );
 
-      emit(ProfileUpdateSuccess());
+        emit( ProfileUpdateSuccess());
 
-      fetchUserProfile(uid);
-    });
+        fetchUserProfile(uid);
+      },
+    );
   }
 
   Future<void> deleteAccount() async {
     try {
-      emit(ProfileDeleting());
+      emit( ProfileDeleting());
 
       await authRepository.deleteAccount();
 
-      emit(ProfileAccountDeleted());
+      emit( ProfileAccountDeleted());
     } catch (e) {
       emit(ProfileError(e.toString().replaceAll('Exception: ', '')));
     }
@@ -81,7 +85,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     try {
       await authRepository.logout();
 
-      emit(ProfileLoggedOut());
+      emit( ProfileLoggedOut());
     } catch (e) {
       emit(ProfileError(e.toString()));
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/cart_skeleton.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/cafe_experience_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
@@ -11,6 +12,7 @@ import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/c
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_menu/menu_category_chips.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_menu/popular_product_menu_card.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_menu/regular_product_menu_card.dart';
+import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view_model/cubit/cafe_state.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/domain/entities/cart_item_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/presentation/view_model/cubit/cart_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/presentation/view_model/cubit/cart_state.dart';
@@ -27,8 +29,8 @@ class CafeMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<CartCubit>()
-        ..initCartWatcher(cafeName: experience.cafe.name),
+      create: (_) =>
+          getIt<CartCubit>()..initCartWatcher(cafeName: experience.cafe.name),
       child: _CafeMenuView(experience: experience),
     );
   }
@@ -83,8 +85,10 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
   int _getProductQuantity(CartState cartState, ProductEntity product) {
     if (cartState is CartLoaded) {
       return cartState.items
-          .where((item) =>
-              item.id == product.id || item.id.startsWith('${product.id}_'))
+          .where(
+            (item) =>
+                item.id == product.id || item.id.startsWith('${product.id}_'),
+          )
           .fold(0, (sum, item) => sum + item.quantity);
     }
     return 0;
@@ -99,12 +103,16 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
       body: SafeArea(
         child: BlocBuilder<CartCubit, CartState>(
           builder: (context, cartState) {
-            final hasCartItems =
-                cartState is CartLoaded && !cartState.isEmpty;
-            final cartItemCount =
-                cartState is CartLoaded ? cartState.totalItemsCount : 0;
-            final cartTotalPrice =
-                cartState is CartLoaded ? cartState.subtotal : 0.0;
+            if (cartState is CafeInitial || cartState is CafeLoading) {
+              return const Center(child: CartSkeleton());
+            }
+            final hasCartItems = cartState is CartLoaded && !cartState.isEmpty;
+            final cartItemCount = cartState is CartLoaded
+                ? cartState.totalItemsCount
+                : 0;
+            final cartTotalPrice = cartState is CartLoaded
+                ? cartState.subtotal
+                : 0.0;
 
             return Stack(
               children: [
@@ -153,8 +161,10 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                             ...popularProducts().map(
                               (product) => PopularProductMenuCard(
                                 product: product,
-                                quantity:
-                                    _getProductQuantity(cartState, product),
+                                quantity: _getProductQuantity(
+                                  cartState,
+                                  product,
+                                ),
                                 onAdd: () {
                                   cartCubit.addToCart(
                                     CartItemEntity(
@@ -170,18 +180,18 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                                 },
                                 onRemove: () {
                                   if (cartState is CartLoaded) {
-                                    final matchingItem =
-                                        cartState.items.firstWhere(
-                                      (i) =>
-                                          i.id == product.id ||
-                                          i.id.startsWith('${product.id}_'),
-                                      orElse: () => CartItemEntity(
-                                        id: product.id,
-                                        title: product.name,
-                                        price: product.price,
-                                        quantity: 1,
-                                      ),
-                                    );
+                                    final matchingItem = cartState.items
+                                        .firstWhere(
+                                          (i) =>
+                                              i.id == product.id ||
+                                              i.id.startsWith('${product.id}_'),
+                                          orElse: () => CartItemEntity(
+                                            id: product.id,
+                                            title: product.name,
+                                            price: product.price,
+                                            quantity: 1,
+                                          ),
+                                        );
                                     cartCubit.decrementQuantity(matchingItem);
                                   }
                                 },
@@ -190,7 +200,9 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          ProductDetailsScreen(product: product),
+                                          ProductDetailsScreen(
+                                            product: product,
+                                          ),
                                     ),
                                   );
                                 },
@@ -218,8 +230,10 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                             ...regularProducts().map(
                               (product) => RegularProductMenuCard(
                                 product: product,
-                                quantity:
-                                    _getProductQuantity(cartState, product),
+                                quantity: _getProductQuantity(
+                                  cartState,
+                                  product,
+                                ),
                                 onAdd: () {
                                   cartCubit.addToCart(
                                     CartItemEntity(
@@ -235,18 +249,18 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                                 },
                                 onRemove: () {
                                   if (cartState is CartLoaded) {
-                                    final matchingItem =
-                                        cartState.items.firstWhere(
-                                      (i) =>
-                                          i.id == product.id ||
-                                          i.id.startsWith('${product.id}_'),
-                                      orElse: () => CartItemEntity(
-                                        id: product.id,
-                                        title: product.name,
-                                        price: product.price,
-                                        quantity: 1,
-                                      ),
-                                    );
+                                    final matchingItem = cartState.items
+                                        .firstWhere(
+                                          (i) =>
+                                              i.id == product.id ||
+                                              i.id.startsWith('${product.id}_'),
+                                          orElse: () => CartItemEntity(
+                                            id: product.id,
+                                            title: product.name,
+                                            price: product.price,
+                                            quantity: 1,
+                                          ),
+                                        );
                                     cartCubit.decrementQuantity(matchingItem);
                                   }
                                 },
@@ -255,7 +269,9 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          ProductDetailsScreen(product: product),
+                                          ProductDetailsScreen(
+                                            product: product,
+                                          ),
                                     ),
                                   );
                                 },

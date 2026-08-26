@@ -1,0 +1,6 @@
+import 'package:flutter/material.dart';
+import 'skeleton_primitives.dart';
+import '../../theme/app_colors.dart';
+
+class NotificationsSkeleton extends StatelessWidget { const NotificationsSkeleton({super.key}); @override Widget build(BuildContext context)=>ListView(padding:const EdgeInsets.fromLTRB(18,14,18,24),physics:const NeverScrollableScrollPhysics(),children:const[SkeletonText(widthFactor:.46,height:24),SizedBox(height:18),NotificationTileSkeleton(),NotificationTileSkeleton(),NotificationTileSkeleton(),NotificationTileSkeleton()]); }
+class NotificationTileSkeleton extends StatelessWidget { const NotificationTileSkeleton({super.key}); @override Widget build(BuildContext context)=>Container(margin:const EdgeInsets.only(bottom:12),padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:AppColors.surface,borderRadius:BorderRadius.circular(18),border:Border.all(color:AppColors.border)),child:const Row(children:[AppSkeleton(width:46,height:46,radius:15),SizedBox(width:12),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[SkeletonText(widthFactor:.65,height:14),SizedBox(height:9),SkeletonText(widthFactor:1,height:10),SizedBox(height:7),SkeletonText(widthFactor:.45,height:9)]))])); }

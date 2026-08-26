@@ -47,12 +47,10 @@ class CartItemCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Item Details (Left side)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title and Price row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -78,7 +76,6 @@ class CartItemCard extends StatelessWidget {
                   ],
                 ),
 
-                // Custom Options Chips
                 if (optionsList.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Wrap(
@@ -109,7 +106,6 @@ class CartItemCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Counter Button Pill
                 Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5EBE6),
@@ -151,7 +147,6 @@ class CartItemCard extends StatelessWidget {
 
           const SizedBox(width: 14),
 
-          // Image Thumbnail (Right side)
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: item.imageUrl != null && item.imageUrl!.isNotEmpty

@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/location_permission_gate.dart';
 import 'package:toastification/toastification.dart';
-
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
 import '../../../domain/use_cases/google_signin_usecase.dart';
@@ -118,13 +117,11 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
           AppToast.showToast(
             context: context,
             title: AppLocale.toastSuccess.getString(context),
-            description: '${AppLocale.welcomeUserPrefix.getString(context)} $userName',
+            description:
+                '${AppLocale.welcomeUserPrefix.getString(context)} $userName',
             type: ToastificationType.success,
           );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const LocationPermissionGate()),
-          );
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
       },
       builder: (context, state) {
@@ -163,10 +160,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           ),
                           label: Text(
                             FlutterLocalization
-                                .instance
-                                .currentLocale
-                                ?.languageCode ==
-                                'ar'
+                                        .instance
+                                        .currentLocale
+                                        ?.languageCode ==
+                                    'ar'
                                 ? 'English'
                                 : 'العربية',
                             style: const TextStyle(
@@ -177,7 +174,8 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           ),
                           onPressed: () {
                             final localization = FlutterLocalization.instance;
-                            if (localization.currentLocale?.languageCode == 'ar') {
+                            if (localization.currentLocale?.languageCode ==
+                                'ar') {
                               localization.translate('en');
                             } else {
                               localization.translate('ar');
@@ -238,7 +236,8 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => setState(() => isLogin = false),
+                                      onTap: () =>
+                                          setState(() => isLogin = false),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 8,
@@ -247,7 +246,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                           color: !isLogin
                                               ? AppColors.textPrimary
                                               : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
                                           AppLocale.register.getString(context),
@@ -264,7 +265,8 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ),
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => setState(() => isLogin = true),
+                                      onTap: () =>
+                                          setState(() => isLogin = true),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 8,
@@ -273,7 +275,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                           color: isLogin
                                               ? AppColors.textPrimary
                                               : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
                                           AppLocale.login.getString(context),
@@ -298,8 +302,11 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 label: AppLocale.name.getString(context),
                                 hint: AppLocale.nameHint.getString(context),
                                 suffixIcon: Icons.person_outline,
-                                validator: (v) => (v == null || v.trim().isEmpty)
-                                    ? AppLocale.enterNameError.getString(context)
+                                validator: (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                    ? AppLocale.enterNameError.getString(
+                                        context,
+                                      )
                                     : null,
                               ),
                               const SizedBox(height: 14),
@@ -323,18 +330,25 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               hint: AppLocale.passwordHint.getString(context),
                               isPassword: true,
                               validator: (v) => (v == null || v.length < 6)
-                                  ? AppLocale.passwordMinLengthError.getString(context)
+                                  ? AppLocale.passwordMinLengthError.getString(
+                                      context,
+                                    )
                                   : null,
                             ),
                             if (!isLogin) ...[
                               const SizedBox(height: 14),
                               CustomTextField(
                                 controller: _confirmPasswordController,
-                                label: AppLocale.confirmPassword.getString(context),
-                                hint: AppLocale.confirmPasswordHint.getString(context),
+                                label: AppLocale.confirmPassword.getString(
+                                  context,
+                                ),
+                                hint: AppLocale.confirmPasswordHint.getString(
+                                  context,
+                                ),
                                 isPassword: true,
                                 validator: (v) => (v == null || v.isEmpty)
-                                    ? AppLocale.confirmPasswordRequiredError.getString(context)
+                                    ? AppLocale.confirmPasswordRequiredError
+                                          .getString(context)
                                     : null,
                               ),
                             ],
@@ -375,7 +389,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               children: [
                                 const Expanded(child: Divider()),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
                                   child: Text(
                                     AppLocale.or.getString(context),
                                     style: const TextStyle(
@@ -392,10 +408,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               onPressed: isLoading
                                   ? null
                                   : () {
-                                context.read<AuthCubit>().processIntent(
-                                  GoogleSignInIntent(),
-                                );
-                              },
+                                      context.read<AuthCubit>().processIntent(
+                                        GoogleSignInIntent(),
+                                      );
+                                    },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 48),
                                 shape: RoundedRectangleBorder(
@@ -412,7 +428,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    AppLocale.continueWithGoogle.getString(context),
+                                    AppLocale.continueWithGoogle.getString(
+                                      context,
+                                    ),
                                     style: const TextStyle(
                                       color: AppColors.textPrimary,
                                       fontSize: 13,
@@ -423,7 +441,8 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                             ),
                             const SizedBox(height: 12),
                             TextButton(
-                              onPressed: () => setState(() => isLogin = !isLogin),
+                              onPressed: () =>
+                                  setState(() => isLogin = !isLogin),
                               child: Text(
                                 isLogin
                                     ? AppLocale.noAccount.getString(context)

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
 abstract class AppColors {
-  // Prevent instantiation
   const AppColors._();
 
-  // --- Primary & Accent Colors ---
   /// Warm Terracotta / Chestnut Brown (Primary brand accent)
   static const Color primary = Color(0xFF8A5A36);
 
@@ -20,14 +18,12 @@ abstract class AppColors {
   /// Text / icon color on top of [primaryContainer]
   static const Color onPrimaryContainer = Color(0xFF52331C);
 
-  // --- Button & Dark Accent Colors ---
   /// Dark charcoal used for primary action buttons & high-contrast chips in Figma
   static const Color darkButton = Color(0xFF1E1E1E);
 
   /// Text color on top of dark button
   static const Color onDarkButton = Color(0xFFFFFFFF);
 
-  // --- Canvas & Surface Colors ---
   /// Main scaffold background color (warm soft off-white / cream)
   static const Color background = Color(0xFFFBF8F5);
 
@@ -40,7 +36,6 @@ abstract class AppColors {
   /// Input background color
   static const Color inputBackground = Color(0xFFFFFFFF);
 
-  // --- Text Colors ---
   /// High emphasis text (titles, headings, primary labels)
   static const Color textPrimary = Color(0xFF1E1E1E);
 
@@ -53,14 +48,12 @@ abstract class AppColors {
   /// Light text for dark backgrounds
   static const Color textWhite = Color(0xFFFFFFFF);
 
-  // --- Borders & Dividers ---
   /// Default border color for inputs, cards, and outlines
   static const Color border = Color(0xFFEADBCE);
 
   /// Subtle divider color
   static const Color divider = Color(0xFFEDE7DF);
 
-  // --- Status & Feedback Colors ---
   /// Success green (e.g. confirmed bookings, active statuses)
   static const Color success = Color(0xFF2E7D32);
   static const Color successContainer = Color(0xFFE8F5E9);
@@ -77,7 +70,6 @@ abstract class AppColors {
   static const Color info = Color(0xFF1976D2);
   static const Color infoContainer = Color(0xFFE3F2FD);
 
-  // --- Navigation & Interactive ---
   /// Bottom nav active item pill fill
   static const Color navActivePill = Color(0xFFEFE4D8);
 
@@ -86,7 +78,10 @@ abstract class AppColors {
 
   /// Chip border color
   static const Color chipBorder = Color(0xFFE8DEC8);
-  static const Color accent = Color(0xFFBF9B7A); // بني فاتح للإبرازات والبطاقات
-  static const Color textBody = Color(0xFF7D7D7D); // رمادي غامق للنصوص الثانوية
+  static const Color accent = Color(0xFFBF9B7A);
+  static const Color star = Color(0xFFE5A23C);
+  static const Color overlay = Color(0x14000000);
+  static const Color skeletonHighlight = Color(0xFFFFFFFF);
+  static const Color textBody = Color(0xFF7D7D7D);
   static const Color textDark = Colors.black87;
 }

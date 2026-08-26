@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
-
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_result_image.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/category_result_location.dart';
@@ -17,19 +19,18 @@ class CategoryResultsCard extends StatelessWidget {
     required this.category,
   });
 
-  String getDescription() {
-    switch (category) {
-      case 'هادئ للمذاكرة':
-        return 'مكان مناسب للمذاكرة والعمل في أجواء هادئة.';
-
-      case 'مفتوح الآن':
-        return 'مفتوح الآن ويمكنك زيارته في الوقت الحالي.';
-
-      case 'قهوة مختصة':
-        return 'مكان مناسب لمحبي القهوة والمشروبات المختصة.';
-
-      default:
-        return 'مكان مناسب للقهوة والجلوس وقضاء وقت ممتع.';
+  String getDescription(BuildContext context) {
+    if (category == AppLocale.study.getString(context) ||
+        category == 'هادئ للمذاكرة') {
+      return AppLocale.studyDescription.getString(context);
+    } else if (category == AppLocale.openNow.getString(context) ||
+        category == 'مفتوح الآن') {
+      return AppLocale.openNowDescription.getString(context);
+    } else if (category == AppLocale.specialtyCoffee.getString(context) ||
+        category == 'قهوة مختصة') {
+      return AppLocale.specialtyCoffeeDescription.getString(context);
+    } else {
+      return AppLocale.defaultCafeDescription.getString(context);
     }
   }
 
@@ -37,37 +38,41 @@ class CategoryResultsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 3)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
         ],
       ),
       child: Column(
         children: [
           CategoryResultImage(cafe: cafe),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  cafe.name.isNotEmpty ? cafe.name : 'كافيه',
+                  cafe.name.isNotEmpty
+                      ? cafe.name
+                      : AppLocale.defaultCafeName.getString(context),
                   textAlign: TextAlign.right,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D2521),
+                    color: AppColors.textPrimary,
                   ),
                 ),
-
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 CategoryResultLocation(cafe: cafe, userLocation: userLocation),
-
-                SizedBox(height: 9),
+                const SizedBox(height: 9),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -78,52 +83,55 @@ class CategoryResultsCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: cafe.isOpen
-                            ? Color(0xFFFFE5C9)
-                            : Color(0xFFEAEAEA),
+                            ? AppColors.surfaceVariant
+                            : AppColors.border,
                         borderRadius: BorderRadius.circular(7),
                       ),
                       child: Text(
-                        cafe.isOpen ? 'مفتوح الآن' : 'مغلق الآن',
+                        cafe.isOpen
+                            ? AppLocale.openNow.getString(context)
+                            : AppLocale.closedNow.getString(context),
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                           color: cafe.isOpen
-                              ? Color(0xFF9A5A20)
-                              : Colors.grey.shade700,
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
                         ),
                       ),
                     ),
                   ],
                 ),
-
-                SizedBox(height: 9),
+                const SizedBox(height: 9),
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 9,
+                  ),
                   decoration: BoxDecoration(
-                    color: Color(0xFFFFF8F4),
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.lightbulb_outline,
                         size: 18,
-                        color: Color(0xFFB47C54),
+                        color: AppColors.primary,
                       ),
-
-                      SizedBox(width: 7),
-
+                      const SizedBox(width: 7),
                       Expanded(
                         child: Text(
-                          getDescription(),
+                          getDescription(context),
                           textAlign: TextAlign.right,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 9,
                             height: 1.5,
-                            color: Color(0xFF6D5B51),
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),

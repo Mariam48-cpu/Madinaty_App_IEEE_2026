@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 class CafeCard extends StatelessWidget {
@@ -10,12 +11,17 @@ class CafeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 235,
-      margin: EdgeInsets.only(left: 10),
+      margin: const EdgeInsetsDirectional.only(end: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border, width: 1),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -24,53 +30,56 @@ class CafeCard extends StatelessWidget {
           buildImage(),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.bookmark_border, size: 19, color: Colors.grey),
-
-                      SizedBox(width: 6),
-
+                      const Icon(
+                        Icons.bookmark_border,
+                        size: 19,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           cafe.name,
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
                     ],
                   ),
-
                   Text(
                     cafe.address,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey, fontSize: 10),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 10,
+                    ),
                   ),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
                         '${cafe.rating}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 11,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-
-                      SizedBox(width: 3),
-
-                      Icon(Icons.star, color: Colors.amber, size: 14),
+                      const SizedBox(width: 3),
+                      const Icon(Icons.star, color: Colors.amber, size: 14),
                     ],
                   ),
                 ],
@@ -87,12 +96,12 @@ class CafeCard extends StatelessWidget {
       return Container(
         height: 125,
         width: double.infinity,
-        color: Color(0xFFE8E0DC),
-        child: Icon(Icons.local_cafe, size: 50, color: Color(0xFF8D6654)),
+        color: AppColors.surfaceVariant,
+        child: const Icon(Icons.local_cafe, size: 50, color: AppColors.primary),
       );
     }
     return ClipRRect(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
       child: Image.network(
         cafe.photos.first,
         height: 125,
@@ -102,8 +111,12 @@ class CafeCard extends StatelessWidget {
           return Container(
             height: 125,
             width: double.infinity,
-            color: Color(0xFFE8E0DC),
-            child: Icon(Icons.local_cafe, size: 50, color: Color(0xFF8D6654)),
+            color: AppColors.surfaceVariant,
+            child: const Icon(
+              Icons.local_cafe,
+              size: 50,
+              color: AppColors.primary,
+            ),
           );
         },
       ),

@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
@@ -30,6 +29,9 @@ import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view/widge
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view_model/checkout_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view_model/checkout_state.dart';
 import 'package:toastification/toastification.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/features/notifications/domain/use_cases/create_notification_use_case.dart';
+
 
 class CheckoutScreen extends StatelessWidget {
   final BookingEntity booking;
@@ -51,14 +53,15 @@ class CheckoutScreen extends StatelessWidget {
             confirmBookingUseCase: ConfirmBookingUseCase(repo),
             getPaymobUrlUseCase: GetPaymobUrlUseCase(repo),
             getPaymobWalletUrlUseCase: GetPaymobWalletUrlUseCase(repo),
-            createPreOrderUseCase: getIt<CreatePreOrderUseCase>(),
-            clearCartUseCase: getIt<ClearCartUseCase>(),
+            createPreOrderUseCase: sl<CreatePreOrderUseCase>(),
+            clearCartUseCase: sl<ClearCartUseCase>(),
+            createNotificationUseCase: sl<CreateNotificationUseCase>(),
             initialBooking: booking,
           ),
         ),
         BlocProvider(
           create: (context) =>
-              getIt<CartCubit>()..initCartWatcher(cafeName: booking.cafeId),
+              sl<CartCubit>()..initCartWatcher(cafeName: booking.cafeId),
         ),
       ],
       child: const _CheckoutView(),
@@ -117,7 +120,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
         ),
       ),
       body: BlocConsumer<CheckoutCubit, CheckoutState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is CheckoutErrorState) {
             AppToast.showToast(
               context: context,
@@ -128,20 +131,26 @@ class _CheckoutViewState extends State<_CheckoutView> {
           }
 
           if (state is CheckoutPaymobReadyState) {
-            Navigator.push(
+            final isSuccess = await Navigator.push<bool>(
               context,
               MaterialPageRoute(
                 builder: (_) => PaymobWebViewScreen(
                   paymentUrl: state.paymentUrl,
                   booking: state.booking,
-                  onPaymentSuccess: (confirmedBooking) {
-                    context.read<CheckoutCubit>().finalizePaymobSuccess(
-                      confirmedBooking,
-                    );
-                  },
                 ),
               ),
             );
+
+            if (isSuccess == true && context.mounted) {
+              context.read<CheckoutCubit>().finalizePaymobSuccess(state.booking);
+            } else if (isSuccess == false && context.mounted) {
+              AppToast.showToast(
+                context: context,
+                title: 'فشلت عملية الدفع',
+                description: 'يرجى المحاولة مرة أخرى أو اختيار طريقة دفع أخرى',
+                type: ToastificationType.error,
+              );
+            }
           }
 
           if (state is CheckoutSuccessState) {

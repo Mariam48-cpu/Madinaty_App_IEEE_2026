@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 void showCafeDetailsBottomSheet({
@@ -24,9 +26,9 @@ class CafeDetailsBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
@@ -39,28 +41,28 @@ class CafeDetailsBottomSheet extends StatelessWidget {
                 width: 45,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.border,
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
-
-            SizedBox(height: 20),
-
+            const SizedBox(height: 20),
             Row(
               children: [
                 Container(
                   width: 55,
                   height: 55,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
+                  decoration: const BoxDecoration(
+                    color: AppColors.darkButton,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.coffee, color: Colors.white, size: 28),
+                  child: const Icon(
+                    Icons.coffee,
+                    color: AppColors.onDarkButton,
+                    size: 28,
+                  ),
                 ),
-
-                SizedBox(width: 14),
-
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -68,39 +70,39 @@ class CafeDetailsBottomSheet extends StatelessWidget {
                       Text(
                         cafe.name,
                         textAlign: TextAlign.right,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-
-                      SizedBox(height: 5),
-
+                      const SizedBox(height: 5),
                       Text(
                         cafe.address,
                         textAlign: TextAlign.right,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: AppColors.textSecondary),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-
-            SizedBox(height: 20),
-
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star, size: 18),
-                    SizedBox(width: 5),
+                    const Icon(Icons.star, size: 18, color: Colors.amber),
+                    const SizedBox(width: 5),
                     Text(
-                      cafe.rating > 0 ? cafe.rating.toString() : 'No rating',
+                      cafe.rating > 0
+                          ? cafe.rating.toString()
+                          : AppLocale.noRatingText.getString(context),
+                      style: const TextStyle(color: AppColors.textPrimary),
                     ),
                   ],
                 ),
@@ -110,23 +112,40 @@ class CafeDetailsBottomSheet extends StatelessWidget {
                     Icon(
                       cafe.isOpen ? Icons.check_circle : Icons.cancel,
                       size: 18,
+                      color: cafe.isOpen ? Colors.green : Colors.redAccent,
                     ),
-                    SizedBox(width: 5),
-                    Text(cafe.isOpen ? 'Open' : 'Closed'),
+                    const SizedBox(width: 5),
+                    Text(
+                      cafe.isOpen
+                          ? AppLocale.openNow.getString(context)
+                          : AppLocale.closed.getString(context),
+                      style: TextStyle(
+                        color: cafe.isOpen ? Colors.green : Colors.redAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
-
-            SizedBox(height: 20),
-
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.darkButton,
+                  foregroundColor: AppColors.onDarkButton,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Close'),
+                child: Text(
+                  AppLocale.close.getString(context),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],

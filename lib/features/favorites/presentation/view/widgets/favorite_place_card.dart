@@ -38,16 +38,12 @@ class FavoritePlaceCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // --- Image Header ---
               _buildImageSection(context),
-
-              // --- Content Body ---
               Padding(
                 padding: const EdgeInsets.all(14.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title & Optional Distance Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +72,6 @@ class FavoritePlaceCard extends StatelessWidget {
                       ],
                     ),
 
-                    // Address / Location
                     if (item.address != null && item.address!.isNotEmpty) ...[
                       const SizedBox(height: 5),
                       Row(
@@ -101,8 +96,6 @@ class FavoritePlaceCard extends StatelessWidget {
                         ],
                       ),
                     ],
-
-                    // Tag Description Pill
                     if (item.tagText != null && item.tagText!.isNotEmpty) ...[
                       const SizedBox(height: 10),
                       Container(
@@ -167,8 +160,6 @@ class FavoritePlaceCard extends StatelessWidget {
                 )
               : _buildPlaceholder(),
         ),
-
-        // Favorite Heart Button (Top Corner)
         Positioned(
           top: 12,
           right: 12,
@@ -191,8 +182,6 @@ class FavoritePlaceCard extends StatelessWidget {
             ),
           ),
         ),
-
-        // Rating Badge (Bottom Corner of Image)
         if (item.rating != null && item.rating! > 0)
           Positioned(
             bottom: 12,

@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class BookingSummaryCard extends StatelessWidget {
   final String table;
   final String? time;
   final int guests;
+  final String? seatingAreaName;
 
   const BookingSummaryCard({
     super.key,
     required this.table,
     required this.time,
     required this.guests,
+    this.seatingAreaName,
   });
 
   @override
   Widget build(BuildContext context) {
+    final String resolvedSeating =
+        seatingAreaName ?? AppLocale.filterNileView.getString(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -21,27 +29,41 @@ class BookingSummaryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'تم تحديد',
-              style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+              AppLocale.selectedStatusLabel.getString(context),
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppColors.textSecondary,
+              ),
             ),
-             SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
-              'طاولة $table',
-              style:  TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              '${AppLocale.tablePrefix.getString(context)} $table',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
           ],
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-             Text(
-              'إطلالة النيل',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-            ),
-             SizedBox(height: 4),
             Text(
-              '$guests أشخاص • ${time ?? '--'}',
-              style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+              resolvedSeating,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$guests ${AppLocale.guestsCountText.getString(context)} • ${time ?? '--'}',
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),

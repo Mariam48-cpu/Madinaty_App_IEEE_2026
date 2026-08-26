@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class StoreIcon extends StatelessWidget {
   const StoreIcon({super.key});
@@ -8,8 +9,12 @@ class StoreIcon extends StatelessWidget {
     return Container(
       height: 95,
       width: double.infinity,
-      color: Colors.brown.shade100,
-      child: Icon(Icons.storefront, size: 45, color: Colors.brown),
+      color: AppColors.surfaceVariant,
+      child: const Icon(
+        Icons.storefront,
+        size: 45,
+        color: AppColors.primary,
+      ),
     );
   }
 }

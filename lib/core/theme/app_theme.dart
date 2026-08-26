@@ -3,7 +3,6 @@ import 'app_colors.dart';
 import 'app_typography.dart';
 
 abstract class AppTheme {
-  // Prevent instantiation
   const AppTheme._();
 
   /// Primary Light [ThemeData] configured for the application.
@@ -33,11 +32,9 @@ abstract class AppTheme {
       canvasColor: AppColors.background,
       dividerColor: AppColors.divider,
 
-      // --- Typography ---
       textTheme: AppTypography.textTheme,
       primaryTextTheme: AppTypography.textTheme,
 
-      // --- App Bar Theme ---
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
@@ -49,7 +46,6 @@ abstract class AppTheme {
         titleTextStyle: AppTypography.titleLarge,
       ),
 
-      // --- Button Themes ---
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkButton,
@@ -104,7 +100,6 @@ abstract class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
-      // --- Card Theme ---
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -116,7 +111,6 @@ abstract class AppTheme {
         ),
       ),
 
-      // --- Input Decoration (TextField / Form Fields) ---
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.inputBackground,
@@ -155,7 +149,6 @@ abstract class AppTheme {
         ),
       ),
 
-      // --- Chips Theme ---
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.chipBackground,
         disabledColor: AppColors.surfaceVariant,
@@ -178,7 +171,6 @@ abstract class AppTheme {
         showCheckmark: false,
       ),
 
-      // --- Bottom Navigation Bar Theme ---
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.primary,
@@ -202,7 +194,6 @@ abstract class AppTheme {
         elevation: 8,
       ),
 
-      // --- Material 3 Navigation Bar Theme ---
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
         indicatorColor: AppColors.navActivePill,
@@ -224,7 +215,6 @@ abstract class AppTheme {
         }),
       ),
 
-      // --- Tab Bar Theme ---
       tabBarTheme: TabBarThemeData(
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
@@ -240,14 +230,12 @@ abstract class AppTheme {
         dividerColor: Colors.transparent,
       ),
 
-      // --- Divider Theme ---
       dividerTheme: const DividerThemeData(
         color: AppColors.divider,
         thickness: 1,
         space: 1,
       ),
 
-      // --- Dialog & BottomSheet Themes ---
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surface,
         elevation: 6,
@@ -266,7 +254,6 @@ abstract class AppTheme {
         clipBehavior: Clip.antiAlias,
       ),
 
-      // --- Checkbox / Radio / Switch Themes ---
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {

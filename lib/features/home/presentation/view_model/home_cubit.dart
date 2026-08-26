@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:injectable/injectable.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import '../../../personalization/domain/use_cases/get_user_preferences_usecase.dart';
 import '../../domain/entities/cafe_recommendation_entity.dart';
@@ -25,20 +28,63 @@ class HomeCubit extends Cubit<HomeState> {
     required this.searchCafesUseCase,
     @factoryParam required this.currentUserId,
   }) : super(const HomeInitial());
-  Future<void> fetchHomeData({String? categoryFilter}) async {
+
+  Future<void> fetchHomeData({
+    String? categoryFilter,
+    LatLng? userLocation,
+  }) async {
+    if (isClosed) return;
+
     emit(const HomeLoading());
 
     try {
       final preferences = await getUserPreferencesUseCase(currentUserId);
 
+      if (isClosed) return;
+
       final interests =
-          preferences?.interests ?? ['قهوة مختصة', 'أماكن للمذاكرة'];
+          preferences?.interests ??
+              [AppLocale.specialtyCoffee, AppLocale.studyPlaces];
 
       final mood = preferences?.selectedMood;
-
       final occasion = preferences?.selectedOccasion;
 
-      const location = 'مدينتي، القاهرة';
+      String location = '';
+
+      if (userLocation != null) {
+        try {
+          final placemarks = await placemarkFromCoordinates(
+            userLocation.latitude,
+            userLocation.longitude,
+          );
+
+          if (isClosed) return;
+
+          if (placemarks.isNotEmpty) {
+            final place = placemarks.first;
+
+            final possibleNames = <String?>[
+              place.subLocality,
+              place.locality,
+              place.subAdministrativeArea,
+              place.administrativeArea,
+            ];
+
+            for (final value in possibleNames) {
+              if (value != null && value.trim().isNotEmpty) {
+                location = value.trim();
+                break;
+              }
+            }
+          }
+        } catch (_) {
+          location = '';
+        }
+      }
+
+      if (location.isEmpty) {
+        location = 'current location';
+      }
 
       final cafes = await getRecommendationsUseCase(
         interests: interests,
@@ -47,14 +93,18 @@ class HomeCubit extends Cubit<HomeState> {
         location: location,
       );
 
+      if (isClosed) return;
+
       if (cafes.isEmpty) {
         emit(const HomeEmpty());
         return;
       }
 
-      final selectedCategory = categoryFilter ?? 'الكل';
+      final selectedCategory = categoryFilter ?? AppLocale.all;
 
       final filtered = _filterCafes(cafes, selectedCategory);
+
+      if (isClosed) return;
 
       emit(
         HomeLoaded(
@@ -66,17 +116,20 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
+
       emit(HomeError(e.toString().replaceAll('Exception: ', '')));
     }
   }
 
   List<CafeRecommendationEntity> _filterCafes(
-    List<CafeRecommendationEntity> cafes,
-    String category,
-  ) {
-    if (category == 'الكل') {
+      List<CafeRecommendationEntity> cafes,
+      String category,
+      ) {
+    if (category == AppLocale.all || category == 'الكل' || category == 'All') {
       return cafes;
     }
+
     String normalize(String value) {
       return value.trim().toLowerCase();
     }
@@ -100,16 +153,18 @@ class HomeCubit extends Cubit<HomeState> {
     }
 
     return cafes.where((cafe) {
-      if (category == 'للعمل') {
+      if (category == AppLocale.forWork ||
+          category == 'للعمل' ||
+          category == 'Work / Study') {
         return containsAny(cafe.interests, [
-              'للعمل',
-              'أماكن للمذاكرة',
-              'مذاكرة',
-              'study',
-              'work',
-              'workspace',
-              'working',
-            ]) ||
+          'للعمل',
+          'أماكن للمذاكرة',
+          'مذاكرة',
+          'study',
+          'work',
+          'workspace',
+          'working',
+        ]) ||
             containsAny(cafe.moods, [
               'جلسة هادئة',
               'هادئ',
@@ -122,13 +177,16 @@ class HomeCubit extends Cubit<HomeState> {
             ]) ||
             containsAny(cafe.occasions, ['للعمل', 'work', 'study']);
       }
-      if (category == 'قهوة') {
+
+      if (category == AppLocale.coffeeCategoryTag ||
+          category == 'قهوة' ||
+          category == 'Coffee') {
         return containsAny(cafe.interests, [
-              'قهوة',
-              'قهوة مختصة',
-              'coffee',
-              'specialty coffee',
-            ]) ||
+          'قهوة',
+          'قهوة مختصة',
+          'coffee',
+          'specialty coffee',
+        ]) ||
             containsAny(cafe.moods, ['قهوة', 'coffee']);
       }
 
@@ -137,6 +195,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void filterByCategory(String category) {
+    if (isClosed) return;
+
     final currentState = state;
 
     if (currentState is! HomeLoaded) {
@@ -149,6 +209,8 @@ class HomeCubit extends Cubit<HomeState> {
 
     filtered.shuffle();
 
+    if (isClosed) return;
+
     emit(
       currentState.copyWith(
         filteredCafes: filtered,
@@ -158,6 +220,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void searchCafes(String query) {
+    if (isClosed) return;
+
     final searchQuery = query.trim();
 
     _searchDebounce?.cancel();
@@ -167,17 +231,20 @@ class HomeCubit extends Cubit<HomeState> {
       return;
     }
 
-    // Don't search with less than 4 characters
     if (searchQuery.length < 4) {
       return;
     }
 
     _searchDebounce = Timer(const Duration(milliseconds: 800), () async {
+      if (isClosed) return;
+
       await _performSearch(searchQuery);
     });
   }
 
   Future<void> _performSearch(String query) async {
+    if (isClosed) return;
+
     final currentState = state;
 
     if (currentState is! HomeLoaded) {
@@ -196,6 +263,8 @@ class HomeCubit extends Cubit<HomeState> {
     try {
       final results = await searchCafesUseCase(query);
 
+      if (isClosed) return;
+
       final latestState = state;
 
       if (latestState is! HomeLoaded) {
@@ -211,6 +280,8 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     } catch (e) {
+      if (isClosed) return;
+
       final latestState = state;
 
       if (latestState is! HomeLoaded) {
@@ -220,12 +291,12 @@ class HomeCubit extends Cubit<HomeState> {
       String message = e.toString();
 
       if (message.contains('429')) {
-        message =
-            'تم الوصول للحد اليومي للبحث. '
-            'جرب مرة أخرى لاحقًا.';
+        message = AppLocale.searchRateLimitExceeded;
       } else {
         message = message.replaceAll('Exception: ', '');
       }
+
+      if (isClosed) return;
 
       emit(
         latestState.copyWith(
@@ -239,11 +310,15 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void clearSearch() {
+    if (isClosed) return;
+
     _searchDebounce?.cancel();
     _clearSearch();
   }
 
   void _clearSearch() {
+    if (isClosed) return;
+
     final currentState = state;
 
     if (currentState is HomeLoaded) {
@@ -261,6 +336,7 @@ class HomeCubit extends Cubit<HomeState> {
   @override
   Future<void> close() {
     _searchDebounce?.cancel();
+
     return super.close();
   }
 }

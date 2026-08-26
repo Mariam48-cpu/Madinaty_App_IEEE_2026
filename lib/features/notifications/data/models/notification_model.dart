@@ -8,14 +8,12 @@ class NotificationModel extends NotificationEntity {
     required super.title,
     required super.body,
     required super.type,
+    super.bookingId,
     required super.createdAt,
     required super.isRead,
   });
 
-  factory NotificationModel.fromMap(
-    Map<String, dynamic> map,
-    String id,
-  ) {
+  factory NotificationModel.fromMap(Map<String, dynamic> map, String id) {
     final timestamp = map['createdAt'];
 
     DateTime createdAt;
@@ -33,6 +31,7 @@ class NotificationModel extends NotificationEntity {
       title: map['title'] as String? ?? '',
       body: map['body'] as String? ?? '',
       type: map['type'] as String? ?? '',
+      bookingId: map['bookingId'] as String?,
       createdAt: createdAt,
       isRead: map['isRead'] as bool? ?? false,
     );
@@ -43,6 +42,7 @@ class NotificationModel extends NotificationEntity {
       'title': title,
       'body': body,
       'type': type,
+      'bookingId': bookingId,
       'createdAt': Timestamp.fromDate(createdAt),
       'isRead': isRead,
     };

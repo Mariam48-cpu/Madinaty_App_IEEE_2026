@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/search/recent_search_item.dart';
 
 class RecentSearchesSection extends StatelessWidget {
@@ -18,45 +21,46 @@ class RecentSearchesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (searches.isEmpty) {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Text(
+              AppLocale.recentSearches.getString(context),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
             GestureDetector(
               onTap: onClearAll,
               child: Text(
-                'مسح',
-                style: TextStyle(color: Color(0xFF8D6654), fontSize: 12),
+                AppLocale.clear.getString(context),
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-
-            Text(
-              'عمليات البحث الأخيرة',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-
-        SizedBox(height: 12),
-
+        const SizedBox(height: 12),
         Wrap(
-          alignment: WrapAlignment.end,
+          alignment: WrapAlignment.start,
           spacing: 8,
           runSpacing: 8,
           children: searches.map((search) {
             return RecentSearchItem(
               search: search,
-              onSelected: () {
-                onSearchSelected(search);
-              },
-              onRemoved: () {
-                onSearchRemoved(search);
-              },
+              onSelected: () => onSearchSelected(search),
+              onRemoved: () => onSearchRemoved(search),
             );
           }).toList(),
         ),

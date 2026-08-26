@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/widgets/Icon_Button.dart';
 
 class DiscoveryTopOverlay extends StatefulWidget {
@@ -40,7 +43,7 @@ class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
 
   void onSearchChanged(String query) {
     debounce?.cancel();
-    debounce = Timer(Duration(milliseconds: 500), () {
+    debounce = Timer(const Duration(milliseconds: 500), () {
       widget.onSearch(query);
     });
   }
@@ -63,27 +66,28 @@ class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButtonWidget(
-                icon: Icons.arrow_forward_ios,
-                onTap: widget.onBack,
-              ),
-
+              SizedBox.shrink(),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                  border: Border.all(color: AppColors.border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.location_on_outlined,
                       size: 16,
-                      color: Colors.black54,
+                      color: AppColors.textSecondary,
                     ),
-                    SizedBox(width: 4),
-
+                    const SizedBox(width: 4),
                     if (widget.userLocation != null)
                       FutureBuilder<String>(
                         future: widget.getLocationName(
@@ -94,83 +98,105 @@ class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return Text(
-                              'جاري التحديد..',
-                              style: TextStyle(
+                              AppLocale.determiningLocation.getString(context),
+                              style: const TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey,
+                                color: AppColors.textSecondary,
                               ),
                             );
                           }
 
                           return Text(
-                            snapshot.data ?? 'موقعي الحالي',
-                            style: TextStyle(
+                            snapshot.data ??
+                                AppLocale.myCurrentLocation.getString(context),
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
                             ),
                           );
                         },
                       )
                     else
                       Text(
-                        'موقعي الحالي',
-                        style: TextStyle(
+                        AppLocale.myCurrentLocation.getString(context),
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                   ],
                 ),
               ),
-
               IconButtonWidget(
                 icon: Icons.notifications_none_outlined,
                 onTap: widget.onNotificationTap,
               ),
             ],
           ),
-
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           TextField(
             controller: searchController,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             onChanged: onSearchChanged,
             decoration: InputDecoration(
-              hintText: 'ابحث عن كافيه، منطقة',
-              hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+              hintText: AppLocale.discoverySearchHint.getString(context),
+              hintStyle: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
               border: InputBorder.none,
-              prefixIcon: Icon(Icons.search, color: Colors.grey),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: AppColors.textSecondary,
+              ),
               suffixIcon: GestureDetector(
                 onTap: widget.onFilterTap,
-                child: Icon(Icons.tune, color: Colors.grey),
+                child: const Icon(
+                  Icons.tune,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           ),
-
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           SizedBox(
             height: 36,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: widget.filters.length,
-              separatorBuilder: (_, __) => SizedBox(width: 8),
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final isSelected = widget.selectedChipIndex == index;
                 return GestureDetector(
                   onTap: () => widget.onChipSelected(index),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? Color(0xFF5D4037) : Colors.white,
+                      color: isSelected ? AppColors.primary : AppColors.surface,
                       borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.border,
+                      ),
                       boxShadow: [
-                        BoxShadow(color: Colors.black12, blurRadius: 2),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 2,
+                        ),
                       ],
                     ),
                     child: Text(
                       widget.filters[index],
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textPrimary,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
