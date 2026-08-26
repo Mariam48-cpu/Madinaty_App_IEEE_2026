@@ -129,10 +129,7 @@ class _DiscoveryTopOverlayState extends State<DiscoveryTopOverlay> {
                   ],
                 ),
               ),
-              IconButtonWidget(
-                icon: Icons.notifications_none_outlined,
-                onTap: widget.onNotificationTap,
-              ),
+              SizedBox.shrink()
             ],
           ),
           const SizedBox(height: 12),

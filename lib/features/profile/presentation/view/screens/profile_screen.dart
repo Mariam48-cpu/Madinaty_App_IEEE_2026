@@ -20,19 +20,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final FlutterLocalization _localization = FlutterLocalization.instance;
-
   @override
   void initState() {
     super.initState();
     context.read<ProfileCubit>().fetchUserProfile(widget.uid);
-
-    // الاستماع لأي تغيير في اللغة وإعادة بناء الشاشة فوراً
-    _localization.onTranslatedLanguage = (locale) {
-      if (mounted) {
-        setState(() {});
-      }
-    };
   }
 
   @override
@@ -90,7 +81,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const Spacer(),
-                      _HeaderLanguageSwitch(localization: _localization),
+                      _HeaderLanguageSwitch(
+                        onLocaleChanged: () {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                      ),
                       const SizedBox(width: 8),
                       IconButton(
                         icon: const Icon(
@@ -421,14 +418,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-class _HeaderLanguageSwitch extends StatelessWidget {
-  final FlutterLocalization localization;
+class _HeaderLanguageSwitch extends StatefulWidget {
+  final VoidCallback onLocaleChanged;
 
-  const _HeaderLanguageSwitch({required this.localization});
+  const _HeaderLanguageSwitch({super.key, required this.onLocaleChanged});
+
+  @override
+  State<_HeaderLanguageSwitch> createState() => _HeaderLanguageSwitchState();
+}
+
+class _HeaderLanguageSwitchState extends State<_HeaderLanguageSwitch> {
+  final FlutterLocalization _localization = FlutterLocalization.instance;
 
   @override
   Widget build(BuildContext context) {
-    final currentCode = localization.currentLocale?.languageCode ?? 'ar';
+    final currentCode = _localization.currentLocale?.languageCode ?? 'ar';
     final isArabic = currentCode == 'ar';
 
     return Container(
@@ -448,7 +452,9 @@ class _HeaderLanguageSwitch extends StatelessWidget {
               isSelected: isArabic,
               onTap: () {
                 if (!isArabic) {
-                  localization.translate('ar');
+                  _localization.translate('ar');
+                  setState(() {});
+                  widget.onLocaleChanged();
                 }
               },
             ),
@@ -457,7 +463,9 @@ class _HeaderLanguageSwitch extends StatelessWidget {
               isSelected: !isArabic,
               onTap: () {
                 if (isArabic) {
-                  localization.translate('en');
+                  _localization.translate('en');
+                  setState(() {});
+                  widget.onLocaleChanged();
                 }
               },
             ),
