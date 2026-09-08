@@ -7,7 +7,6 @@ import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/onboarding/presentation/view_model/onboarding_bloc.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 import 'package:toastification/toastification.dart';
-
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
 import 'core/services/firebase_service.dart';
@@ -16,6 +15,7 @@ import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseService.init();
@@ -37,10 +37,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final FlutterLocalization _localization = FlutterLocalization.instance;
 
+  Locale _currentLocale = const Locale('ar');
+
   @override
   void initState() {
     super.initState();
-    _localization.onTranslatedLanguage = _onTranslatedLanguage;
+
     _initializeLocalization();
   }
 
@@ -62,27 +64,49 @@ class _MyAppState extends State<MyApp> {
         ),
       ],
     );
+
+    _currentLocale = _localization.currentLocale ?? const Locale('ar');
+
+    _localization.onTranslatedLanguage = (locale) {
+      if (!mounted || locale == null) return;
+
+      setState(() {
+        _currentLocale = locale;
+      });
+    };
   }
 
-  void _onTranslatedLanguage(Locale? locale) {
-    setState(() {});
+  void changeLanguage(String languageCode) {
+    if (_currentLocale.languageCode == languageCode) {
+      return;
+    }
+
+    _localization.translate(languageCode);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isArabic = _localization.currentLocale?.languageCode == 'ar';
+    final bool isArabic = _currentLocale.languageCode == 'ar';
 
     return ToastificationWrapper(
       child: MaterialApp(
         title: 'Madinaty',
         debugShowCheckedModeBanner: false,
-        supportedLocales: _localization.supportedLocales,
+
+        locale: _currentLocale,
+
+        supportedLocales: const [Locale('ar', 'EG'), Locale('en', 'US')],
+
         localizationsDelegates: _localization.localizationsDelegates,
+
         initialRoute: AppRoutes.splash,
+
         onGenerateRoute: AppRoutes.onGenerateRoute,
+
         theme: AppTheme.lightTheme.copyWith(
           scaffoldBackgroundColor: AppColors.background,
         ),
+
         builder: (context, child) {
           return Directionality(
             textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,

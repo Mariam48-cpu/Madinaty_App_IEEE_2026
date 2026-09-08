@@ -280,67 +280,11 @@ class _PreOrderViewState extends State<_PreOrderView> {
                               child: PreOrderTableBanner(
                                 booking: widget.booking,
                                 cafeName: widget.cafeName,
-                                onEdit: () {
-                                  final cafeEntity =
-                                      widget.cafe ??
-                                      CafeEntity(
-                                        id: widget.cafeId,
-                                        name: widget.cafeName,
-                                        location: const LatLng(
-                                          30.0131,
-                                          31.4913,
-                                        ),
-                                        address: '',
-                                        description: '',
-                                        rating: 4.5,
-                                        photos: const [],
-                                      );
-
-                                  final bookingCubit = getIt<BookingCubit>()
-                                    ..setCafeId(cafeEntity.id);
-                                  if (widget.booking != null) {
-                                    if (widget.booking!.date != null) {
-                                      bookingCubit.selectDate(
-                                        widget.booking!.date!,
-                                      );
-                                    }
-                                    if (widget.booking!.time != null) {
-                                      bookingCubit.selectTime(
-                                        widget.booking!.time!,
-                                      );
-                                    }
-                                    bookingCubit.guests =
-                                        widget.booking!.guests;
-                                    if (widget.booking!.occasion != null) {
-                                      bookingCubit.selectOccasion(
-                                        widget.booking!.occasion!,
-                                      );
-                                    }
-                                    if (widget.booking!.seatingPreference !=
-                                        null) {
-                                      bookingCubit.selectSeatingPreference(
-                                        widget.booking!.seatingPreference!,
-                                      );
-                                    }
-                                  }
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => BlocProvider.value(
-                                        value: bookingCubit,
-                                        child: BookTableScreen(
-                                          cafe: cafeEntity,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                                cafe: widget.cafe,
                               ),
                             ),
                           ),
 
-                          // Horizontal Category Chips Filter
                           SliverToBoxAdapter(
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 12.0),
@@ -377,7 +321,7 @@ class _PreOrderViewState extends State<_PreOrderView> {
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
-                                      childAspectRatio: 0.65,
+                                      mainAxisExtent: 255,
                                       crossAxisSpacing: 12,
                                       mainAxisSpacing: 12,
                                     ),
