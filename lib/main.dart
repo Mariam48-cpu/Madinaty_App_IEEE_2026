@@ -4,9 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/onboarding/presentation/view_model/onboarding_bloc.dart';
 import 'package:madinaty_app_ieee_2026/firebase_options.dart';
 import 'package:toastification/toastification.dart';
+
 import 'core/localization/app_locale.dart';
 import 'core/routes/app_routes.dart';
 import 'core/services/firebase_service.dart';
@@ -23,7 +26,16 @@ void main() async {
   await initDependencies();
 
   runApp(
-    BlocProvider(create: (_) => sl<OnboardingBloc>(), child: const MyApp()),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<OnboardingBloc>(create: (_) => sl<OnboardingBloc>()),
+
+        BlocProvider<DiscoveryCubit>(create: (_) => sl<DiscoveryCubit>()),
+
+        BlocProvider<GroupCafeCubit>(create: (_) => sl<GroupCafeCubit>()),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 

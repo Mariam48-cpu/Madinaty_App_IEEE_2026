@@ -6,6 +6,15 @@ import 'package:madinaty_app_ieee_2026/features/ai_planner/data/datasources/ai_p
 import 'package:madinaty_app_ieee_2026/features/ai_planner/data/datasources/weather_data_source.dart';
 import 'package:madinaty_app_ieee_2026/features/ai_planner/data/repositories/ai_planner_repository_impl.dart';
 import 'package:madinaty_app_ieee_2026/features/ai_planner/domain/repositories/ai_planner_repository.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/data/repositories/group_cafe_repository_impl.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/repositories/group_cafe_repository_interface.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/create_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/join_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/spin_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/submit_group_picks_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/watch_group_picks_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/watch_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/auth/data/data_sources/auth_data_source_interface.dart';
 import '../../features/auth/data/data_sources/auth_data_source_imp.dart';
@@ -110,7 +119,44 @@ final GetIt sl = GetIt.instance;
 
 Future<void> initDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<GroupCafeRepositoryInterface>(
+    () => GroupCafeRepositoryImpl(firestore: sl<FirebaseFirestore>()),
+  );
 
+  sl.registerLazySingleton<CreateGroupUseCase>(
+    () => CreateGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<JoinGroupUseCase>(
+    () => JoinGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<SubmitGroupPicksUseCase>(
+    () => SubmitGroupPicksUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<WatchGroupUseCase>(
+    () => WatchGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<WatchGroupPicksUseCase>(
+    () => WatchGroupPicksUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<SpinGroupUseCase>(
+    () => SpinGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerFactory<GroupCafeCubit>(
+    () => GroupCafeCubit(
+      createGroupUseCase: sl<CreateGroupUseCase>(),
+      joinGroupUseCase: sl<JoinGroupUseCase>(),
+      submitGroupPicksUseCase: sl<SubmitGroupPicksUseCase>(),
+      watchGroupUseCase: sl<WatchGroupUseCase>(),
+      watchGroupPicksUseCase: sl<WatchGroupPicksUseCase>(),
+      spinGroupUseCase: sl<SpinGroupUseCase>(),
+    ),
+  );
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
@@ -369,7 +415,7 @@ Future<void> initDependencies() async {
       removeCartUseCase: sl<RemoveFromCartUseCase>(),
       clearCartUseCase: sl<ClearCartUseCase>(),
       getCartUseCase: sl<GetCartUseCase>(),
-      createNotificationUseCase: sl<CreateNotificationUseCase>()  ,
+      createNotificationUseCase: sl<CreateNotificationUseCase>(),
     ),
   );
 

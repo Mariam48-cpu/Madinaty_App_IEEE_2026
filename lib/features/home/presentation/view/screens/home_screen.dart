@@ -19,6 +19,7 @@ import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_mode
 
 import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view/screens/favorites_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view_model/cubit/favorites_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/screens/plan_with_friends_screen.dart';
 
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view/screens/notifications_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/presentation/view_model/notification_cubit.dart';
@@ -214,6 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return const FavoritesScreen();
 
       case 4:
+        return const PlanWithFriendsScreen();
+      case 5:
         return _buildProfilePage();
 
       default:
@@ -804,9 +807,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Colors.white
                 : AppColors.textSecondary,
           ),
-
           Icon(
             _selectedNavIndex == 4
+                ? Icons.groups_rounded
+                : Icons.groups_outlined,
+
+            size: 25,
+
+            color: _selectedNavIndex == 5
+                ? Colors.white
+                : AppColors.textSecondary,
+          ),
+          Icon(
+            _selectedNavIndex == 5
                 ? Icons.person_rounded
                 : Icons.person_outline_rounded,
 

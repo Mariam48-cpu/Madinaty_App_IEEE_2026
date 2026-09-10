@@ -287,7 +287,7 @@ class CafeCard extends StatelessWidget {
                             title: cafe.name.toString(),
                             imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
                             rating: cafe.rating > 0 ? cafe.rating : null,
-                            address: cafe.location?.toString(),
+                            address: cafe.location.toString(),
                             tagText: cafe.interests.isNotEmpty
                                 ? cafe.interests.first
                                 : null,

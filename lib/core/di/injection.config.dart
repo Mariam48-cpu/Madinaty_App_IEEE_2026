@@ -107,6 +107,24 @@ import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/watch
     as _i860;
 import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view_model/cubit/favorites_cubit.dart'
     as _i1042;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/data/repositories/group_cafe_repository_impl.dart'
+    as _i800;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/repositories/group_cafe_repository_interface.dart'
+    as _i518;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/create_group_usecase.dart'
+    as _i833;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/join_group_usecase.dart'
+    as _i450;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/spin_group_usecase.dart'
+    as _i574;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/submit_group_picks_usecase.dart'
+    as _i981;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/watch_group_picks_usecase.dart'
+    as _i414;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/watch_group_usecase.dart'
+    as _i333;
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart'
+    as _i140;
 import 'package:madinaty_app_ieee_2026/features/home/data/data_sources/google_places_datasource.dart'
     as _i1065;
 import 'package:madinaty_app_ieee_2026/features/home/data/repositories/recommendation_repository_impl.dart'
@@ -227,6 +245,11 @@ extension GetItInjectableX on _i174.GetIt {
       () =>
           _i498.BookingRepositoryImpl(firestore: gh<_i974.FirebaseFirestore>()),
     );
+    gh.lazySingleton<_i518.GroupCafeRepositoryInterface>(
+      () => _i800.GroupCafeRepositoryImpl(
+        firestore: gh<_i974.FirebaseFirestore>(),
+      ),
+    );
     gh.factory<_i1020.CafeRepositoryInterface>(
       () => _i525.CafeRepositoryImpl(
         googlePlacesDataSource: gh<_i1013.GooglePlacesDataSource>(),
@@ -263,6 +286,28 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i297.GetCafeMenuUseCase(
         repository: gh<_i297.CafeeRepositoryInterface>(),
       ),
+    );
+    gh.factory<_i833.CreateGroupUseCase>(
+      () => _i833.CreateGroupUseCase(gh<_i518.GroupCafeRepositoryInterface>()),
+    );
+    gh.factory<_i450.JoinGroupUseCase>(
+      () => _i450.JoinGroupUseCase(gh<_i518.GroupCafeRepositoryInterface>()),
+    );
+    gh.factory<_i574.SpinGroupUseCase>(
+      () => _i574.SpinGroupUseCase(gh<_i518.GroupCafeRepositoryInterface>()),
+    );
+    gh.factory<_i981.SubmitGroupPicksUseCase>(
+      () => _i981.SubmitGroupPicksUseCase(
+        gh<_i518.GroupCafeRepositoryInterface>(),
+      ),
+    );
+    gh.factory<_i414.WatchGroupPicksUseCase>(
+      () => _i414.WatchGroupPicksUseCase(
+        gh<_i518.GroupCafeRepositoryInterface>(),
+      ),
+    );
+    gh.factory<_i333.WatchGroupUseCase>(
+      () => _i333.WatchGroupUseCase(gh<_i518.GroupCafeRepositoryInterface>()),
     );
     gh.factory<_i473.CartRepositoryInterface>(
       () => _i633.CartRepositoryImpl(
@@ -406,6 +451,16 @@ extension GetItInjectableX on _i174.GetIt {
         toggleFavoriteUseCase: gh<_i289.ToggleFavoriteUseCase>(),
         removeFavoriteUseCase: gh<_i237.RemoveFavoriteUseCase>(),
         getFavoritesUseCase: gh<_i453.GetFavoritesUseCase>(),
+      ),
+    );
+    gh.factory<_i140.GroupCafeCubit>(
+      () => _i140.GroupCafeCubit(
+        createGroupUseCase: gh<_i833.CreateGroupUseCase>(),
+        joinGroupUseCase: gh<_i450.JoinGroupUseCase>(),
+        submitGroupPicksUseCase: gh<_i981.SubmitGroupPicksUseCase>(),
+        watchGroupUseCase: gh<_i333.WatchGroupUseCase>(),
+        watchGroupPicksUseCase: gh<_i414.WatchGroupPicksUseCase>(),
+        spinGroupUseCase: gh<_i574.SpinGroupUseCase>(),
       ),
     );
     gh.factory<_i79.ReviewsCubit>(
