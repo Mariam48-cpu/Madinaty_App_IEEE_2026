@@ -5,8 +5,14 @@ abstract class BookingRepositoryInterface {
 
   Future<BookingEntity?> getBooking(String bookingId);
 
+  Future<List<BookingEntity>> getUserBookings(String userId);
+
+  Stream<List<BookingEntity>> watchUserBookings(String userId);
+
   Future<void> updateBookingStatus({
     required String bookingId,
     required BookingStatus status,
   });
+
+  Future<void> cancelBooking(String bookingId);
 }

@@ -32,6 +32,11 @@ import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view/scree
 import 'package:madinaty_app_ieee_2026/features/personalization/presentation/view/screens/personalization_screen.dart';
 
 import 'package:madinaty_app_ieee_2026/features/pre_order/presentation/view/screens/pre_order_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/my_bookings_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/my_orders_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/payment_methods_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/saved_addresses_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/profile/presentation/view/screens/help_support_screen.dart';
 
 
 abstract class AppRoutes {
@@ -51,8 +56,11 @@ abstract class AppRoutes {
   static const String checkout = '/checkout';
   static const String cart = '/cart';
   static const String preOrder = '/pre_order';
-
   static const String aiPlanner = '/ai_planner';
+  static const String myBookings = '/my_bookings';
+  static const String paymentMethods = '/payment_methods';
+  static const String savedAddresses = '/saved_addresses';
+  static const String helpSupport = '/help_support';
 
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
@@ -257,6 +265,36 @@ abstract class AppRoutes {
               uid: user.uid,
             ),
           ),
+          settings: settings,
+        );
+
+      case myBookings:
+        return MaterialPageRoute(
+          builder: (_) => const MyBookingsScreen(),
+          settings: settings,
+        );
+
+      case orders:
+        return MaterialPageRoute(
+          builder: (_) => const MyOrdersScreen(),
+          settings: settings,
+        );
+
+      case paymentMethods:
+        return MaterialPageRoute(
+          builder: (_) => const PaymentMethodsScreen(),
+          settings: settings,
+        );
+
+      case savedAddresses:
+        return MaterialPageRoute(
+          builder: (_) => const SavedAddressesScreen(),
+          settings: settings,
+        );
+
+      case helpSupport:
+        return MaterialPageRoute(
+          builder: (_) => const HelpSupportScreen(),
           settings: settings,
         );
 

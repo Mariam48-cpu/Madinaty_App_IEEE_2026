@@ -10,6 +10,7 @@ class UserModel extends UserEntity {
     super.phone,
     super.profileImageUrl,
     super.birthDate,
+    super.points,
     this.createdAt,
   });
 
@@ -17,6 +18,13 @@ class UserModel extends UserEntity {
     Map<String, dynamic> map,
     String uid,
   ) {
+    int parsedPoints = 0;
+    if (map['points'] != null) {
+      parsedPoints = (map['points'] as num).toInt();
+    } else if (map['loyaltyPoints'] != null) {
+      parsedPoints = (map['loyaltyPoints'] as num).toInt();
+    }
+
     return UserModel(
       uid: uid,
       name: map['name'] as String?,
@@ -26,6 +34,7 @@ class UserModel extends UserEntity {
       birthDate: map['birthDate'] != null
           ? DateTime.tryParse(map['birthDate'].toString())
           : null,
+      points: parsedPoints,
       createdAt: map['createdAt'] != null
           ? DateTime.tryParse(map['createdAt'].toString())
           : null,
@@ -39,6 +48,7 @@ class UserModel extends UserEntity {
       'email': email,
       'phone': phone,
       'profileImageUrl': profileImageUrl,
+      'points': points,
     };
 
     if (birthDate != null) {

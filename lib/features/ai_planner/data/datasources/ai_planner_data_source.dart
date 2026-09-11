@@ -27,7 +27,7 @@ abstract class AIPlannerDataSource {
 class AIPlannerDataSourceImpl implements AIPlannerDataSource {
 
   static const String _apiKey =
-      'AQ.Ab8RN6LMlccq9zKfCksq39stPTghe4mIxXiTqavQvzJNCw0k9A';
+      'AQ.Ab8RN6IHKnKi2nFD1esyNQXWzSCF32ovBPXejnqUOOSFnv3RoA';
 
   static const String _model = 'gemini-3.5-flash';
 

@@ -68,6 +68,7 @@ mixin AppLocale {
   static const String bookingsSubtitle = 'bookingsSubtitle';
   static const String ordersTitle = 'ordersTitle';
   static const String favoritePlacesSubtitle = 'favoritePlacesSubtitle';
+  static const String favoriteCafesAndPlaces = 'favoriteCafesAndPlaces';
   static const String favoriteProducts = 'favoriteProducts';
   static const String favoriteProductsSubtitle = 'favoriteProductsSubtitle';
   static const String loyaltyPoints = 'loyaltyPoints';
@@ -226,6 +227,19 @@ mixin AppLocale {
   static const String statusConfirmed = 'statusConfirmed';
   static const String statusPending = 'statusPending';
   static const String statusCancelled = 'statusCancelled';
+  static const String statusCompleted = 'statusCompleted';
+  static const String statusRejected = 'statusRejected';
+  static const String cancelBooking = 'cancelBooking';
+  static const String cancelBookingConfirmMsg = 'cancelBookingConfirmMsg';
+  static const String yesCancelBooking = 'yesCancelBooking';
+  static const String cancelBack = 'cancelBack';
+  static const String bookingCancelledSuccess = 'bookingCancelledSuccess';
+  static const String noBookingsFoundYet = 'noBookingsFoundYet';
+  static const String savedBookingSuffix = 'savedBookingSuffix';
+  static const String favoritePlaceSuffix = 'favoritePlaceSuffix';
+  static const String favoriteProductSuffix = 'favoriteProductSuffix';
+  static const String loyaltyDialogContent = 'loyaltyDialogContent';
+  static const String okBtn = 'okBtn';
   static const String waitingForConfirmation = 'waitingForConfirmation';
   static const String showQrOnArrival = 'showQrOnArrival';
   static const String digitalPassSearchHint = 'digitalPassSearchHint';
@@ -380,6 +394,39 @@ mixin AppLocale {
   static const String aiRateLimitError = 'aiRateLimitError';
   static const String aiServerError = 'aiServerError';
   static const String aiNetworkConnectionError = 'aiNetworkConnectionError';
+
+  static const String choosePreferredPaymentMethod = 'choosePreferredPaymentMethod';
+  static const String defaultPaymentMethodDesc = 'defaultPaymentMethodDesc';
+  static const String cardPaymentTitle = 'cardPaymentTitle';
+  static const String cardPaymentSubtitle = 'cardPaymentSubtitle';
+  static const String walletPaymentTitle = 'walletPaymentTitle';
+  static const String walletPaymentSubtitle = 'walletPaymentSubtitle';
+  static const String cashPaymentTitle = 'cashPaymentTitle';
+  static const String cashPaymentSubtitle = 'cashPaymentSubtitle';
+
+  static const String addNewAddress = 'addNewAddress';
+  static const String addressNameLabel = 'addressNameLabel';
+  static const String addressDetailsLabel = 'addressDetailsLabel';
+  static const String addressDeletedSuccess = 'addressDeletedSuccess';
+  static const String newAddressBtn = 'newAddressBtn';
+  static const String noSavedAddresses = 'noSavedAddresses';
+  static const String addAddressPrompt = 'addAddressPrompt';
+  static const String addressDefaultTitle = 'addressDefaultTitle';
+
+  static const String contactUs = 'contactUs';
+  static const String whatsappSupport = 'whatsappSupport';
+  static const String whatsappSupportDesc = 'whatsappSupportDesc';
+  static const String callCustomerService = 'callCustomerService';
+  static const String faqTitle = 'faqTitle';
+  static const String faqQ1 = 'faqQ1';
+  static const String faqA1 = 'faqA1';
+  static const String faqQ2 = 'faqQ2';
+  static const String faqA2 = 'faqA2';
+  static const String faqQ3 = 'faqQ3';
+  static const String faqA3 = 'faqA3';
+  static const String faqQ4 = 'faqQ4';
+  static const String faqA4 = 'faqA4';
+  static const String whatsappNotInstalled = 'whatsappNotInstalled';
   static const Map<String, dynamic> AR = {
     appTitle: 'مدينتي',
     nextButtonText: 'التالي',
@@ -451,6 +498,7 @@ mixin AppLocale {
     bookingsSubtitle: 'إدارة الحجوزات القادمة',
     ordersTitle: 'الطلبات',
     favoritePlacesSubtitle: 'مقاهيك ومطاعمك المفضلة',
+    favoriteCafesAndPlaces: 'الكافيهات والأماكن المفضلة',
     favoriteProducts: 'المنتجات المفضلة',
     favoriteProductsSubtitle: 'قائمة مشروباتك المفضلة',
     loyaltyPoints: 'نقاط الولاء',
@@ -619,6 +667,19 @@ mixin AppLocale {
     statusConfirmed: 'مؤكد',
     statusPending: 'قيد الانتظار',
     statusCancelled: 'ملغي',
+    statusCompleted: 'مكتمل',
+    statusRejected: 'مرفوض',
+    cancelBooking: 'إلغاء الحجز',
+    cancelBookingConfirmMsg: 'هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لن تتمكن من التراجع عن هذه الخطوة.',
+    yesCancelBooking: 'نعم، إلغاء الحجز',
+    cancelBack: 'تراجع',
+    bookingCancelledSuccess: 'تم إلغاء الحجز بنجاح',
+    noBookingsFoundYet: 'لا توجد حجوزات حتى الآن',
+    savedBookingSuffix: 'حجز محفوظ',
+    favoritePlaceSuffix: 'مكان مفضل',
+    favoriteProductSuffix: 'منتج مفضل',
+    loyaltyDialogContent: 'رصيدك الحالي هو {points} نقطة ولاء. يتم تجميع النقاط عند قيامك بمزيد من الحجوزات والطلبات داخل التطبيق.',
+    okBtn: 'حسناً',
     waitingForConfirmation: 'في انتظار التأكيد',
     showQrOnArrival: 'اعرض الـ QR Code عند الوصول',
     digitalPassSearchHint: 'ابحث عن تفاصيل الحجز أو الخدمات...',
@@ -780,6 +841,37 @@ mixin AppLocale {
     aiRateLimitError: 'تم الوصول للحد الأقصى للاستخدام. يرجى المحاولة بعد قليل.',
     aiServerError: 'حدث خطأ في خادم الذكاء الاصطناعي، يرجى إعادة المحاولة.',
     aiNetworkConnectionError: 'تعذر الاتصال بالإنترنت، يرجى التحقق من الشبكة.',
+
+    choosePreferredPaymentMethod: 'اختر طريقة الدفع المفضلة لديك',
+    defaultPaymentMethodDesc: 'سيتم استخدام طريقة الدفع المختارة افتراضياً أثناء إتمام الحجوزات والطلبات.',
+    cardPaymentTitle: 'بطاقة ائتمان / خصم مباشر',
+    cardPaymentSubtitle: 'فيزا، ماستركارد، ميزة',
+    walletPaymentTitle: 'محفظة رقمية',
+    walletPaymentSubtitle: 'فودافون كاش، إنستاباي، وغيرها',
+    cashPaymentTitle: 'الدفع عند الوصول للكافيه',
+    cashPaymentSubtitle: 'نقداً أو عبر نقاط البيع المتاحة بالكافيه',
+    addNewAddress: 'إضافة عنوان جديد',
+    addressNameLabel: 'اسم العنوان (مثلاً: المنزل، العمل)',
+    addressDetailsLabel: 'تفاصيل العنوان (المنطقة، الشارع، المبنى)',
+    addressDeletedSuccess: 'تم حذف العنوان بنجاح',
+    newAddressBtn: 'عنوان جديد',
+    noSavedAddresses: 'لا توجد عناوين محفوظة',
+    addAddressPrompt: 'اضغط على زر "عنوان جديد" لإضافة عنوانك المفضّل.',
+    addressDefaultTitle: 'عنوان',
+    contactUs: 'تواصل معنا',
+    whatsappSupport: 'الدعم عبر الواتساب',
+    whatsappSupportDesc: 'متاح على مدار الساعة للمساعدة الفورية',
+    callCustomerService: 'الاتصال بفريق خدمة العملاء',
+    faqTitle: 'الأسئلة الشائعة (FAQ)',
+    faqQ1: 'كيف يمكنني حجز طاولة في الكافيه؟',
+    faqA1: 'يمكنك اختيار الكافيه المناسب من الشاشة الرئيسية أو قسم الاستكشاف، تحديد عدد الأفراد والوقت وتأكيد الحجز بكل سهولة.',
+    faqQ2: 'ما هي خدمة الطلب المسبق (Pre-Order)؟',
+    faqA2: 'تتيح لك خدمة الطلب المسبق طلب مشروباتك ومأكولاتك المفضلّة مسبقاً لتقوم باستلامها أو الاستمتاع بها فور وصولك دون انتظار.',
+    faqQ3: 'كيف أحصل على نقاط الولاء؟',
+    faqA3: 'تحصل على نقاط ولاء تلقائياً مع كل عملية حجز أو طلب مأكولات عبر التطبيق، ويمكنك متابعة رصيدك من النقاط في الملف الشخصي.',
+    faqQ4: 'كيف يمكنني إلغاء الحجز؟',
+    faqA4: 'يمكنك التوجه إلى قسم "حجوزاتي" في الملف الشخصي واختيار الحجز المراد إلغاؤه واختيار إلغاء الحجز.',
+    whatsappNotInstalled: 'تطبيق واتساب غير مثبت على جهازك.',
   };
 
   static const Map<String, dynamic> EN = {
@@ -1021,6 +1113,19 @@ mixin AppLocale {
     statusConfirmed: 'Confirmed',
     statusPending: 'Pending',
     statusCancelled: 'Cancelled',
+    statusCompleted: 'Completed',
+    statusRejected: 'Rejected',
+    cancelBooking: 'Cancel Booking',
+    cancelBookingConfirmMsg: 'Are you sure you want to cancel this booking? You will not be able to undo this action.',
+    yesCancelBooking: 'Yes, Cancel Booking',
+    cancelBack: 'Cancel / Back',
+    bookingCancelledSuccess: 'Booking cancelled successfully',
+    noBookingsFoundYet: 'No bookings found yet',
+    savedBookingSuffix: 'saved booking(s)',
+    favoritePlaceSuffix: 'favorite place(s)',
+    favoriteProductSuffix: 'favorite product(s)',
+    loyaltyDialogContent: 'Your current balance is {points} loyalty point(s). Points are earned whenever you make bookings and pre-orders within the app.',
+    okBtn: 'OK',
     waitingForConfirmation: 'Awaiting Confirmation',
     showQrOnArrival: 'Show QR Code on arrival',
     digitalPassSearchHint: 'Search reservation details or services...',
@@ -1099,6 +1204,7 @@ mixin AppLocale {
     helpful: 'Helpful',
 
     places: 'Cafes & Places',
+    favoriteCafesAndPlaces: 'Favorite Cafes & Places',
     products: 'Products',
     noFavoritesYet: 'No favorites saved yet',
 
@@ -1182,5 +1288,36 @@ mixin AppLocale {
     aiRateLimitError: 'Usage limit reached. Please try again in a few moments.',
     aiServerError: 'An AI server error occurred. Please try again.',
     aiNetworkConnectionError: 'Unable to connect to the internet. Please check your network.',
+
+    choosePreferredPaymentMethod: 'Choose your preferred payment method',
+    defaultPaymentMethodDesc: 'The selected payment method will be used by default for bookings and orders.',
+    cardPaymentTitle: 'Credit / Debit Card',
+    cardPaymentSubtitle: 'Visa, Mastercard, Meeza',
+    walletPaymentTitle: 'Digital Wallet',
+    walletPaymentSubtitle: 'Vodafone Cash, Instapay, and others',
+    cashPaymentTitle: 'Cash on Arrival',
+    cashPaymentSubtitle: 'Cash or via POS at the cafe',
+    addNewAddress: 'Add New Address',
+    addressNameLabel: 'Address Name (e.g. Home, Work)',
+    addressDetailsLabel: 'Address Details (Area, Street, Building)',
+    addressDeletedSuccess: 'Address deleted successfully',
+    newAddressBtn: 'New Address',
+    noSavedAddresses: 'No saved addresses',
+    addAddressPrompt: 'Tap on "New Address" to add your preferred address.',
+    addressDefaultTitle: 'Address',
+    contactUs: 'Contact Us',
+    whatsappSupport: 'WhatsApp Support',
+    whatsappSupportDesc: 'Available 24/7 for instant help',
+    callCustomerService: 'Call Customer Service',
+    faqTitle: 'Frequently Asked Questions (FAQ)',
+    faqQ1: 'How can I book a table at the cafe?',
+    faqA1: 'You can choose a cafe from the home screen or explore section, select the number of guests and time, and confirm your booking easily.',
+    faqQ2: 'What is the Pre-Order service?',
+    faqA2: 'Pre-Order allows you to order your favorite drinks and food in advance to pick them up or enjoy them immediately upon arrival without waiting.',
+    faqQ3: 'How do I get loyalty points?',
+    faqA3: 'You automatically earn loyalty points with every booking or food order via the app, and you can track your points balance in your profile.',
+    faqQ4: 'How can I cancel my booking?',
+    faqA4: 'You can go to the "My Bookings" section in your profile, select the booking you want to cancel, and choose cancel booking.',
+    whatsappNotInstalled: 'WhatsApp is not installed on your device.',
   };
 }

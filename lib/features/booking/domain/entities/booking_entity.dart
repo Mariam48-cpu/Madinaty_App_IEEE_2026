@@ -6,6 +6,7 @@ class BookingEntity extends Equatable {
   final String id;
   final String userId;
   final String cafeId;
+  final String? cafeName;
   final DateTime? date;
   final String? time;
   final int guests;
@@ -20,6 +21,7 @@ class BookingEntity extends Equatable {
     this.id = '',
     this.userId = '',
     required this.cafeId,
+    this.cafeName,
     this.date,
     this.time,
     this.guests = 1,
@@ -36,6 +38,7 @@ class BookingEntity extends Equatable {
     id,
     userId,
     cafeId,
+    cafeName,
     date,
     time,
     guests,

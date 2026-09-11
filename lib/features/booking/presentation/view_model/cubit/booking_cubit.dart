@@ -25,6 +25,7 @@ class BookingCubit extends Cubit<BookingState> {
       ) : super(BookingInitial());
 
   String? cafeId;
+  String? cafeName;
   DateTime? date;
   String? time;
   int guests = 1;
@@ -33,8 +34,9 @@ class BookingCubit extends Cubit<BookingState> {
 
   String? bookingId;
 
-  void setCafeId(String id) {
+  void setCafeId(String id, {String? name}) {
     cafeId = id;
+    cafeName = name;
     emit(BookingInitial());
   }
 
@@ -126,6 +128,7 @@ class BookingCubit extends Cubit<BookingState> {
         id: '',
         userId: user.uid,
         cafeId: cafeId!,
+        cafeName: cafeName,
         date: date!,
         time: time!,
         guests: guests,

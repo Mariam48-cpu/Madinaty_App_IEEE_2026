@@ -5,6 +5,7 @@ class UserEntity {
   final String? phone;
   final String? profileImageUrl;
   final DateTime? birthDate;
+  final int points;
 
   const UserEntity({
     required this.uid,
@@ -13,5 +14,6 @@ class UserEntity {
     this.phone,
     this.profileImageUrl,
     this.birthDate,
+    this.points = 0,
   });
 }

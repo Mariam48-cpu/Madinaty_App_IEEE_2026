@@ -6,6 +6,10 @@ import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/profile_skeleton.dart';
 import 'package:toastification/toastification.dart';
 
+import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/entities/favorite_item_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view/screens/favorites_screen.dart';
+
 import '../../../../../core/utils/app_toast.dart';
 import '../../view_model/profile_cubit.dart';
 import 'edit_profile_screen.dart';
@@ -59,7 +63,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             String? profileImageUrl;
             String birthDateStr = "";
 
-            const int loyaltyPoints = 1250;
+            int userPoints = 0;
+            int bookingsCount = 0;
+            int favoritesCount = 0;
+            int ordersCount = 0;
+            int favoritePlacesCount = 0;
+            int favoriteProductsCount = 0;
 
             if (state is ProfileLoaded) {
               name = state.user.name ?? name;
@@ -67,6 +76,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               phone = state.user.phone ?? "";
               profileImageUrl = state.user.profileImageUrl;
               birthDateStr = state.user.birthDate?.toString() ?? "";
+              userPoints = state.user.points;
+              bookingsCount = state.bookingsCount;
+              favoritesCount = state.favoritesCount;
+              ordersCount = state.ordersCount;
+              favoritePlacesCount = state.favoritePlacesCount;
+              favoriteProductsCount = state.favoriteProductsCount;
             }
 
             return SingleChildScrollView(
@@ -89,16 +104,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const Spacer(),
 
                       _HeaderLanguageSwitch(localization: _localization),
-
-                      const SizedBox(width: 8),
-
-                      IconButton(
-                        icon: const Icon(
-                          Icons.settings_outlined,
-                          color: AppColors.primary,
-                        ),
-                        onPressed: () {},
-                      ),
                     ],
                   ),
 
@@ -188,15 +193,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 4),
-                        Text(
-                          email,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16.0),
                           child: Divider(color: AppColors.border),
@@ -206,21 +202,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             _ProfileStatItem(
                               title: AppLocale.bookingsTitle.getString(context),
-                              value: "12",
+                              value: "$bookingsCount",
                             ),
 
                             const _VerticalDivider(),
 
                             _ProfileStatItem(
                               title: AppLocale.navFavorites.getString(context),
-                              value: "8",
+                              value: "$favoritesCount",
                             ),
 
                             const _VerticalDivider(),
 
                             _ProfileStatItem(
                               title: AppLocale.ordersTitle.getString(context),
-                              value: "45",
+                              value: "$ordersCount",
                             ),
                           ],
                         ),
@@ -240,37 +236,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildMenuCard(
                         context,
                         AppLocale.bookingsTitle.getString(context),
-                        AppLocale.bookingsSubtitle.getString(context),
+                        bookingsCount > 0
+                            ? "$bookingsCount ${AppLocale.savedBookingSuffix.getString(context)}"
+                            : AppLocale.bookingsSubtitle.getString(context),
                         Icons.calendar_today_outlined,
                         AppColors.surfaceVariant,
                         AppColors.primary,
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.myBookings);
+                        },
                       ),
 
                       _buildMenuCard(
                         context,
-                        AppLocale.navFavorites.getString(context),
-                        AppLocale.favoritePlacesSubtitle.getString(context),
+                        AppLocale.favoriteCafesAndPlaces.getString(context),
+                        favoritePlacesCount > 0
+                            ? "$favoritePlacesCount ${AppLocale.favoritePlaceSuffix.getString(context)}"
+                            : AppLocale.favoritePlacesSubtitle.getString(context),
                         Icons.favorite_border,
                         AppColors.error.withValues(alpha: 0.1),
                         AppColors.error,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const FavoritesScreen(
+                                initialTab: FavoriteTargetType.cafe,
+                              ),
+                            ),
+                          );
+                        },
                       ),
 
                       _buildMenuCard(
                         context,
                         AppLocale.favoriteProducts.getString(context),
-                        AppLocale.favoriteProductsSubtitle.getString(context),
+                        favoriteProductsCount > 0
+                            ? "$favoriteProductsCount ${AppLocale.favoriteProductSuffix.getString(context)}"
+                            : AppLocale.favoriteProductsSubtitle.getString(context),
                         Icons.coffee_outlined,
                         AppColors.surfaceVariant,
                         AppColors.primary,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const FavoritesScreen(
+                                initialTab: FavoriteTargetType.product,
+                              ),
+                            ),
+                          );
+                        },
                       ),
 
                       _buildMenuCard(
                         context,
                         AppLocale.loyaltyPoints.getString(context),
-                        "$loyaltyPoints ${AppLocale.pointsUnit.getString(context)}",
+                        "$userPoints ${AppLocale.pointsUnit.getString(context)}",
                         Icons.workspace_premium_outlined,
                         Colors.amber.shade50,
                         Colors.amber.shade800,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              title: Row(
+                                children: [
+                                  Icon(Icons.workspace_premium, color: Colors.amber.shade800),
+                                  const SizedBox(width: 8),
+                                  Text(AppLocale.loyaltyPoints.getString(context)),
+                                ],
+                              ),
+                              content: Text(
+                                AppLocale.loyaltyDialogContent.getString(context).replaceAll('{points}', '$userPoints'),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(AppLocale.okBtn.getString(context)),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -287,6 +338,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildListTile(
                           AppLocale.paymentMethods.getString(context),
                           Icons.credit_card_outlined,
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRoutes.paymentMethods);
+                          },
                         ),
 
                         const Divider(
@@ -299,6 +353,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildListTile(
                           AppLocale.savedAddresses.getString(context),
                           Icons.location_on_outlined,
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRoutes.savedAddresses);
+                          },
                         ),
 
                         const Divider(
@@ -311,6 +368,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildListTile(
                           AppLocale.helpAndSupport.getString(context),
                           Icons.help_outline,
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRoutes.helpSupport);
+                          },
                         ),
                       ],
                     ),
@@ -361,64 +421,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String subtitle,
     IconData icon,
     Color bgColor,
-    Color iconColor,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+    Color iconColor, {
+    VoidCallback? onTap,
+  }) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: AppColors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: iconColor, size: 18),
+                  ),
+                ],
               ),
 
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  shape: BoxShape.circle,
+              const SizedBox(height: 6),
+
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
                 ),
-                child: Icon(icon, color: iconColor, size: 18),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
-
-          const SizedBox(height: 6),
-
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        ),
       ),
     );
   }
 
   // ================= LIST TILE =================
 
-  Widget _buildListTile(String title, IconData icon) {
+  Widget _buildListTile(String title, IconData icon, {VoidCallback? onTap}) {
     return ListTile(
       leading: Icon(icon, color: AppColors.textPrimary),
       title: Text(
@@ -434,7 +502,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         size: 14,
         color: AppColors.textSecondary,
       ),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }

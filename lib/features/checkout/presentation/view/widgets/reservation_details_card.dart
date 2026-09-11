@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/utils/cafe_name_resolver.dart';
 import '../../../../booking/domain/entities/booking_entity.dart';
 
 class ReservationDetailsCard extends StatelessWidget {
@@ -14,6 +15,9 @@ class ReservationDetailsCard extends StatelessWidget {
         ? '${booking.date!.day}/${booking.date!.month}/${booking.date!.year}'
         : 'غير محدد';
     final String bookingTimeStr = booking.time ?? 'غير محدد';
+
+    final String? directName =
+        booking.cafeName ?? CafeNameResolver.getCachedName(booking.cafeId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,10 +52,29 @@ class ReservationDetailsCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          booking.cafeId.replaceAll('cafe_', '').toUpperCase(),
-                          style: AppTypography.titleLarge,
-                        ),
+                        directName != null && directName.isNotEmpty
+                            ? Text(
+                                directName,
+                                style: AppTypography.titleLarge,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            : FutureBuilder<String>(
+                                future: CafeNameResolver.resolveCafeName(
+                                  booking.cafeId,
+                                ),
+                                builder: (context, snapshot) {
+                                  return Text(
+                                    snapshot.data ??
+                                        booking.cafeId
+                                            .replaceAll('cafe_', '')
+                                            .toUpperCase(),
+                                    style: AppTypography.titleLarge,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+                                },
+                              ),
                         const SizedBox(height: 4),
                         const Row(
                           children: [
