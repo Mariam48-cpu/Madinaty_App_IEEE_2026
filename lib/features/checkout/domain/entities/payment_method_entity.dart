@@ -1,3 +1,5 @@
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+
 enum PaymentType { card, wallet, cashOnArrival }
 
 class PaymentMethodEntity {
@@ -15,23 +17,23 @@ class PaymentMethodEntity {
     this.isSelected = false,
   });
 
-  static const List<PaymentMethodEntity> availableMethods = [
+  static final List<PaymentMethodEntity> availableMethods = [
     PaymentMethodEntity(
       id: 'card',
-      title: 'بطاقة ائتمان / خصم مباشر',
-      subtitle: 'فيزا، ماستركارد، ميزة',
+      title: AppLocale.cardPaymentTitle,
+      subtitle: AppLocale.cardPaymentSubtitle,
       type: PaymentType.card,
     ),
-    PaymentMethodEntity(
+    const PaymentMethodEntity(
       id: 'wallet',
-      title: 'محفظة رقمية',
-      subtitle: 'فودافون كاش، إنستاباي، وغيرها',
+      title: AppLocale.walletPaymentTitle,
+      subtitle: AppLocale.walletPaymentSubtitle,
       type: PaymentType.wallet,
     ),
-    PaymentMethodEntity(
+    const PaymentMethodEntity(
       id: 'cash',
-      title: 'الدفع عند الوصول للكافيه',
-      subtitle: 'نقداً أو عبر نقاط البيع المتاحة بالكافيه',
+      title: AppLocale.cashPaymentTitle,
+      subtitle: AppLocale.cashPaymentSubtitle,
       type: PaymentType.cashOnArrival,
     ),
   ];

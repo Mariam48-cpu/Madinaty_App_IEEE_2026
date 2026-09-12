@@ -65,6 +65,7 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       id: bookingId,
       userId: booking.userId,
       cafeId: booking.cafeId,
+      cafeName: booking.cafeName,
       date: booking.date,
       time: booking.time,
       guests: booking.guests,
@@ -77,6 +78,13 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
     );
 
     await bookingRef.set(bookingModel.toFirestore());
+
+    try {
+      await firestore.collection('users').doc(booking.userId).set({
+        'points': FieldValue.increment(50),
+        'loyaltyPoints': FieldValue.increment(50),
+      }, SetOptions(merge: true));
+    } catch (_) {}
 
     return bookingId;
   }
@@ -95,10 +103,64 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
   }
 
   @override
+  Future<List<BookingEntity>> getUserBookings(String userId) async {
+    if (userId.isEmpty) return [];
+    try {
+      final snapshot = await bookings()
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      final list = snapshot.docs
+          .map((doc) => BookingModel.fromFirestore(doc).toEntity())
+          .toList();
+
+      list.sort((a, b) {
+        final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bDate.compareTo(aDate);
+      });
+      return list;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  @override
+  Stream<List<BookingEntity>> watchUserBookings(String userId) {
+    if (userId.isEmpty) return Stream.value([]);
+    try {
+      return bookings()
+          .where('userId', isEqualTo: userId)
+          .snapshots()
+          .map((snapshot) {
+        final list = snapshot.docs
+            .map((doc) => BookingModel.fromFirestore(doc).toEntity())
+            .toList();
+        list.sort((a, b) {
+          final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          return bDate.compareTo(aDate);
+        });
+        return list;
+      }).handleError((_) => <BookingEntity>[]);
+    } catch (_) {
+      return Stream.value([]);
+    }
+  }
+
+  @override
   Future<void> updateBookingStatus({
     required String bookingId,
     required BookingStatus status,
   }) async {
     await bookings().doc(bookingId).update({'status': status.name});
+  }
+
+  @override
+  Future<void> cancelBooking(String bookingId) async {
+    await updateBookingStatus(
+      bookingId: bookingId,
+      status: BookingStatus.cancelled,
+    );
   }
 }
