@@ -6,6 +6,15 @@ import 'package:madinaty_app_ieee_2026/features/ai_planner/data/datasources/ai_p
 import 'package:madinaty_app_ieee_2026/features/ai_planner/data/datasources/weather_data_source.dart';
 import 'package:madinaty_app_ieee_2026/features/ai_planner/data/repositories/ai_planner_repository_impl.dart';
 import 'package:madinaty_app_ieee_2026/features/ai_planner/domain/repositories/ai_planner_repository.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/data/repositories/group_cafe_repository_impl.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/repositories/group_cafe_repository_interface.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/create_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/join_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/spin_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/submit_group_picks_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/watch_group_picks_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/watch_group_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/auth/data/data_sources/auth_data_source_interface.dart';
 import '../../features/auth/data/data_sources/auth_data_source_imp.dart';
@@ -30,7 +39,8 @@ import '../../features/home/domain/repositories/recommendation_repository.dart';
 import '../../features/home/domain/use_cases/get_recommendations_use_case.dart';
 import '../../features/home/domain/use_cases/search_cafes_use_case.dart';
 import '../../features/home/presentation/view_model/home_cubit.dart';
-import '../../features/discovery/data/data_sources/google_places_datasource.dart' as discovery;
+import '../../features/discovery/data/data_sources/google_places_datasource.dart'
+    as discovery;
 import '../../features/discovery/data/repositories/cafe_repository_impl.dart';
 import '../../features/discovery/domain/repositories/cafe_repository_interface.dart';
 import '../../features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
@@ -108,9 +118,45 @@ import '../services/location_service.dart';
 final GetIt sl = GetIt.instance;
 
 Future<void> initDependencies() async {
-
   final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<GroupCafeRepositoryInterface>(
+    () => GroupCafeRepositoryImpl(firestore: sl<FirebaseFirestore>()),
+  );
 
+  sl.registerLazySingleton<CreateGroupUseCase>(
+    () => CreateGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<JoinGroupUseCase>(
+    () => JoinGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<SubmitGroupPicksUseCase>(
+    () => SubmitGroupPicksUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<WatchGroupUseCase>(
+    () => WatchGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<WatchGroupPicksUseCase>(
+    () => WatchGroupPicksUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerLazySingleton<SpinGroupUseCase>(
+    () => SpinGroupUseCase(sl<GroupCafeRepositoryInterface>()),
+  );
+
+  sl.registerFactory<GroupCafeCubit>(
+    () => GroupCafeCubit(
+      createGroupUseCase: sl<CreateGroupUseCase>(),
+      joinGroupUseCase: sl<JoinGroupUseCase>(),
+      submitGroupPicksUseCase: sl<SubmitGroupPicksUseCase>(),
+      watchGroupUseCase: sl<WatchGroupUseCase>(),
+      watchGroupPicksUseCase: sl<WatchGroupPicksUseCase>(),
+      spinGroupUseCase: sl<SpinGroupUseCase>(),
+    ),
+  );
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
@@ -122,13 +168,13 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
 
   sl.registerLazySingleton<AIPlannerDataSource>(
-        () => AIPlannerDataSourceImpl(),
+    () => AIPlannerDataSourceImpl(),
   );
 
   sl.registerLazySingleton<WeatherDataSource>(() => WeatherDataSourceImpl());
 
   sl.registerLazySingleton<AIPlannerRepository>(
-        () => AIPlannerRepositoryImpl(
+    () => AIPlannerRepositoryImpl(
       aiDataSource: sl<AIPlannerDataSource>(),
       weatherDataSource: sl<WeatherDataSource>(),
       discoveryRepository: sl<CafeRepositoryInterface>(),
@@ -138,7 +184,7 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<AuthRemoteDataSourceInterface>(
-        () => AuthRemoteDataSourceImpl(
+    () => AuthRemoteDataSourceImpl(
       firebaseAuth: sl<FirebaseAuth>(),
       firestore: sl<FirebaseFirestore>(),
       googleSignIn: sl<GoogleSignIn>(),
@@ -146,80 +192,78 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<AuthRepoInterface>(
-        () => AuthRepoImpl(remoteDataSource: sl<AuthRemoteDataSourceInterface>()),
+    () => AuthRepoImpl(remoteDataSource: sl<AuthRemoteDataSourceInterface>()),
   );
 
   sl.registerLazySingleton<OnboardingLocalDataSource>(
-        () => OnboardingLocalDataSource(sl<SharedPreferences>()),
+    () => OnboardingLocalDataSource(sl<SharedPreferences>()),
   );
 
   sl.registerLazySingleton<OnboardingRepository>(
-        () => OnboardingRepositoryImpl(sl<OnboardingLocalDataSource>()),
+    () => OnboardingRepositoryImpl(sl<OnboardingLocalDataSource>()),
   );
 
   sl.registerLazySingleton<GetOnboardingPages>(
-        () => GetOnboardingPages(sl<OnboardingRepository>()),
+    () => GetOnboardingPages(sl<OnboardingRepository>()),
   );
 
   sl.registerLazySingleton<SetOnboardingSeen>(
-        () => SetOnboardingSeen(sl<OnboardingRepository>()),
+    () => SetOnboardingSeen(sl<OnboardingRepository>()),
   );
 
   sl.registerLazySingleton<IsOnboardingSeen>(
-        () => IsOnboardingSeen(sl<OnboardingRepository>()),
+    () => IsOnboardingSeen(sl<OnboardingRepository>()),
   );
 
   sl.registerFactory<OnboardingBloc>(
-        () => OnboardingBloc(
+    () => OnboardingBloc(
       getOnboardingPages: sl<GetOnboardingPages>(),
       setOnboardingSeen: sl<SetOnboardingSeen>(),
     ),
   );
 
-
   sl.registerLazySingleton<PersonalizationRemoteDataSourceInterface>(
-        () => PersonalizationRemoteDataSourceImpl(
+    () => PersonalizationRemoteDataSourceImpl(
       firebaseAuth: sl<FirebaseAuth>(),
       firestore: sl<FirebaseFirestore>(),
     ),
   );
 
   sl.registerLazySingleton<PersonalizationRepositoryInterface>(
-        () => PersonalizationRepoImpl(
+    () => PersonalizationRepoImpl(
       remoteDataSource: sl<PersonalizationRemoteDataSourceInterface>(),
     ),
   );
 
   sl.registerLazySingleton<GetUserPreferencesUseCase>(
-        () => GetUserPreferencesUseCase(sl<PersonalizationRepositoryInterface>()),
+    () => GetUserPreferencesUseCase(sl<PersonalizationRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<SaveUserPreferencesUseCase>(
-        () => SaveUserPreferencesUseCase(sl<PersonalizationRepositoryInterface>()),
+    () => SaveUserPreferencesUseCase(sl<PersonalizationRepositoryInterface>()),
   );
 
-
   sl.registerLazySingleton<GooglePlacesDataSource>(
-        () => GooglePlacesDataSource(),
+    () => GooglePlacesDataSource(),
   );
 
   sl.registerLazySingleton<RecommendationRepository>(
-        () => RecommendationRepositoryImpl(
+    () => RecommendationRepositoryImpl(
       sl<GooglePlacesDataSource>(),
       sl<FirebaseFirestore>(),
     ),
   );
 
   sl.registerLazySingleton<GetRecommendationsUseCase>(
-        () => GetRecommendationsUseCase(sl<RecommendationRepository>()),
+    () => GetRecommendationsUseCase(sl<RecommendationRepository>()),
   );
 
   sl.registerLazySingleton<SearchCafesUseCase>(
-        () => SearchCafesUseCase(sl<RecommendationRepository>()),
+    () => SearchCafesUseCase(sl<RecommendationRepository>()),
   );
 
   sl.registerFactoryParam<HomeCubit, String, void>(
-        (currentUserId, _) => HomeCubit(
+    (currentUserId, _) => HomeCubit(
       getRecommendationsUseCase: sl<GetRecommendationsUseCase>(),
       getUserPreferencesUseCase: sl<GetUserPreferencesUseCase>(),
       searchCafesUseCase: sl<SearchCafesUseCase>(),
@@ -227,35 +271,34 @@ Future<void> initDependencies() async {
     ),
   );
 
-
   sl.registerLazySingleton<ReviewsRemoteDataSourceInterface>(
-        () => ReviewsRemoteDataSourceImpl(),
+    () => ReviewsRemoteDataSourceImpl(),
   );
 
   sl.registerLazySingleton<ReviewsRepositoryInterface>(
-        () => ReviewsRepositoryImpl(
+    () => ReviewsRepositoryImpl(
       dataSource: sl<ReviewsRemoteDataSourceInterface>(),
     ),
   );
 
   sl.registerLazySingleton<GetCafeReviewsUseCase>(
-        () => GetCafeReviewsUseCase(repository: sl<ReviewsRepositoryInterface>()),
+    () => GetCafeReviewsUseCase(repository: sl<ReviewsRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<GetUserReviewUseCase>(
-        () => GetUserReviewUseCase(repository: sl<ReviewsRepositoryInterface>()),
+    () => GetUserReviewUseCase(repository: sl<ReviewsRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<SubmitReviewUseCase>(
-        () => SubmitReviewUseCase(repository: sl<ReviewsRepositoryInterface>()),
+    () => SubmitReviewUseCase(repository: sl<ReviewsRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<WatchCafeReviewsUseCase>(
-        () => WatchCafeReviewsUseCase(repository: sl<ReviewsRepositoryInterface>()),
+    () => WatchCafeReviewsUseCase(repository: sl<ReviewsRepositoryInterface>()),
   );
 
   sl.registerFactory<ReviewsCubit>(
-        () => ReviewsCubit(
+    () => ReviewsCubit(
       getCafeReviewsUseCase: sl<GetCafeReviewsUseCase>(),
       watchCafeReviewsUseCase: sl<WatchCafeReviewsUseCase>(),
       submitReviewUseCase: sl<SubmitReviewUseCase>(),
@@ -263,68 +306,65 @@ Future<void> initDependencies() async {
     ),
   );
 
-
   sl.registerLazySingleton<discovery.GooglePlacesDataSource>(
-        () => discovery.GooglePlacesDataSource(),
+    () => discovery.GooglePlacesDataSource(),
   );
 
   sl.registerLazySingleton<CafeFirestoreDataSource>(
-        () => CafeFirestoreDataSource(),
+    () => CafeFirestoreDataSource(),
   );
 
   sl.registerLazySingleton<CafeRepositoryInterface>(
-        () => CafeRepositoryImpl(
+    () => CafeRepositoryImpl(
       googlePlacesDataSource: sl<discovery.GooglePlacesDataSource>(),
       firebaseDataSource: sl<CafeFirestoreDataSource>(),
     ),
   );
 
   sl.registerFactory<DiscoveryCubit>(
-        () => DiscoveryCubit(
+    () => DiscoveryCubit(
       repository: sl<CafeRepositoryInterface>(),
       locationService: sl<LocationService>(),
     ),
   );
 
-
   sl.registerLazySingleton<CafeeRepositoryInterface>(
-        () => CafeRepositoryFirebase(dataSource: sl<CafeFirestoreDataSource>()),
+    () => CafeRepositoryFirebase(dataSource: sl<CafeFirestoreDataSource>()),
   );
 
   sl.registerLazySingleton<GetCafeExperienceUseCase>(
-        () => GetCafeExperienceUseCase(repository: sl<CafeeRepositoryInterface>()),
+    () => GetCafeExperienceUseCase(repository: sl<CafeeRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<GetCafeMenuUseCase>(
-        () => GetCafeMenuUseCase(repository: sl<CafeeRepositoryInterface>()),
+    () => GetCafeMenuUseCase(repository: sl<CafeeRepositoryInterface>()),
   );
 
   sl.registerFactory<CafeCubit>(
-        () => CafeCubit(
+    () => CafeCubit(
       getCafeExperienceUseCase: sl<GetCafeExperienceUseCase>(),
       getCafeMenuUseCase: sl<GetCafeMenuUseCase>(),
     ),
   );
 
-
   sl.registerLazySingleton<BookingRepositoryInterface>(
-        () => BookingRepositoryImpl(),
+    () => BookingRepositoryImpl(),
   );
 
   sl.registerLazySingleton<CreateBookingUseCase>(
-        () => CreateBookingUseCase(sl<BookingRepositoryInterface>()),
+    () => CreateBookingUseCase(sl<BookingRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<GetBookingUseCase>(
-        () => GetBookingUseCase(sl<BookingRepositoryInterface>()),
+    () => GetBookingUseCase(sl<BookingRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<UpdateBookingStatusUseCase>(
-        () => UpdateBookingStatusUseCase(sl<BookingRepositoryInterface>()),
+    () => UpdateBookingStatusUseCase(sl<BookingRepositoryInterface>()),
   );
 
   sl.registerFactory<BookingCubit>(
-        () => BookingCubit(
+    () => BookingCubit(
       sl<CreateBookingUseCase>(),
       sl<GetBookingUseCase>(),
       sl<UpdateBookingStatusUseCase>(),
@@ -332,138 +372,135 @@ Future<void> initDependencies() async {
     ),
   );
 
-
-
   sl.registerLazySingleton<CartRemoteDataSourceInterface>(
-        () => CartRemoteDataSourceImpl(),
+    () => CartRemoteDataSourceImpl(),
   );
 
   sl.registerLazySingleton<CartRepositoryInterface>(
-        () => CartRepositoryImpl(dataSource: sl<CartRemoteDataSourceInterface>()),
+    () => CartRepositoryImpl(dataSource: sl<CartRemoteDataSourceInterface>()),
   );
 
   sl.registerLazySingleton<AddToCartUseCase>(
-        () => AddToCartUseCase(repository: sl<CartRepositoryInterface>()),
+    () => AddToCartUseCase(repository: sl<CartRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<ClearCartUseCase>(
-        () => ClearCartUseCase(repository: sl<CartRepositoryInterface>()),
+    () => ClearCartUseCase(repository: sl<CartRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<GetCartUseCase>(
-        () => GetCartUseCase(repository: sl<CartRepositoryInterface>()),
+    () => GetCartUseCase(repository: sl<CartRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<RemoveFromCartUseCase>(
-        () => RemoveFromCartUseCase(repository: sl<CartRepositoryInterface>()),
+    () => RemoveFromCartUseCase(repository: sl<CartRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<UpdateCartQuantityUseCase>(
-        () => UpdateCartQuantityUseCase(repository: sl<CartRepositoryInterface>()),
+    () => UpdateCartQuantityUseCase(repository: sl<CartRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<WatchCartUseCase>(
-        () => WatchCartUseCase(
+    () => WatchCartUseCase(
       sl<CartRepositoryInterface>(),
       repository: sl<CartRepositoryInterface>(),
     ),
   );
 
   sl.registerFactory<CartCubit>(
-        () => CartCubit(
+    () => CartCubit(
       watchCartUseCase: sl<WatchCartUseCase>(),
       addToCartUseCase: sl<AddToCartUseCase>(),
       updateCartQuantityUseCase: sl<UpdateCartQuantityUseCase>(),
       removeCartUseCase: sl<RemoveFromCartUseCase>(),
       clearCartUseCase: sl<ClearCartUseCase>(),
       getCartUseCase: sl<GetCartUseCase>(),
+      createNotificationUseCase: sl<CreateNotificationUseCase>(),
     ),
   );
 
-
   sl.registerLazySingleton<PreOrderRemoteDataSourceInterface>(
-        () => PreOrderRemoteDataSourceImpl(),
+    () => PreOrderRemoteDataSourceImpl(),
   );
 
   sl.registerLazySingleton<PreOrderRepositoryInterface>(
-        () => PreOrderRepositoryImpl(
+    () => PreOrderRepositoryImpl(
       dataSource: sl<PreOrderRemoteDataSourceInterface>(),
     ),
   );
 
   sl.registerLazySingleton<CreatePreOrderUseCase>(
-        () => CreatePreOrderUseCase(repository: sl<PreOrderRepositoryInterface>()),
+    () => CreatePreOrderUseCase(repository: sl<PreOrderRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<CancelPreOrderUseCase>(
-        () => CancelPreOrderUseCase(repository: sl<PreOrderRepositoryInterface>()),
+    () => CancelPreOrderUseCase(repository: sl<PreOrderRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<GetPreOrderUseCase>(
-        () => GetPreOrderUseCase(repository: sl<PreOrderRepositoryInterface>()),
+    () => GetPreOrderUseCase(repository: sl<PreOrderRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<GetUserPreOrdersUseCase>(
-        () =>
+    () =>
         GetUserPreOrdersUseCase(repository: sl<PreOrderRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<UpdatePreOrderStatusUseCase>(
-        () => UpdatePreOrderStatusUseCase(
+    () => UpdatePreOrderStatusUseCase(
       repository: sl<PreOrderRepositoryInterface>(),
     ),
   );
 
   sl.registerLazySingleton<WatchUserPreOrdersUseCase>(
-        () => WatchUserPreOrdersUseCase(
+    () => WatchUserPreOrdersUseCase(
       repository: sl<PreOrderRepositoryInterface>(),
     ),
   );
 
   sl.registerFactory<PreOrderCubit>(
-        () => PreOrderCubit(
+    () => PreOrderCubit(
       getCafeMenuUseCase: sl<GetCafeMenuUseCase>(),
       createPreOrderUseCase: sl<CreatePreOrderUseCase>(),
     ),
   );
 
-
   sl.registerLazySingleton<FavoritesRemoteDataSourceInterface>(
-        () => FavoritesRemoteDataSourceImpl(),
+    () => FavoritesRemoteDataSourceImpl(),
   );
 
   sl.registerLazySingleton<FavoritesRepositoryInterface>(
-        () => FavoritesRepositoryImpl(
+    () => FavoritesRepositoryImpl(
       dataSource: sl<FavoritesRemoteDataSourceInterface>(),
     ),
   );
 
   sl.registerLazySingleton<AddFavoriteUseCase>(
-        () => AddFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
+    () => AddFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<GetFavoritesUseCase>(
-        () => GetFavoritesUseCase(repository: sl<FavoritesRepositoryInterface>()),
+    () => GetFavoritesUseCase(repository: sl<FavoritesRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<IsFavoriteUseCase>(
-        () => IsFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
+    () => IsFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<RemoveFavoriteUseCase>(
-        () => RemoveFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
+    () => RemoveFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<ToggleFavoriteUseCase>(
-        () => ToggleFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
+    () => ToggleFavoriteUseCase(repository: sl<FavoritesRepositoryInterface>()),
   );
 
   sl.registerLazySingleton<WatchFavoritesUseCase>(
-        () => WatchFavoritesUseCase(repository: sl<FavoritesRepositoryInterface>()),
+    () => WatchFavoritesUseCase(repository: sl<FavoritesRepositoryInterface>()),
   );
 
   sl.registerFactory<FavoritesCubit>(
-        () => FavoritesCubit(
+    () => FavoritesCubit(
       watchFavoritesUseCase: sl<WatchFavoritesUseCase>(),
       toggleFavoriteUseCase: sl<ToggleFavoriteUseCase>(),
       removeFavoriteUseCase: sl<RemoveFavoriteUseCase>(),
@@ -471,56 +508,54 @@ Future<void> initDependencies() async {
     ),
   );
 
-
   sl.registerLazySingleton<NotificationRemoteDataSource>(
-        () => NotificationRemoteDataSourceImpl(firestore: sl<FirebaseFirestore>()),
+    () => NotificationRemoteDataSourceImpl(firestore: sl<FirebaseFirestore>()),
   );
 
   sl.registerLazySingleton<NotificationRepoInterface>(
-        () => NotificationRepoImp(
+    () => NotificationRepoImp(
       remoteDataSource: sl<NotificationRemoteDataSource>(),
     ),
   );
 
   sl.registerLazySingleton<CreateNotificationUseCase>(
-        () => CreateNotificationUseCase(sl<NotificationRepoInterface>()),
+    () => CreateNotificationUseCase(sl<NotificationRepoInterface>()),
   );
 
   sl.registerLazySingleton<GetNotificationsUseCase>(
-        () => GetNotificationsUseCase(sl<NotificationRepoInterface>()),
+    () => GetNotificationsUseCase(sl<NotificationRepoInterface>()),
   );
 
   sl.registerLazySingleton<MarkNotificationReadUseCase>(
-        () => MarkNotificationReadUseCase(sl<NotificationRepoInterface>()),
+    () => MarkNotificationReadUseCase(sl<NotificationRepoInterface>()),
   );
 
   sl.registerLazySingleton<MarkAllNotificationsAsReadUseCase>(
-        () => MarkAllNotificationsAsReadUseCase(sl<NotificationRepoInterface>()),
+    () => MarkAllNotificationsAsReadUseCase(sl<NotificationRepoInterface>()),
   );
 
   sl.registerLazySingleton<DeleteNotificationUseCase>(
-        () => DeleteNotificationUseCase(sl<NotificationRepoInterface>()),
+    () => DeleteNotificationUseCase(sl<NotificationRepoInterface>()),
   );
 
-
   sl.registerLazySingleton<ProfileRemoteDataSource>(
-        () => ProfileRemoteDataSourceImpl(firestore: sl<FirebaseFirestore>()),
+    () => ProfileRemoteDataSourceImpl(firestore: sl<FirebaseFirestore>()),
   );
 
   sl.registerLazySingleton<ProfileRepoInterface>(
-        () => ProfileRepoImp(remoteDataSource: sl<ProfileRemoteDataSource>()),
+    () => ProfileRepoImp(remoteDataSource: sl<ProfileRemoteDataSource>()),
   );
 
   sl.registerLazySingleton<GetProfileUseCase>(
-        () => GetProfileUseCase(sl<ProfileRepoInterface>()),
+    () => GetProfileUseCase(sl<ProfileRepoInterface>()),
   );
 
   sl.registerLazySingleton<UpdateProfileUseCase>(
-        () => UpdateProfileUseCase(sl<ProfileRepoInterface>()),
+    () => UpdateProfileUseCase(sl<ProfileRepoInterface>()),
   );
 
   sl.registerFactory<ProfileCubit>(
-        () => ProfileCubit(
+    () => ProfileCubit(
       getUserProfileUseCase: sl<GetProfileUseCase>(),
       updateProfileUseCase: sl<UpdateProfileUseCase>(),
       authRepository: sl<AuthRepoInterface>(),
@@ -528,13 +563,12 @@ Future<void> initDependencies() async {
     ),
   );
 
-
   sl.registerFactory<NotificationCubit>(
-        () => NotificationCubit(
+    () => NotificationCubit(
       getNotificationsUseCase: sl<GetNotificationsUseCase>(),
       markNotificationReadUseCase: sl<MarkNotificationReadUseCase>(),
       markAllNotificationsAsReadUseCase:
-      sl<MarkAllNotificationsAsReadUseCase>(),
+          sl<MarkAllNotificationsAsReadUseCase>(),
       deleteNotificationUseCase: sl<DeleteNotificationUseCase>(),
       notificationRepository: sl<NotificationRepoInterface>(),
     ),

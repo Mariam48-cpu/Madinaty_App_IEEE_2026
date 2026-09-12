@@ -6,6 +6,10 @@ import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/profile_skeleton.dart';
 import 'package:toastification/toastification.dart';
 
+import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/domain/entities/favorite_item_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/favorites/presentation/view/screens/favorites_screen.dart';
+
 import '../../../../../core/utils/app_toast.dart';
 import '../../view_model/profile_cubit.dart';
 import 'edit_profile_screen.dart';
@@ -20,9 +24,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final FlutterLocalization _localization = FlutterLocalization.instance;
+
   @override
   void initState() {
     super.initState();
+
     context.read<ProfileCubit>().fetchUserProfile(widget.uid);
   }
 
@@ -50,12 +57,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
 
             String name = AppLocale.defaultUser.getString(context);
+
             String email = "";
             String phone = "";
             String? profileImageUrl;
             String birthDateStr = "";
 
-            const int loyaltyPoints = 1250;
+            int userPoints = 0;
+            int bookingsCount = 0;
+            int favoritesCount = 0;
+            int ordersCount = 0;
+            int favoritePlacesCount = 0;
+            int favoriteProductsCount = 0;
 
             if (state is ProfileLoaded) {
               name = state.user.name ?? name;
@@ -63,6 +76,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               phone = state.user.phone ?? "";
               profileImageUrl = state.user.profileImageUrl;
               birthDateStr = state.user.birthDate?.toString() ?? "";
+              userPoints = state.user.points;
+              bookingsCount = state.bookingsCount;
+              favoritesCount = state.favoritesCount;
+              ordersCount = state.ordersCount;
+              favoritePlacesCount = state.favoritePlacesCount;
+              favoriteProductsCount = state.favoriteProductsCount;
             }
 
             return SingleChildScrollView(
@@ -70,6 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ================= HEADER =================
                   Row(
                     children: [
                       Text(
@@ -80,27 +100,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: AppColors.textPrimary,
                         ),
                       ),
+
                       const Spacer(),
-                      _HeaderLanguageSwitch(
-                        onLocaleChanged: () {
-                          if (mounted) {
-                            setState(() {});
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.settings_outlined,
-                          color: AppColors.primary,
-                        ),
-                        onPressed: () {},
-                      ),
+
+                      _HeaderLanguageSwitch(localization: _localization),
                     ],
                   ),
 
                   const SizedBox(height: 20),
 
+                  // ================= PROFILE CARD =================
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -116,6 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Column(
                       children: [
+                        // ================= PROFILE IMAGE =================
                         Stack(
                           alignment: AlignmentDirectional.bottomEnd,
                           children: [
@@ -123,18 +133,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               radius: 45,
                               backgroundColor: AppColors.surfaceVariant,
                               backgroundImage:
-                              profileImageUrl != null &&
-                                  profileImageUrl.isNotEmpty
+                                  profileImageUrl != null &&
+                                      profileImageUrl.isNotEmpty
                                   ? NetworkImage(profileImageUrl)
                                   : null,
                               child:
-                              profileImageUrl == null ||
-                                  profileImageUrl.isEmpty
+                                  profileImageUrl == null ||
+                                      profileImageUrl.isEmpty
                                   ? const Icon(
-                                Icons.person,
-                                size: 50,
-                                color: AppColors.primary,
-                              )
+                                      Icons.person,
+                                      size: 50,
+                                      color: AppColors.primary,
+                                    )
                                   : null,
                             ),
 
@@ -174,7 +184,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         const SizedBox(height: 12),
-
                         Text(
                           name,
                           style: const TextStyle(
@@ -184,37 +193,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 4),
-
-                        Text(
-                          email,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16.0),
                           child: Divider(color: AppColors.border),
                         ),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _ProfileStatItem(
                               title: AppLocale.bookingsTitle.getString(context),
-                              value: "12",
+                              value: "$bookingsCount",
                             ),
+
                             const _VerticalDivider(),
+
                             _ProfileStatItem(
                               title: AppLocale.navFavorites.getString(context),
-                              value: "8",
+                              value: "$favoritesCount",
                             ),
+
                             const _VerticalDivider(),
+
                             _ProfileStatItem(
                               title: AppLocale.ordersTitle.getString(context),
-                              value: "45",
+                              value: "$ordersCount",
                             ),
                           ],
                         ),
@@ -223,7 +225,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   const SizedBox(height: 16),
-
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -235,40 +236,112 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildMenuCard(
                         context,
                         AppLocale.bookingsTitle.getString(context),
-                        AppLocale.bookingsSubtitle.getString(context),
+                        bookingsCount > 0
+                            ? "$bookingsCount ${AppLocale.savedBookingSuffix.getString(context)}"
+                            : AppLocale.bookingsSubtitle.getString(context),
                         Icons.calendar_today_outlined,
                         AppColors.surfaceVariant,
                         AppColors.primary,
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.myBookings);
+                        },
                       ),
+
                       _buildMenuCard(
                         context,
-                        AppLocale.navFavorites.getString(context),
-                        AppLocale.favoritePlacesSubtitle.getString(context),
+                        AppLocale.favoriteCafesAndPlaces.getString(context),
+                        favoritePlacesCount > 0
+                            ? "$favoritePlacesCount ${AppLocale.favoritePlaceSuffix.getString(context)}"
+                            : AppLocale.favoritePlacesSubtitle.getString(
+                                context,
+                              ),
                         Icons.favorite_border,
                         AppColors.error.withValues(alpha: 0.1),
                         AppColors.error,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const FavoritesScreen(
+                                initialTab: FavoriteTargetType.cafe,
+                              ),
+                            ),
+                          );
+                        },
                       ),
+
                       _buildMenuCard(
                         context,
                         AppLocale.favoriteProducts.getString(context),
-                        AppLocale.favoriteProductsSubtitle.getString(context),
+                        favoriteProductsCount > 0
+                            ? "$favoriteProductsCount ${AppLocale.favoriteProductSuffix.getString(context)}"
+                            : AppLocale.favoriteProductsSubtitle.getString(
+                                context,
+                              ),
                         Icons.coffee_outlined,
                         AppColors.surfaceVariant,
                         AppColors.primary,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const FavoritesScreen(
+                                initialTab: FavoriteTargetType.product,
+                              ),
+                            ),
+                          );
+                        },
                       ),
+
                       _buildMenuCard(
                         context,
                         AppLocale.loyaltyPoints.getString(context),
-                        "$loyaltyPoints ${AppLocale.pointsUnit.getString(context)}",
+                        "$userPoints ${AppLocale.pointsUnit.getString(context)}",
                         Icons.workspace_premium_outlined,
                         Colors.amber.shade50,
                         Colors.amber.shade800,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              title: Row(
+                                children: [
+                                  Icon(
+                                    Icons.workspace_premium,
+                                    color: Colors.amber.shade800,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    AppLocale.loyaltyPoints.getString(context),
+                                  ),
+                                ],
+                              ),
+                              content: Text(
+                                AppLocale.loyaltyDialogContent
+                                    .getString(context)
+                                    .replaceAll('{points}', '$userPoints'),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    AppLocale.okBtn.getString(context),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 16),
 
+                  // ================= SETTINGS LIST =================
                   Material(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
@@ -278,26 +351,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildListTile(
                           AppLocale.paymentMethods.getString(context),
                           Icons.credit_card_outlined,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.paymentMethods,
+                            );
+                          },
                         ),
+
                         const Divider(
                           height: 1,
                           indent: 16,
                           endIndent: 16,
                           color: AppColors.border,
                         ),
+
                         _buildListTile(
                           AppLocale.savedAddresses.getString(context),
                           Icons.location_on_outlined,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.savedAddresses,
+                            );
+                          },
                         ),
+
                         const Divider(
                           height: 1,
                           indent: 16,
                           endIndent: 16,
                           color: AppColors.border,
                         ),
+
                         _buildListTile(
                           AppLocale.helpAndSupport.getString(context),
                           Icons.help_outline,
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRoutes.helpSupport);
+                          },
                         ),
                       ],
                     ),
@@ -305,6 +397,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(height: 20),
 
+                  // ================= LOGOUT =================
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -339,65 +432,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ================= MENU CARD =================
+
   Widget _buildMenuCard(
-      BuildContext context,
-      String title,
-      String subtitle,
-      IconData icon,
-      Color bgColor,
-      Color iconColor,
-      ) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
+    BuildContext context,
+    String title,
+    String subtitle,
+    IconData icon,
+    Color bgColor,
+    Color iconColor, {
+    VoidCallback? onTap,
+  }) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: AppColors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: iconColor, size: 18),
+                  ),
+                ],
               ),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  shape: BoxShape.circle,
+
+              const SizedBox(height: 6),
+
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
                 ),
-                child: Icon(icon, color: iconColor, size: 18),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildListTile(String title, IconData icon) {
+  // ================= LIST TILE =================
+
+  Widget _buildListTile(String title, IconData icon, {VoidCallback? onTap}) {
     return ListTile(
       leading: Icon(icon, color: AppColors.textPrimary),
       title: Text(
@@ -409,30 +517,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
       trailing: const Icon(
-        Icons.arrow_forward_ios,
+        Icons.arrow_forward_ios_rounded,
         size: 14,
         color: AppColors.textSecondary,
       ),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }
 
-class _HeaderLanguageSwitch extends StatefulWidget {
-  final VoidCallback onLocaleChanged;
+// ============================================================
+// LANGUAGE SWITCH
+// ============================================================
 
-  const _HeaderLanguageSwitch({super.key, required this.onLocaleChanged});
+class _HeaderLanguageSwitch extends StatelessWidget {
+  final FlutterLocalization localization;
 
-  @override
-  State<_HeaderLanguageSwitch> createState() => _HeaderLanguageSwitchState();
-}
-
-class _HeaderLanguageSwitchState extends State<_HeaderLanguageSwitch> {
-  final FlutterLocalization _localization = FlutterLocalization.instance;
+  const _HeaderLanguageSwitch({required this.localization});
 
   @override
   Widget build(BuildContext context) {
-    final currentCode = _localization.currentLocale?.languageCode ?? 'ar';
+    final currentCode = localization.currentLocale?.languageCode ?? 'ar';
+
     final isArabic = currentCode == 'ar';
 
     return Container(
@@ -452,20 +558,17 @@ class _HeaderLanguageSwitchState extends State<_HeaderLanguageSwitch> {
               isSelected: isArabic,
               onTap: () {
                 if (!isArabic) {
-                  _localization.translate('ar');
-                  setState(() {});
-                  widget.onLocaleChanged();
+                  localization.translate('ar');
                 }
               },
             ),
+
             _buildLangBtn(
               title: 'EN',
               isSelected: !isArabic,
               onTap: () {
                 if (isArabic) {
-                  _localization.translate('en');
-                  setState(() {});
-                  widget.onLocaleChanged();
+                  localization.translate('en');
                 }
               },
             ),
@@ -503,6 +606,10 @@ class _HeaderLanguageSwitchState extends State<_HeaderLanguageSwitch> {
   }
 }
 
+// ============================================================
+// PROFILE STAT ITEM
+// ============================================================
+
 class _ProfileStatItem extends StatelessWidget {
   final String title;
   final String value;
@@ -521,7 +628,9 @@ class _ProfileStatItem extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
+
         const SizedBox(height: 4),
+
         Text(
           title,
           style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -530,6 +639,10 @@ class _ProfileStatItem extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// VERTICAL DIVIDER
+// ============================================================
 
 class _VerticalDivider extends StatelessWidget {
   const _VerticalDivider();

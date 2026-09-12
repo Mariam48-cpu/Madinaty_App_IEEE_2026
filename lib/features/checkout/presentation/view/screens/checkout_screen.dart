@@ -32,7 +32,6 @@ import 'package:toastification/toastification.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/domain/use_cases/create_notification_use_case.dart';
 
-
 class CheckoutScreen extends StatelessWidget {
   final BookingEntity booking;
 
@@ -110,7 +109,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
             backgroundColor: AppColors.surfaceVariant,
             child: IconButton(
               icon: const Icon(
-                Icons.arrow_back,
+                Icons.arrow_back_ios_new,
                 color: AppColors.textPrimary,
                 size: 20,
               ),
@@ -142,7 +141,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
             );
 
             if (isSuccess == true && context.mounted) {
-              context.read<CheckoutCubit>().finalizePaymobSuccess(state.booking);
+              context.read<CheckoutCubit>().finalizePaymobSuccess(
+                state.booking,
+              );
             } else if (isSuccess == false && context.mounted) {
               AppToast.showToast(
                 context: context,

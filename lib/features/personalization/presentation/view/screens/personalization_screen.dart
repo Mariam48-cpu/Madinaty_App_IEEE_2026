@@ -3,19 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/personalization_skeleton.dart';
 import 'package:toastification/toastification.dart';
-import 'package:flutter_localization/flutter_localization.dart';
 
-import '../../../../../core/constants/app_assets.dart';
-import '../../../../../core/di/injection_container.dart';
-import '../../../../../core/localization/app_locale.dart';
-import '../../../../../core/routes/app_routes.dart';
-import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/utils/app_toast.dart';
-import '../../../../../core/widgets/custom_button.dart';
-import '../../../../../core/widgets/error_state_widget.dart';
-import '../../../../../core/widgets/loading_widget.dart';
+import 'package:madinaty_app_ieee_2026/core/constants/app_assets.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
+import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/custom_button.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/error_state_widget.dart';
+import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/personalization_skeleton.dart';
+import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
 
 import '../../../domain/use_cases/get_user_preferences_usecase.dart';
 import '../../../domain/use_cases/save_user_preferences_usecase.dart';
@@ -63,7 +61,6 @@ class PersonalizationView extends StatefulWidget {
 }
 
 class _PersonalizationViewState extends State<PersonalizationView> {
-  int _bottomNavIndex = 0;
   int? _previousStep;
 
   @override
@@ -72,15 +69,26 @@ class _PersonalizationViewState extends State<PersonalizationView> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: AppColors.background,
+
+        // ==========================================================
+        // BODY
+        // ==========================================================
         body: BlocConsumer<PersonalizationCubit, PersonalizationState>(
           listener: (context, state) {
+            // ------------------------------------------------------
+            // SUCCESS
+            // ------------------------------------------------------
             if (state is PersonalizationSuccessState) {
               if (widget.onSaved != null) {
                 widget.onSaved!();
               } else {
                 Navigator.of(context).pushReplacementNamed(AppRoutes.home);
               }
-            } else if (state is PersonalizationLoadedState) {
+            }
+            // ------------------------------------------------------
+            // LOADED
+            // ------------------------------------------------------
+            else if (state is PersonalizationLoadedState) {
               if (_previousStep == 0 &&
                   state.currentStep == 1 &&
                   state.errorMessage == null) {
@@ -104,7 +112,11 @@ class _PersonalizationViewState extends State<PersonalizationView> {
                   type: ToastificationType.error,
                 );
               }
-            } else if (state is PersonalizationErrorState) {
+            }
+            // ------------------------------------------------------
+            // ERROR
+            // ------------------------------------------------------
+            else if (state is PersonalizationErrorState) {
               AppToast.showToast(
                 context: context,
                 title: AppLocale.toastError.getString(context),
@@ -113,17 +125,25 @@ class _PersonalizationViewState extends State<PersonalizationView> {
               );
             }
           },
+
           builder: (context, state) {
+            // ======================================================
+            // LOADING
+            // ======================================================
             if (state is PersonalizationLoadingState ||
                 state is PersonalizationInitialState) {
               return const PersonalizationSkeleton();
             }
 
+            // ======================================================
+            // ERROR
+            // ======================================================
             if (state is PersonalizationErrorState) {
               return ErrorStateWidget(
                 errorMessage: state.message,
-                onRetry: () =>
-                    context.read<PersonalizationCubit>().loadPreferences(),
+                onRetry: () {
+                  context.read<PersonalizationCubit>().loadPreferences();
+                },
               );
             }
 
@@ -131,6 +151,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
                 ? state
                 : const PersonalizationLoadedState();
 
+            // ======================================================
+            // CONTENT
+            // ======================================================
             return SafeArea(
               child: loadedState.currentStep == 0
                   ? _buildInterestsScreen(context, loadedState)
@@ -138,17 +161,21 @@ class _PersonalizationViewState extends State<PersonalizationView> {
             );
           },
         ),
-        bottomNavigationBar:
-            context.select<PersonalizationCubit, bool>(
-              (cubit) =>
-                  cubit.state is PersonalizationLoadedState &&
-                  (cubit.state as PersonalizationLoadedState).currentStep == 1,
-            )
-            ? _buildBottomNavBar()
-            : null,
+
+        // ==========================================================
+        // IMPORTANT:
+        // مفيش BottomNavigationBar هنا خالص.
+        //
+        // الـ Personalization شاشة إعدادات قبل دخول الـ Home.
+        // وبعد الحفظ /home بيفتح MainNavigationScreen.
+        // ==========================================================
       ),
     );
   }
+
+  // ================================================================
+  // STEP 1 — INTERESTS
+  // ================================================================
 
   Widget _buildInterestsScreen(
     BuildContext context,
@@ -201,10 +228,13 @@ class _PersonalizationViewState extends State<PersonalizationView> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ========================================================
+          // STEP INDICATOR
+          // ========================================================
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
@@ -216,7 +246,12 @@ class _PersonalizationViewState extends State<PersonalizationView> {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+
+          const SizedBox(height: 20),
+
+          // ========================================================
+          // TITLE
+          // ========================================================
           Center(
             child: Column(
               children: [
@@ -229,7 +264,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
                     fontSize: 22,
                   ),
                 ),
-                const SizedBox(height: 6),
+
+                const SizedBox(height: 7),
+
                 Text(
                   AppLocale.whatDoYouLikeSubtitle.getString(context),
                   textAlign: TextAlign.center,
@@ -241,50 +278,78 @@ class _PersonalizationViewState extends State<PersonalizationView> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 22),
+
+          // ========================================================
+          // INTERESTS GRID
+          // ========================================================
           Expanded(
             child: GridView.builder(
               physics: const BouncingScrollPhysics(),
+
+              padding: const EdgeInsets.only(bottom: 8),
+
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 14,
                 mainAxisSpacing: 14,
                 childAspectRatio: 1.22,
               ),
+
               itemCount: interests.length,
+
               itemBuilder: (context, index) {
                 final item = interests[index];
+
                 final id = item['id']!;
+
                 final isSelected = state.selectedInterests.contains(id);
 
                 return PersonalizationGridCard(
                   title: item['label']!,
                   svgAsset: item['svg']!,
                   isSelected: isSelected,
-                  onTap: () => cubit.toggleInterest(id),
+                  onTap: () {
+                    cubit.toggleInterest(id);
+                  },
                 );
               },
             ),
           ),
-          const SizedBox(height: 14),
+
+          const SizedBox(height: 12),
+
+          // ========================================================
+          // CONTINUE BUTTON
+          // ========================================================
           CustomButton(
             text: AppLocale.continueBtn.getString(context),
             backgroundColor: AppColors.darkButton,
             textColor: AppColors.onDarkButton,
             borderRadius: 18,
             height: 58,
+
             textStyle: theme.textTheme.titleMedium?.copyWith(
               color: AppColors.onDarkButton,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
-            onPressed: () => cubit.goToNextStep(),
+
+            onPressed: () {
+              cubit.goToNextStep();
+            },
           ),
-          const SizedBox(height: 10),
+
+          const SizedBox(height: 6),
         ],
       ),
     );
   }
+
+  // ================================================================
+  // STEP 2 — MOOD / OCCASION
+  // ================================================================
 
   Widget _buildMoodOccasionScreen(
     BuildContext context,
@@ -337,43 +402,15 @@ class _PersonalizationViewState extends State<PersonalizationView> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.location_on_outlined,
-                    color: AppColors.textPrimary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    AppLocale.appTitle.getString(context),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: const Icon(
-                  Icons.notifications_none_rounded,
-                  color: AppColors.textPrimary,
-                  size: 22,
-                ),
-                onPressed: () {},
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
+          // ========================================================
+          // TITLE
+          // ========================================================
+          const SizedBox(height: 12),
+
           Center(
             child: Column(
               children: [
@@ -386,7 +423,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
                     fontSize: 22,
                   ),
                 ),
-                const SizedBox(height: 6),
+
+                const SizedBox(height: 7),
+
                 Text(
                   AppLocale.whyGoingOutSubtitle.getString(context),
                   textAlign: TextAlign.center,
@@ -398,19 +437,30 @@ class _PersonalizationViewState extends State<PersonalizationView> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 22),
+
+          // ========================================================
+          // OPTIONS GRID
+          // ========================================================
           Expanded(
             child: GridView.builder(
               physics: const BouncingScrollPhysics(),
+
+              padding: const EdgeInsets.only(bottom: 8),
+
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 14,
                 mainAxisSpacing: 14,
                 childAspectRatio: 1.22,
               ),
+
               itemCount: options.length,
+
               itemBuilder: (context, index) {
                 final item = options[index];
+
                 final id = item['id']!;
 
                 final isSelected =
@@ -420,76 +470,40 @@ class _PersonalizationViewState extends State<PersonalizationView> {
                   title: item['label']!,
                   svgAsset: item['svg']!,
                   isSelected: isSelected,
-                  onTap: () => cubit.selectOption(id),
+                  onTap: () {
+                    cubit.selectOption(id);
+                  },
                 );
               },
             ),
           ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 10),
+
+          // ========================================================
+          // SAVE BUTTON
+          // ========================================================
           CustomButton(
             text: AppLocale.showSuitablePlaces.getString(context),
+
             isLoading: state.isSaving,
+
             backgroundColor: const Color(0xFF7E8082),
+
             textColor: AppColors.onDarkButton,
+
             borderRadius: 18,
-            height: 50,
+
+            height: 52,
+
             onPressed: state.isSaving
                 ? null
                 : () {
                     cubit.savePreferences();
                   },
           ),
-          const SizedBox(height: 4),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(
-          top: BorderSide(color: Color(0xFFF0ECE6), width: 1.0),
-        ),
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _bottomNavIndex,
-        onTap: (index) => setState(() => _bottomNavIndex = index),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.surface,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textMuted,
-        selectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-          fontFamily: 'Cairo',
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 11,
-          fontFamily: 'Cairo',
-        ),
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            activeIcon: const Icon(Icons.home_rounded),
-            label: AppLocale.navHome.getString(context),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.map_outlined),
-            activeIcon: const Icon(Icons.map_rounded),
-            label: AppLocale.navMap.getString(context),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.format_list_bulleted_rounded),
-            activeIcon: const Icon(Icons.format_list_bulleted_rounded),
-            label: AppLocale.navMyLists.getString(context),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person_outline_rounded),
-            activeIcon: const Icon(Icons.person_rounded),
-            label: AppLocale.navMyAccount.getString(context),
-          ),
+          const SizedBox(height: 4),
         ],
       ),
     );

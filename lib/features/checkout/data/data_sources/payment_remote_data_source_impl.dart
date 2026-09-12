@@ -236,6 +236,7 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
       id: docRef.id,
       userId: user.uid,
       cafeId: booking.cafeId,
+      cafeName: booking.cafeName,
       date: booking.date,
       time: booking.time,
       guests: booking.guests,
@@ -246,6 +247,13 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
     );
 
     await docRef.set(confirmedBooking.toFirestore());
+
+    try {
+      await _firestore.collection('users').doc(user.uid).set({
+        'points': FieldValue.increment(50),
+        'loyaltyPoints': FieldValue.increment(50),
+      }, SetOptions(merge: true));
+    } catch (_) {}
 
     return confirmedBooking;
   }

@@ -27,7 +27,7 @@ abstract class AIPlannerDataSource {
 class AIPlannerDataSourceImpl implements AIPlannerDataSource {
 
   static const String _apiKey =
-      'AQ.Ab8RN6LMlccq9zKfCksq39stPTghe4mIxXiTqavQvzJNCw0k9A';
+      'AQ.Ab8RN6IHKnKi2nFD1esyNQXWzSCF32ovBPXejnqUOOSFnv3RoA';
 
   static const String _model = 'gemini-3.5-flash';
 
@@ -121,7 +121,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
       }
 
       throw Exception(AppLocale.aiServerError);
-    } on http.ClientException catch (e) {
+    } on http.ClientException catch (_) {
       throw Exception(AppLocale.aiNetworkConnectionError);
     } catch (e) {
       if (e is Exception) {

@@ -75,6 +75,7 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
               id: state.bookingId,
               userId: FirebaseAuth.instance.currentUser?.uid ?? 'guest_user',
               cafeId: widget.cafe.id,
+              cafeName: widget.cafe.name,
               date: cubit.date ?? DateTime.now(),
               time: cubit.time ?? '18:00',
               guests: cubit.guests,
