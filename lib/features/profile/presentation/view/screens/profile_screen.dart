@@ -252,7 +252,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         AppLocale.favoriteCafesAndPlaces.getString(context),
                         favoritePlacesCount > 0
                             ? "$favoritePlacesCount ${AppLocale.favoritePlaceSuffix.getString(context)}"
-                            : AppLocale.favoritePlacesSubtitle.getString(context),
+                            : AppLocale.favoritePlacesSubtitle.getString(
+                                context,
+                              ),
                         Icons.favorite_border,
                         AppColors.error.withValues(alpha: 0.1),
                         AppColors.error,
@@ -273,7 +275,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         AppLocale.favoriteProducts.getString(context),
                         favoriteProductsCount > 0
                             ? "$favoriteProductsCount ${AppLocale.favoriteProductSuffix.getString(context)}"
-                            : AppLocale.favoriteProductsSubtitle.getString(context),
+                            : AppLocale.favoriteProductsSubtitle.getString(
+                                context,
+                              ),
                         Icons.coffee_outlined,
                         AppColors.surfaceVariant,
                         AppColors.primary,
@@ -305,18 +309,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               title: Row(
                                 children: [
-                                  Icon(Icons.workspace_premium, color: Colors.amber.shade800),
+                                  Icon(
+                                    Icons.workspace_premium,
+                                    color: Colors.amber.shade800,
+                                  ),
                                   const SizedBox(width: 8),
-                                  Text(AppLocale.loyaltyPoints.getString(context)),
+                                  Text(
+                                    AppLocale.loyaltyPoints.getString(context),
+                                  ),
                                 ],
                               ),
                               content: Text(
-                                AppLocale.loyaltyDialogContent.getString(context).replaceAll('{points}', '$userPoints'),
+                                AppLocale.loyaltyDialogContent
+                                    .getString(context)
+                                    .replaceAll('{points}', '$userPoints'),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: Text(AppLocale.okBtn.getString(context)),
+                                  child: Text(
+                                    AppLocale.okBtn.getString(context),
+                                  ),
                                 ),
                               ],
                             ),
@@ -339,7 +352,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           AppLocale.paymentMethods.getString(context),
                           Icons.credit_card_outlined,
                           onTap: () {
-                            Navigator.pushNamed(context, AppRoutes.paymentMethods);
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.paymentMethods,
+                            );
                           },
                         ),
 
@@ -354,7 +370,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           AppLocale.savedAddresses.getString(context),
                           Icons.location_on_outlined,
                           onTap: () {
-                            Navigator.pushNamed(context, AppRoutes.savedAddresses);
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.savedAddresses,
+                            );
                           },
                         ),
 
@@ -498,7 +517,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
       trailing: const Icon(
-        Icons.arrow_forward_ios,
+        Icons.arrow_forward_ios_rounded,
         size: 14,
         color: AppColors.textSecondary,
       ),

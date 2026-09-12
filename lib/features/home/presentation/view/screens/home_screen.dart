@@ -944,7 +944,7 @@ class _AiPlannerEntryCard extends StatelessWidget {
                         Navigator.pushNamed(context, AppRoutes.aiPlanner);
                       },
 
-                      icon: const Icon(Icons.arrow_back_rounded, size: 14),
+                      icon: const Icon(Icons.arrow_back_ios_new, size: 14),
 
                       label: const Text(
                         'ابدأ الآن',
