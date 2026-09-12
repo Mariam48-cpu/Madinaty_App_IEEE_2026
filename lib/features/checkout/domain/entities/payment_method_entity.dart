@@ -17,20 +17,20 @@ class PaymentMethodEntity {
     this.isSelected = false,
   });
 
-  static const List<PaymentMethodEntity> availableMethods = [
+  static final List<PaymentMethodEntity> availableMethods = [
     PaymentMethodEntity(
       id: 'card',
       title: AppLocale.cardPaymentTitle,
       subtitle: AppLocale.cardPaymentSubtitle,
       type: PaymentType.card,
     ),
-    PaymentMethodEntity(
+    const PaymentMethodEntity(
       id: 'wallet',
       title: AppLocale.walletPaymentTitle,
       subtitle: AppLocale.walletPaymentSubtitle,
       type: PaymentType.wallet,
     ),
-    PaymentMethodEntity(
+    const PaymentMethodEntity(
       id: 'cash',
       title: AppLocale.cashPaymentTitle,
       subtitle: AppLocale.cashPaymentSubtitle,

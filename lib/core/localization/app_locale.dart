@@ -59,7 +59,8 @@ mixin AppLocale {
   static const String changePasswordBtn = 'changePasswordBtn';
   static const String deleteAccountBtn = 'deleteAccountBtn';
   static const String deleteAccountTitle = 'deleteAccountTitle';
-  static const String deleteAccountConfirmMessage = 'deleteAccountConfirmMessage';
+  static const String deleteAccountConfirmMessage =
+      'deleteAccountConfirmMessage';
   static const String deletingAccountProgress = 'deletingAccountProgress';
   static const String dialogNo = 'dialogNo';
   static const String dialogYes = 'dialogYes';
@@ -96,11 +97,14 @@ mixin AppLocale {
   static const String determiningLocation = 'determiningLocation';
   static const String myCurrentLocation = 'myCurrentLocation';
   static const String locationPermissionTitle = 'locationPermissionTitle';
-  static const String locationPermissionDescription = 'locationPermissionDescription';
+  static const String locationPermissionDescription =
+      'locationPermissionDescription';
   static const String allowLocation = 'allowLocation';
   static const String chooseLocationManually = 'chooseLocationManually';
-  static const String locationPermissionDialogTitle = 'locationPermissionDialogTitle';
-  static const String locationPermissionDialogContent = 'locationPermissionDialogContent';
+  static const String locationPermissionDialogTitle =
+      'locationPermissionDialogTitle';
+  static const String locationPermissionDialogContent =
+      'locationPermissionDialogContent';
   static const String locationError = 'locationError';
   static const String selectLocationTitle = 'selectLocationTitle';
   static const String enableGpsPrompt = 'enableGpsPrompt';
@@ -165,12 +169,14 @@ mixin AppLocale {
   static const String resendOtpInPrefix = 'resendOtpInPrefix';
   static const String resendOtpButton = 'resendOtpButton';
   static const String resetLinkSentSuccess = 'resetLinkSentSuccess';
-  static const String resetPasswordEmailSentDefault = 'resetPasswordEmailSentDefault';
+  static const String resetPasswordEmailSentDefault =
+      'resetPasswordEmailSentDefault';
   static const String loginRequiredToProceed = 'loginRequiredToProceed';
   static const String enterNameError = 'enterNameError';
   static const String enterEmailError = 'enterEmailError';
   static const String passwordMinLengthError = 'passwordMinLengthError';
-  static const String confirmPasswordRequiredError = 'confirmPasswordRequiredError';
+  static const String confirmPasswordRequiredError =
+      'confirmPasswordRequiredError';
   static const String passwordMismatchError = 'passwordMismatchError';
   static const String enterCompleteOtpError = 'enterCompleteOtpError';
   static const String noLoggedInUserError = 'noLoggedInUserError';
@@ -254,7 +260,8 @@ mixin AppLocale {
   static const String guests = 'guests';
   static const String calendarTableBookingPrefix = 'calendarTableBookingPrefix';
   static const String calendarBookingForPrefix = 'calendarBookingForPrefix';
-  static const String calendarBookingNumberPrefix = 'calendarBookingNumberPrefix';
+  static const String calendarBookingNumberPrefix =
+      'calendarBookingNumberPrefix';
   static const String defaultMapLocationName = 'defaultMapLocationName';
   static const String defaultMapFallbackCafe = 'defaultMapFallbackCafe';
   static const String selectDateError = 'selectDateError';
@@ -263,7 +270,8 @@ mixin AppLocale {
   static const String userNotLoggedInError = 'userNotLoggedInError';
   static const String tableAlreadyBookedError = 'tableAlreadyBookedError';
   static const String completeBookingDataError = 'complete_booking_data_error';
-  static const String loginRequiredBookingError = 'login_required_booking_error';
+  static const String loginRequiredBookingError =
+      'login_required_booking_error';
   static const String cartTitle = 'cartTitle';
   static const String clearCart = 'clearCart';
   static const String cartSubtotal = 'cartSubtotal';
@@ -284,7 +292,8 @@ mixin AppLocale {
   static const String preOrdersTitle = 'preOrdersTitle';
   static const String preOrdersSubtotal = 'preOrdersSubtotal';
   static const String tableReservationFee = 'tableReservationFee';
-  static const String tableReservationFeeSubtitle = 'tableReservationFeeSubtitle';
+  static const String tableReservationFeeSubtitle =
+      'tableReservationFeeSubtitle';
   static const String taxes = 'taxes';
   static const String inclusiveOfTaxes = 'inclusiveOfTaxes';
   static const String reservationSuccessDesc = 'reservationSuccessDesc';
@@ -346,7 +355,8 @@ mixin AppLocale {
   static const String selectFavoriteInterests = 'selectFavoriteInterests';
   static const String selectGoingOutReason = 'selectGoingOutReason';
   static const String weatherUnavailable = 'weatherUnavailable';
-  static const String weatherRainyIndoorPreferred = 'weatherRainyIndoorPreferred';
+  static const String weatherRainyIndoorPreferred =
+      'weatherRainyIndoorPreferred';
   static const String weatherSuitableOutdoor = 'weatherSuitableOutdoor';
   static const String aiDefaultHeadline = 'aiDefaultHeadline';
   static const String aiDefaultActivityTitle = 'aiDefaultActivityTitle';
@@ -395,7 +405,8 @@ mixin AppLocale {
   static const String aiServerError = 'aiServerError';
   static const String aiNetworkConnectionError = 'aiNetworkConnectionError';
 
-  static const String choosePreferredPaymentMethod = 'choosePreferredPaymentMethod';
+  static const String choosePreferredPaymentMethod =
+      'choosePreferredPaymentMethod';
   static const String defaultPaymentMethodDesc = 'defaultPaymentMethodDesc';
   static const String cardPaymentTitle = 'cardPaymentTitle';
   static const String cardPaymentSubtitle = 'cardPaymentSubtitle';
@@ -475,7 +486,8 @@ mixin AppLocale {
     studyPlaces: 'أماكن للمذاكرة',
     searchErrorOccurred: 'حدث خطأ أثناء البحث',
     trySearchingDifferentName: 'جرب البحث باسم كافيه أو منطقة أخرى',
-    searchRateLimitExceeded: 'تم الوصول للحد اليومي للبحث. جرب مرة أخرى لاحقًا.',
+    searchRateLimitExceeded:
+        'تم الوصول للحد اليومي للبحث. جرب مرة أخرى لاحقًا.',
 
     editProfileTitle: 'تعديل الحساب',
     profileUpdatedSuccess: 'تم تحديث البيانات بنجاح',
@@ -489,7 +501,8 @@ mixin AppLocale {
     changePasswordBtn: 'تغيير كلمة المرور',
     deleteAccountBtn: 'حذف الحساب',
     deleteAccountTitle: 'حذف الحساب',
-    deleteAccountConfirmMessage: 'هل أنت متأكد من حذف الحساب؟\nلا يمكن التراجع عن هذا الإجراء.',
+    deleteAccountConfirmMessage:
+        'هل أنت متأكد من حذف الحساب؟\nلا يمكن التراجع عن هذا الإجراء.',
     deletingAccountProgress: 'جاري حذف الحساب...',
     dialogNo: 'لا',
     dialogYes: 'نعم',
@@ -508,9 +521,11 @@ mixin AppLocale {
     helpAndSupport: 'المساعدة والدعم',
 
     onboardingTitle1: 'اكتشف المكان المناسب ليك',
-    onboardingDesc1: 'اكتشف أفضل الكافيهات والأماكن اللي تناسب ذوقك واهتماماتك.',
+    onboardingDesc1:
+        'اكتشف أفضل الكافيهات والأماكن اللي تناسب ذوقك واهتماماتك.',
     onboardingTitle2: 'احجز تجربتك بسهولة',
-    onboardingDesc2: 'اختار الوقت والمناسبة والموقع اللي يناسبك واحجز مكانك بسهولة.',
+    onboardingDesc2:
+        'اختار الوقت والمناسبة والموقع اللي يناسبك واحجز مكانك بسهولة.',
     onboardingTitle3: 'جهز طلبك قبل ما توصل',
     onboardingDesc3: 'اختار قهوتك وحلوياتك من المنيو وخلي طلبك جاهز وقت وصولك.',
 
@@ -529,11 +544,13 @@ mixin AppLocale {
     determiningLocation: 'جاري تحديد الموقع...',
     myCurrentLocation: 'موقعي الحالي',
     locationPermissionTitle: 'خلي مدينتي أقرب ليك',
-    locationPermissionDescription: 'استخدم موقعك عشان نساعدك تلاقي\nأماكن قريبة منك.',
+    locationPermissionDescription:
+        'استخدم موقعك عشان نساعدك تلاقي\nأماكن قريبة منك.',
     allowLocation: 'السماح بالموقع',
     chooseLocationManually: 'اختيار المنطقة يدوياً',
     locationPermissionDialogTitle: 'السماح بالموقع',
-    locationPermissionDialogContent: 'تم رفض صلاحية الموقع نهائيًا. يمكنك السماح بها من إعدادات الجهاز.',
+    locationPermissionDialogContent:
+        'تم رفض صلاحية الموقع نهائيًا. يمكنك السماح بها من إعدادات الجهاز.',
     locationError: 'حدث خطأ أثناء تحديد الموقع',
     selectLocationTitle: 'تحديد الموقع',
     enableGpsPrompt: 'يرجى تفعيل خدمة الموقع (GPS)',
@@ -586,7 +603,8 @@ mixin AppLocale {
     confirmPassword: 'تأكيد كلمة المرور',
     confirmPasswordHint: '••••••••',
     forgotPassword: 'نسيت كلمة المرور؟',
-    forgotPasswordDesc: 'أدخل بريدك الإلكتروني المسجل وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.',
+    forgotPasswordDesc:
+        'أدخل بريدك الإلكتروني المسجل وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.',
     sendResetLink: 'إرسال رابط الاستعادة',
     backToLogin: 'العودة لتسجيل الدخول',
     continueWithGoogle: 'المتابعة باستخدام Google',
@@ -598,7 +616,8 @@ mixin AppLocale {
     otpSentToDefault: 'تم إرسال رمز التحقق المكون من 6 أرقام إلى هاتفك',
     resendOtpInPrefix: 'إعادة إرسال الرمز خلال',
     resendOtpButton: 'إعادة إرسال الرمز',
-    resetLinkSentSuccess: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني بنجاح',
+    resetLinkSentSuccess:
+        'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني بنجاح',
     resetPasswordEmailSentDefault: 'تم إرسال البريد بنجاح',
     loginRequiredToProceed: 'يجب تسجيل الدخول أولاً',
 
@@ -610,7 +629,8 @@ mixin AppLocale {
     enterCompleteOtpError: 'يرجى إدخال رمز التحقق كاملاً (6 أرقام)',
     noLoggedInUserError: 'لا يوجد مستخدم مسجل الدخول حالياً',
     googleSignInCancelled: 'تم إلغاء تسجيل الدخول عبر Google',
-    verificationCodeNotFound: 'لم يتم العثور على معرّف التحقق، يرجى المحاولة ثانية',
+    verificationCodeNotFound:
+        'لم يتم العثور على معرّف التحقق، يرجى المحاولة ثانية',
 
     navHome: 'الرئيسية',
     navExplore: 'استكشف',
@@ -670,7 +690,8 @@ mixin AppLocale {
     statusCompleted: 'مكتمل',
     statusRejected: 'مرفوض',
     cancelBooking: 'إلغاء الحجز',
-    cancelBookingConfirmMsg: 'هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لن تتمكن من التراجع عن هذه الخطوة.',
+    cancelBookingConfirmMsg:
+        'هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لن تتمكن من التراجع عن هذه الخطوة.',
     yesCancelBooking: 'نعم، إلغاء الحجز',
     cancelBack: 'تراجع',
     bookingCancelledSuccess: 'تم إلغاء الحجز بنجاح',
@@ -678,7 +699,8 @@ mixin AppLocale {
     savedBookingSuffix: 'حجز محفوظ',
     favoritePlaceSuffix: 'مكان مفضل',
     favoriteProductSuffix: 'منتج مفضل',
-    loyaltyDialogContent: 'رصيدك الحالي هو {points} نقطة ولاء. يتم تجميع النقاط عند قيامك بمزيد من الحجوزات والطلبات داخل التطبيق.',
+    loyaltyDialogContent:
+        'رصيدك الحالي هو {points} نقطة ولاء. يتم تجميع النقاط عند قيامك بمزيد من الحجوزات والطلبات داخل التطبيق.',
     okBtn: 'حسناً',
     waitingForConfirmation: 'في انتظار التأكيد',
     showQrOnArrival: 'اعرض الـ QR Code عند الوصول',
@@ -801,17 +823,21 @@ mixin AppLocale {
     aiProcessingStep2: 'البحث عن أفضل الكافيهات والأنشطة المناسبة...',
     aiProcessingStep3: 'التحقق من حالة الطقس والموقع الجغرافي...',
     aiProcessingStep4: 'بناء وتنسيق جدول يومك بأفضل تجربة...',
-    aiInputEmptyPrompt: 'من فضلك اكتب ما تبحث عنه أو اختر من الاقتراحات السريعة',
+    aiInputEmptyPrompt:
+        'من فضلك اكتب ما تبحث عنه أو اختر من الاقتراحات السريعة',
     aiPlanPromptTitle: 'خطط ليومك بذكاء',
-    aiPlanPromptSubtitle: 'اكتب لنا تصورك ليومك أو اختر ما يناسبك وسنقوم بتنظيم خطة متكاملة وممتعة',
-    aiPromptFieldHint: 'مثال: عايز أخرج مع صحابي في مكان هادي نذاكر ونشرب قهوة مختصة...',
+    aiPlanPromptSubtitle:
+        'اكتب لنا تصورك ليومك أو اختر ما يناسبك وسنقوم بتنظيم خطة متكاملة وممتعة',
+    aiPromptFieldHint:
+        'مثال: عايز أخرج مع صحابي في مكان هادي نذاكر ونشرب قهوة مختصة...',
     aiQuickPicks: 'اقتراحات سريعة',
     aiWhatsYourMood: 'ما هو مودك العام؟',
     aiPoweredBy: 'مدعوم بالذكاء الاصطناعي من مدينتي',
     aiErrorTitle: 'تعذر إنشاء الخطة',
     aiErrorGeneric: 'حدث خطأ أثناء إعداد الخطة، يرجى المحاولة مرة أخرى',
     aiProcessingTitle: 'جاري إعداد خطتك المثالية',
-    aiProcessingFooterHint: 'يقوم الذكاء الاصطناعي بمطابقة تفضيلاتك مع أفضل الأماكن المتاحة والطقس',
+    aiProcessingFooterHint:
+        'يقوم الذكاء الاصطناعي بمطابقة تفضيلاتك مع أفضل الأماكن المتاحة والطقس',
     aiStepUnderstanding: 'تحليل وتفسير طلبك',
     aiStepSearchingPlaces: 'مطابقة الأماكن والكافيهات',
     aiStepCheckingWeather: 'التحقق من حالة الطقس والملاءمة',
@@ -838,12 +864,14 @@ mixin AppLocale {
     aiEmptyResponse: 'لم يرجع المساعد الذكي أي نتيجة، حاول مرة أخرى.',
     aiInvalidResponseFormat: 'تعذر معالجة رد المساعد الذكي بالشكل الصحيح.',
     aiAuthError: 'مفتاح خدمة الذكاء الاصطناعي غير صالح أو غير مصرح به.',
-    aiRateLimitError: 'تم الوصول للحد الأقصى للاستخدام. يرجى المحاولة بعد قليل.',
+    aiRateLimitError:
+        'تم الوصول للحد الأقصى للاستخدام. يرجى المحاولة بعد قليل.',
     aiServerError: 'حدث خطأ في خادم الذكاء الاصطناعي، يرجى إعادة المحاولة.',
     aiNetworkConnectionError: 'تعذر الاتصال بالإنترنت، يرجى التحقق من الشبكة.',
 
     choosePreferredPaymentMethod: 'اختر طريقة الدفع المفضلة لديك',
-    defaultPaymentMethodDesc: 'سيتم استخدام طريقة الدفع المختارة افتراضياً أثناء إتمام الحجوزات والطلبات.',
+    defaultPaymentMethodDesc:
+        'سيتم استخدام طريقة الدفع المختارة افتراضياً أثناء إتمام الحجوزات والطلبات.',
     cardPaymentTitle: 'بطاقة ائتمان / خصم مباشر',
     cardPaymentSubtitle: 'فيزا، ماستركارد، ميزة',
     walletPaymentTitle: 'محفظة رقمية',
@@ -864,13 +892,17 @@ mixin AppLocale {
     callCustomerService: 'الاتصال بفريق خدمة العملاء',
     faqTitle: 'الأسئلة الشائعة (FAQ)',
     faqQ1: 'كيف يمكنني حجز طاولة في الكافيه؟',
-    faqA1: 'يمكنك اختيار الكافيه المناسب من الشاشة الرئيسية أو قسم الاستكشاف، تحديد عدد الأفراد والوقت وتأكيد الحجز بكل سهولة.',
+    faqA1:
+        'يمكنك اختيار الكافيه المناسب من الشاشة الرئيسية أو قسم الاستكشاف، تحديد عدد الأفراد والوقت وتأكيد الحجز بكل سهولة.',
     faqQ2: 'ما هي خدمة الطلب المسبق (Pre-Order)؟',
-    faqA2: 'تتيح لك خدمة الطلب المسبق طلب مشروباتك ومأكولاتك المفضلّة مسبقاً لتقوم باستلامها أو الاستمتاع بها فور وصولك دون انتظار.',
+    faqA2:
+        'تتيح لك خدمة الطلب المسبق طلب مشروباتك ومأكولاتك المفضلّة مسبقاً لتقوم باستلامها أو الاستمتاع بها فور وصولك دون انتظار.',
     faqQ3: 'كيف أحصل على نقاط الولاء؟',
-    faqA3: 'تحصل على نقاط ولاء تلقائياً مع كل عملية حجز أو طلب مأكولات عبر التطبيق، ويمكنك متابعة رصيدك من النقاط في الملف الشخصي.',
+    faqA3:
+        'تحصل على نقاط ولاء تلقائياً مع كل عملية حجز أو طلب مأكولات عبر التطبيق، ويمكنك متابعة رصيدك من النقاط في الملف الشخصي.',
     faqQ4: 'كيف يمكنني إلغاء الحجز؟',
-    faqA4: 'يمكنك التوجه إلى قسم "حجوزاتي" في الملف الشخصي واختيار الحجز المراد إلغاؤه واختيار إلغاء الحجز.',
+    faqA4:
+        'يمكنك التوجه إلى قسم "حجوزاتي" في الملف الشخصي واختيار الحجز المراد إلغاؤه واختيار إلغاء الحجز.',
     whatsappNotInstalled: 'تطبيق واتساب غير مثبت على جهازك.',
   };
 
@@ -922,12 +954,14 @@ mixin AppLocale {
     studyPlaces: 'Study Spots',
     searchErrorOccurred: 'An error occurred while searching',
     trySearchingDifferentName: 'Try searching for another cafe name or area',
-    searchRateLimitExceeded: 'Daily search limit reached. Please try again later.',
+    searchRateLimitExceeded:
+        'Daily search limit reached. Please try again later.',
 
     editProfileTitle: 'Edit Profile',
     profileUpdatedSuccess: 'Profile updated successfully',
     profileUpdatedNotifTitle: 'Profile Updated',
-    profileUpdatedNotifBody: 'Your profile details have been successfully updated.',
+    profileUpdatedNotifBody:
+        'Your profile details have been successfully updated.',
     changePhoto: 'Change Photo',
     appLanguageTitle: 'App Language',
     phoneNumberLabel: 'Phone Number',
@@ -936,7 +970,8 @@ mixin AppLocale {
     changePasswordBtn: 'Change Password',
     deleteAccountBtn: 'Delete Account',
     deleteAccountTitle: 'Delete Account',
-    deleteAccountConfirmMessage: 'Are you sure you want to delete your account?\nThis action cannot be undone.',
+    deleteAccountConfirmMessage:
+        'Are you sure you want to delete your account?\nThis action cannot be undone.',
     deletingAccountProgress: 'Deleting account...',
     dialogNo: 'No',
     dialogYes: 'Yes',
@@ -954,15 +989,19 @@ mixin AppLocale {
     helpAndSupport: 'Help & Support',
 
     onboardingTitle1: 'Discover the right place for you',
-    onboardingDesc1: 'Discover the best cafes and spots that match your taste and interests.',
+    onboardingDesc1:
+        'Discover the best cafes and spots that match your taste and interests.',
     onboardingTitle2: 'Book your experience easily',
-    onboardingDesc2: 'Choose your preferred time, occasion, and spot, and reserve with ease.',
+    onboardingDesc2:
+        'Choose your preferred time, occasion, and spot, and reserve with ease.',
     onboardingTitle3: 'Get your order ready in advance',
-    onboardingDesc3: 'Pick your drinks and desserts from the menu to have them ready upon arrival.',
+    onboardingDesc3:
+        'Pick your drinks and desserts from the menu to have them ready upon arrival.',
 
     notificationsTitle: 'Notifications',
     noNotificationsTitle: 'No Notifications',
-    noNotificationsSubtitle: 'Booking confirmations, updates, and offers will appear here.',
+    noNotificationsSubtitle:
+        'Booking confirmations, updates, and offers will appear here.',
     deleteNotificationTitle: 'Delete Notification',
     deleteNotificationConfirm: 'Do you want to delete this notification?',
     momentsAgo: 'Just now',
@@ -975,11 +1014,13 @@ mixin AppLocale {
     determiningLocation: 'Determining location...',
     myCurrentLocation: 'My Current Location',
     locationPermissionTitle: 'Make Madinaty Closer to You',
-    locationPermissionDescription: 'Use your location so we can help you find\nplaces near you.',
+    locationPermissionDescription:
+        'Use your location so we can help you find\nplaces near you.',
     allowLocation: 'Allow Location',
     chooseLocationManually: 'Choose Location Manually',
     locationPermissionDialogTitle: 'Allow Location',
-    locationPermissionDialogContent: 'Location permission was permanently denied. You can enable it from app settings.',
+    locationPermissionDialogContent:
+        'Location permission was permanently denied. You can enable it from app settings.',
     locationError: 'An error occurred while getting location',
     selectLocationTitle: 'Select Location',
     enableGpsPrompt: 'Please enable location services (GPS)',
@@ -1007,8 +1048,10 @@ mixin AppLocale {
     studyDescription: 'Great place for studying and working in a quiet vibe.',
     openNowDescription: 'Open right now and ready for your visit.',
     specialtyCoffeeDescription: 'Ideal for coffee lovers and specialty brews.',
-    defaultCafeDescription: 'A lovely spot for coffee and spending quality time.',
-    tryAnotherCategorySubtitle: 'Try another category or search for a different cafe.',
+    defaultCafeDescription:
+        'A lovely spot for coffee and spending quality time.',
+    tryAnotherCategorySubtitle:
+        'Try another category or search for a different cafe.',
     noOpenPlacesNow: 'No places open right now.',
     noNearbyPlacesAvailable: 'No nearby places available.',
     tryAnotherFilterSubtitle: 'Try selecting a different filter.',
@@ -1032,7 +1075,8 @@ mixin AppLocale {
     confirmPassword: 'Confirm Password',
     confirmPasswordHint: '••••••••',
     forgotPassword: 'Forgot Password?',
-    forgotPasswordDesc: 'Enter your registered email and we will send you a link to reset your password.',
+    forgotPasswordDesc:
+        'Enter your registered email and we will send you a link to reset your password.',
     sendResetLink: 'Send Reset Link',
     backToLogin: 'Back to Login',
     continueWithGoogle: 'Continue with Google',
@@ -1085,10 +1129,12 @@ mixin AppLocale {
     singleGuestText: '1 Guest',
     guestsCountText: 'Guests',
     selectTimeHint: 'Select time',
-    chooseSuitablePlaceHint: 'Select your preferred table from the map by tapping on it',
+    chooseSuitablePlaceHint:
+        'Select your preferred table from the map by tapping on it',
     proceedToSeatingArea: 'Proceed to Seating Area',
     confirmBookingButton: 'Confirm Booking & Proceed',
-    bookingTwoHoursNotice: 'Reservation duration is 2 hours from specified arrival time',
+    bookingTwoHoursNotice:
+        'Reservation duration is 2 hours from specified arrival time',
     selectFirstTableError: 'Please select a table before continuing',
 
     seatingMapTitle: 'Seating Map',
@@ -1116,7 +1162,8 @@ mixin AppLocale {
     statusCompleted: 'Completed',
     statusRejected: 'Rejected',
     cancelBooking: 'Cancel Booking',
-    cancelBookingConfirmMsg: 'Are you sure you want to cancel this booking? You will not be able to undo this action.',
+    cancelBookingConfirmMsg:
+        'Are you sure you want to cancel this booking? You will not be able to undo this action.',
     yesCancelBooking: 'Yes, Cancel Booking',
     cancelBack: 'Cancel / Back',
     bookingCancelledSuccess: 'Booking cancelled successfully',
@@ -1124,13 +1171,15 @@ mixin AppLocale {
     savedBookingSuffix: 'saved booking(s)',
     favoritePlaceSuffix: 'favorite place(s)',
     favoriteProductSuffix: 'favorite product(s)',
-    loyaltyDialogContent: 'Your current balance is {points} loyalty point(s). Points are earned whenever you make bookings and pre-orders within the app.',
+    loyaltyDialogContent:
+        'Your current balance is {points} loyalty point(s). Points are earned whenever you make bookings and pre-orders within the app.',
     okBtn: 'OK',
     waitingForConfirmation: 'Awaiting Confirmation',
     showQrOnArrival: 'Show QR Code on arrival',
     digitalPassSearchHint: 'Search reservation details or services...',
     addToCalendar: 'Add to Calendar',
-    reservationAddedToCalendar: 'Reservation successfully added to your calendar',
+    reservationAddedToCalendar:
+        'Reservation successfully added to your calendar',
     directions: 'Directions',
     defaultCafeName: 'Cafe',
     defaultCafeLocation: 'Location not specified',
@@ -1149,7 +1198,8 @@ mixin AppLocale {
     selectTimeError: 'Please select a booking time',
     cafeDataNotFoundError: 'Cafe information is unavailable',
     userNotLoggedInError: 'You must be logged in to book',
-    tableAlreadyBookedError: 'Sorry, this table is already booked for this time slot',
+    tableAlreadyBookedError:
+        'Sorry, this table is already booked for this time slot',
     completeBookingDataError: 'Please complete all booking details',
     loginRequiredBookingError: 'Please log in first to complete your booking',
 
@@ -1210,9 +1260,11 @@ mixin AppLocale {
 
     step2Of3: 'Step 2 of 3',
     whatDoYouLikeTitle: 'What do you love in a cafe?',
-    whatDoYouLikeSubtitle: 'Choose your interests to get personalized recommendations',
+    whatDoYouLikeSubtitle:
+        'Choose your interests to get personalized recommendations',
     whyGoingOutTitle: 'What are you planning today?',
-    whyGoingOutSubtitle: 'Choose your vibe or occasion to customize your experience',
+    whyGoingOutSubtitle:
+        'Choose your vibe or occasion to customize your experience',
     showSuitablePlaces: 'Show Matching Places',
     preferencesSavedSuccess: 'Preferences saved successfully',
     loadingPreferences: 'Loading your preferences...',
@@ -1250,15 +1302,19 @@ mixin AppLocale {
     aiProcessingStep4: 'Crafting the best itinerary for you...',
     aiInputEmptyPrompt: 'Please write a prompt or select from quick picks',
     aiPlanPromptTitle: 'Plan Your Day with AI',
-    aiPlanPromptSubtitle: 'Describe your perfect day or pick your preferences, and we will build the itinerary for you',
-    aiPromptFieldHint: 'E.g., Looking for a quiet spot to study and enjoy specialty coffee with friends...',
+    aiPlanPromptSubtitle:
+        'Describe your perfect day or pick your preferences, and we will build the itinerary for you',
+    aiPromptFieldHint:
+        'E.g., Looking for a quiet spot to study and enjoy specialty coffee with friends...',
     aiQuickPicks: 'Quick Picks',
     aiWhatsYourMood: 'What is your mood?',
     aiPoweredBy: 'Powered by Madinaty AI',
     aiErrorTitle: 'Failed to Create Plan',
-    aiErrorGeneric: 'An error occurred while building the plan. Please try again',
+    aiErrorGeneric:
+        'An error occurred while building the plan. Please try again',
     aiProcessingTitle: 'Building Your Ideal Plan',
-    aiProcessingFooterHint: 'Madinaty AI matches your preferences with available spots and weather',
+    aiProcessingFooterHint:
+        'Madinaty AI matches your preferences with available spots and weather',
     aiStepUnderstanding: 'Analyzing prompt & preferences',
     aiStepSearchingPlaces: 'Matching places & activities',
     aiStepCheckingWeather: 'Checking weather compatibility',
@@ -1268,7 +1324,8 @@ mixin AppLocale {
     aiPlanReadyTitle: 'Your Plan is Ready!',
     aiYourDayPlanTitle: 'Your Day Itinerary',
     aiPlanAnotherDay: 'Plan Another Day',
-    aiHeroSubtitle: 'Your smart assistant for discovering places and planning outings',
+    aiHeroSubtitle:
+        'Your smart assistant for discovering places and planning outings',
     moodCalm: 'Calm & Cozy',
     moodCheerful: 'Cheerful & Active',
     moodRomantic: 'Romantic',
@@ -1282,15 +1339,19 @@ mixin AppLocale {
     quickPickHangout: 'Friends Hangout',
     iWantPrefix: 'I want',
 
-    aiEmptyResponse: 'AI assistant returned an empty response. Please try again.',
-    aiInvalidResponseFormat: 'Failed to process AI assistant response correctly.',
+    aiEmptyResponse:
+        'AI assistant returned an empty response. Please try again.',
+    aiInvalidResponseFormat:
+        'Failed to process AI assistant response correctly.',
     aiAuthError: 'AI service key is invalid or unauthorized.',
     aiRateLimitError: 'Usage limit reached. Please try again in a few moments.',
     aiServerError: 'An AI server error occurred. Please try again.',
-    aiNetworkConnectionError: 'Unable to connect to the internet. Please check your network.',
+    aiNetworkConnectionError:
+        'Unable to connect to the internet. Please check your network.',
 
     choosePreferredPaymentMethod: 'Choose your preferred payment method',
-    defaultPaymentMethodDesc: 'The selected payment method will be used by default for bookings and orders.',
+    defaultPaymentMethodDesc:
+        'The selected payment method will be used by default for bookings and orders.',
     cardPaymentTitle: 'Credit / Debit Card',
     cardPaymentSubtitle: 'Visa, Mastercard, Meeza',
     walletPaymentTitle: 'Digital Wallet',
@@ -1311,13 +1372,17 @@ mixin AppLocale {
     callCustomerService: 'Call Customer Service',
     faqTitle: 'Frequently Asked Questions (FAQ)',
     faqQ1: 'How can I book a table at the cafe?',
-    faqA1: 'You can choose a cafe from the home screen or explore section, select the number of guests and time, and confirm your booking easily.',
+    faqA1:
+        'You can choose a cafe from the home screen or explore section, select the number of guests and time, and confirm your booking easily.',
     faqQ2: 'What is the Pre-Order service?',
-    faqA2: 'Pre-Order allows you to order your favorite drinks and food in advance to pick them up or enjoy them immediately upon arrival without waiting.',
+    faqA2:
+        'Pre-Order allows you to order your favorite drinks and food in advance to pick them up or enjoy them immediately upon arrival without waiting.',
     faqQ3: 'How do I get loyalty points?',
-    faqA3: 'You automatically earn loyalty points with every booking or food order via the app, and you can track your points balance in your profile.',
+    faqA3:
+        'You automatically earn loyalty points with every booking or food order via the app, and you can track your points balance in your profile.',
     faqQ4: 'How can I cancel my booking?',
-    faqA4: 'You can go to the "My Bookings" section in your profile, select the booking you want to cancel, and choose cancel booking.',
+    faqA4:
+        'You can go to the "My Bookings" section in your profile, select the booking you want to cancel, and choose cancel booking.',
     whatsappNotInstalled: 'WhatsApp is not installed on your device.',
   };
 }
