@@ -160,7 +160,7 @@ class _WriteReviewScreenBodyState extends State<_WriteReviewScreenBody> {
                     ),
                     child: IconButton(
                       icon: const Icon(
-                        Icons.arrow_forward_rounded,
+                        Icons.arrow_forward_ios_rounded,
                         color: Color(0xFF2D2521),
                         size: 22,
                       ),

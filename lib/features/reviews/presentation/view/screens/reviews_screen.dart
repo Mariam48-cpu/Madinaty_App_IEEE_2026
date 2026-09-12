@@ -227,7 +227,7 @@ class _ReviewsScreenContent extends StatelessWidget {
             ),
             child: IconButton(
               icon: const Icon(
-                Icons.arrow_forward_rounded,
+                Icons.arrow_forward_ios_rounded,
                 color: Color(0xFF2D2521),
                 size: 22,
               ),

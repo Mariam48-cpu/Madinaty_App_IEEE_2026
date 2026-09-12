@@ -80,7 +80,7 @@ class SearchBarWidget extends StatelessWidget {
           IconButton(
             onPressed: onBack,
             icon: const Icon(
-              Icons.arrow_forward,
+              Icons.arrow_forward_ios_rounded,
               color: AppColors.textPrimary,
             ),
           ),

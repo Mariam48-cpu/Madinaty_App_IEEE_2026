@@ -576,7 +576,7 @@ class CategoryCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.arrow_forward_rounded,
+                  Icons.arrow_forward_ios_rounded,
                   size: 15,
                   color: AppColors.primary,
                 ),

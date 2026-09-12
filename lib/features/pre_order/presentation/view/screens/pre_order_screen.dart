@@ -203,7 +203,7 @@ class _PreOrderViewState extends State<_PreOrderView> {
               backgroundColor: AppColors.surfaceVariant,
               child: IconButton(
                 icon: const Icon(
-                  Icons.arrow_forward_rounded,
+                  Icons.arrow_forward_ios_rounded,
                   color: AppColors.textPrimary,
                   size: 20,
                 ),

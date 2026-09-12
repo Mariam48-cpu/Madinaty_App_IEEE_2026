@@ -150,7 +150,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 width: 44,
                 height: 44,
                 child: Icon(
-                  Icons.arrow_forward_rounded,
+                  Icons.arrow_forward_ios_rounded,
                   color: AppColors.textPrimary,
                   size: 21,
                 ),
@@ -342,7 +342,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   width: 44,
                   height: 44,
                   child: Icon(
-                    Icons.arrow_forward_rounded,
+                    Icons.arrow_forward_ios_rounded,
                     color: AppColors.textPrimary,
                     size: 21,
                   ),
