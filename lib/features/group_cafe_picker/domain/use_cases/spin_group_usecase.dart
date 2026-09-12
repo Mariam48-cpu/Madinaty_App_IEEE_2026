@@ -8,13 +8,7 @@ class SpinGroupUseCase {
 
   SpinGroupUseCase(this.repository);
 
-  Future<void> call({
-    required String groupId,
-    required String winnerCafeId,
-  }) {
-    return repository.spinGroup(
-      groupId: groupId,
-      winnerCafeId: winnerCafeId,
-    );
+  Future<void> call({required String groupId, required String winnerCafeId}) {
+    return repository.spinGroup(groupId: groupId, winnerCafeId: winnerCafeId);
   }
 }

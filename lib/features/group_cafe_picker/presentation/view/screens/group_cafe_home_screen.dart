@@ -3,10 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_state.dart';
-
-import '../../../domain/entities/group_cafe_entity.dart';
 import 'group_room_screen.dart';
 
 class GroupCafeHomeScreen extends StatefulWidget {

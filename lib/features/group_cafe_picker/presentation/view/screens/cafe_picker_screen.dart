@@ -5,9 +5,8 @@ import 'package:madinaty_app_ieee_2026/core/widgets/cafe_card.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_state.dart';
-
-import '../../../domain/entities/group_cafe_entity.dart';
-import '../../view_model/group_cafe_picker_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart';
 
 class CafePickerScreen extends StatefulWidget {
   final String groupId;
@@ -129,9 +128,6 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
 
           return Column(
             children: [
-              // =========================
-              // INFO CARD
-              // =========================
               Container(
                 margin: const EdgeInsets.fromLTRB(16, 10, 16, 12),
                 padding: const EdgeInsets.all(16),
@@ -186,10 +182,6 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
                   ],
                 ),
               ),
-
-              // =========================
-              // CAFES
-              // =========================
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -218,8 +210,6 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
                               toggleCafe(cafe);
                             },
                           ),
-
-                          // Selection button
                           Positioned(
                             top: 10,
                             left: 10,
@@ -263,10 +253,6 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
                   },
                 ),
               ),
-
-              // =========================
-              // SUBMIT
-              // =========================
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
                 decoration: BoxDecoration(

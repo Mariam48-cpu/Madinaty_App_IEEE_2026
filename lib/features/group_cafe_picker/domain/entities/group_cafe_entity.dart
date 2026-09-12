@@ -1,12 +1,10 @@
-import 'package:equatable/equatable.dart';
-
 enum GroupCafeStatus {
   picking,
   readyToSpin,
   completed,
 }
 
-class GroupMemberEntity extends Equatable {
+class GroupMemberEntity {
   final String userId;
   final String name;
   final String? imageUrl;
@@ -32,17 +30,9 @@ class GroupMemberEntity extends Equatable {
       isReady: isReady ?? this.isReady,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        userId,
-        name,
-        imageUrl,
-        isReady,
-      ];
 }
 
-class GroupCafePickEntity extends Equatable {
+class GroupCafePickEntity {
   final String cafeId;
   final String cafeName;
   final String imageUrl;
@@ -56,18 +46,9 @@ class GroupCafePickEntity extends Equatable {
     this.rating = 0,
     this.address = '',
   });
-
-  @override
-  List<Object?> get props => [
-        cafeId,
-        cafeName,
-        imageUrl,
-        rating,
-        address,
-      ];
 }
 
-class GroupCafeEntity extends Equatable {
+class GroupCafeEntity {
   final String id;
   final String name;
   final String inviteCode;
@@ -109,16 +90,5 @@ class GroupCafeEntity extends Equatable {
       createdAt: createdAt ?? this.createdAt,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        id,
-        name,
-        inviteCode,
-        creatorId,
-        members,
-        status,
-        winnerCafeId,
-        createdAt,
-      ];
 }
+

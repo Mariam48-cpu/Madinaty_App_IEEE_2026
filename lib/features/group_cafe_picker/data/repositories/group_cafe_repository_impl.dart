@@ -2,32 +2,28 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
-
-import '../../domain/entities/group_cafe_entity.dart';
-import '../../domain/repositories/group_cafe_repository_interface.dart';
-import '../models/group_cafe_model.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/data/models/group_cafe_model.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/data/models/group_cafe_pick_model.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/data/models/group_member_model.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/repositories/group_cafe_repository_interface.dart';
 
 @LazySingleton(as: GroupCafeRepositoryInterface)
-class GroupCafeRepositoryImpl
-    implements GroupCafeRepositoryInterface {
+class GroupCafeRepositoryImpl implements GroupCafeRepositoryInterface {
   final FirebaseFirestore firestore;
 
-  GroupCafeRepositoryImpl({
-    FirebaseFirestore? firestore,
-  }) : firestore = firestore ?? FirebaseFirestore.instance;
+  GroupCafeRepositoryImpl({FirebaseFirestore? firestore})
+    : firestore = firestore ?? FirebaseFirestore.instance;
 
-  CollectionReference<Map<String, dynamic>> get _groups =>
+  CollectionReference<Map<String, dynamic>> groups() =>
       firestore.collection('cafe_groups');
 
-  String _generateInviteCode() {
+  String generateInviteCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
     final random = Random();
 
-    return List.generate(
-      6,
-      (_) => chars[random.nextInt(chars.length)],
-    ).join();
+    return List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
   }
 
   @override
@@ -35,16 +31,18 @@ class GroupCafeRepositoryImpl
     required String groupName,
     required GroupMemberEntity creator,
   }) async {
-    final groupRef = _groups.doc();
+    final groupRef = groups().doc();
 
-    final inviteCode = _generateInviteCode();
+    final inviteCode = generateInviteCode();
+
+    final creatorModel = GroupMemberModel.fromEntity(creator);
 
     final group = GroupCafeModel(
       id: groupRef.id,
       name: groupName,
       inviteCode: inviteCode,
       creatorId: creator.userId,
-      members: [creator],
+      members: [creatorModel],
       status: GroupCafeStatus.picking,
       createdAt: DateTime.now(),
     );
@@ -59,8 +57,10 @@ class GroupCafeRepositoryImpl
     required String inviteCode,
     required GroupMemberEntity member,
   }) async {
-    final query = await _groups
-        .where('inviteCode', isEqualTo: inviteCode.trim().toUpperCase())
+    final normalizedCode = inviteCode.trim().toUpperCase();
+
+    final query = await groups()
+        .where('inviteCode', isEqualTo: normalizedCode)
         .limit(1)
         .get();
 
@@ -77,39 +77,29 @@ class GroupCafeRepositoryImpl
     );
 
     if (!alreadyJoined) {
-      final updatedMembers = [
-        ...group.members,
-        member,
-      ];
+      final memberModel = GroupMemberModel.fromEntity(member);
+
+      final updatedMembers = [...group.members, memberModel];
 
       await groupDoc.reference.update({
-        'members': updatedMembers
-            .map(
-              (element) =>
-                  GroupMemberModel.fromEntity(element).toMap(),
-            )
-            .toList(),
+        'members': updatedMembers.map((element) => element.toMap()).toList(),
       });
     }
 
     final updatedDoc = await groupDoc.reference.get();
 
-    return GroupCafeModel.fromFirestore(updatedDoc);
+    return GroupCafeModel.fromFirestore(updatedDoc).toEntity();
   }
 
   @override
-  Stream<GroupCafeEntity?> watchGroup(
-    String groupId,
-  ) {
-    return _groups.doc(groupId).snapshots().map(
-      (snapshot) {
-        if (!snapshot.exists) {
-          return null;
-        }
+  Stream<GroupCafeEntity?> watchGroup(String groupId) {
+    return groups().doc(groupId).snapshots().map((snapshot) {
+      if (!snapshot.exists) {
+        return null;
+      }
 
-        return GroupCafeModel.fromFirestore(snapshot);
-      },
-    );
+      return GroupCafeModel.fromFirestore(snapshot).toEntity();
+    });
   }
 
   @override
@@ -118,10 +108,7 @@ class GroupCafeRepositoryImpl
     required String userId,
     required List<GroupCafePickEntity> picks,
   }) async {
-    final pickRef = _groups
-        .doc(groupId)
-        .collection('picks')
-        .doc(userId);
+    final pickRef = groups().doc(groupId).collection('picks').doc(userId);
 
     final models = picks
         .map(GroupCafePickModel.fromEntity)
@@ -134,32 +121,33 @@ class GroupCafeRepositoryImpl
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
-    await markMemberReady(
-      groupId: groupId,
-      userId: userId,
-    );
+    await markMemberReady(groupId: groupId, userId: userId);
   }
 
   @override
-  Stream<Map<String, List<GroupCafePickEntity>>> watchPicks(
-    String groupId,
-  ) {
-    return _groups
-        .doc(groupId)
-        .collection('picks')
-        .snapshots()
-        .map((snapshot) {
+  Stream<Map<String, List<GroupCafePickEntity>>> watchPicks(String groupId) {
+    return groups().doc(groupId).collection('picks').snapshots().map((
+      snapshot,
+    ) {
       final result = <String, List<GroupCafePickEntity>>{};
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
 
-        final cafes =
-            List<Map<String, dynamic>>.from(data['cafes'] ?? []);
+        final rawCafes = data['cafes'];
 
-        result[doc.id] = cafes
-            .map(GroupCafePickModel.fromMap)
-            .toList();
+        final cafes = rawCafes is List
+            ? rawCafes
+                  .whereType<Map>()
+                  .map(
+                    (cafe) => GroupCafePickModel.fromMap(
+                      Map<String, dynamic>.from(cafe),
+                    ),
+                  )
+                  .toList()
+            : <GroupCafePickModel>[];
+
+        result[doc.id] = cafes.map((cafe) => cafe.toEntity()).toList();
       }
 
       return result;
@@ -171,50 +159,41 @@ class GroupCafeRepositoryImpl
     required String groupId,
     required String userId,
   }) async {
-    final groupRef = _groups.doc(groupId);
+    final groupRef = groups().doc(groupId);
 
-    await firestore.runTransaction(
-      (transaction) async {
-        final snapshot = await transaction.get(groupRef);
+    await firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(groupRef);
 
-        if (!snapshot.exists) {
-          throw Exception('Group not found');
+      if (!snapshot.exists) {
+        throw Exception('Group not found');
+      }
+
+      final group = GroupCafeModel.fromFirestore(snapshot);
+
+      final updatedMembers = group.members.map((member) {
+        if (member.userId == userId) {
+          return GroupMemberModel(
+            userId: member.userId,
+            name: member.name,
+            imageUrl: member.imageUrl,
+            isReady: true,
+          );
         }
 
-        final group =
-            GroupCafeModel.fromFirestore(snapshot);
+        return member;
+      }).toList();
 
-        final updatedMembers = group.members.map(
-          (member) {
-            if (member.userId == userId) {
-              return member.copyWith(isReady: true);
-            }
+      final everyoneReady =
+          updatedMembers.isNotEmpty &&
+          updatedMembers.every((member) => member.isReady);
 
-            return member;
-          },
-        ).toList();
-
-        final everyoneReady = updatedMembers.isNotEmpty &&
-            updatedMembers.every(
-              (member) => member.isReady,
-            );
-
-        transaction.update(
-          groupRef,
-          {
-            'members': updatedMembers
-                .map(
-                  (member) =>
-                      GroupMemberModel.fromEntity(member).toMap(),
-                )
-                .toList(),
-            'status': everyoneReady
-                ? GroupCafeStatus.readyToSpin.name
-                : GroupCafeStatus.picking.name,
-          },
-        );
-      },
-    );
+      transaction.update(groupRef, {
+        'members': updatedMembers.map((member) => member.toMap()).toList(),
+        'status': everyoneReady
+            ? GroupCafeStatus.readyToSpin.name
+            : GroupCafeStatus.picking.name,
+      });
+    });
   }
 
   @override
@@ -222,7 +201,7 @@ class GroupCafeRepositoryImpl
     required String groupId,
     required String winnerCafeId,
   }) async {
-    await _groups.doc(groupId).update({
+    await groups().doc(groupId).update({
       'winnerCafeId': winnerCafeId,
       'status': GroupCafeStatus.completed.name,
     });

@@ -1,101 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
+import 'group_member_model.dart';
 
-import '../../domain/entities/group_cafe_entity.dart';
+class GroupCafeModel {
+  final String? id;
+  final String name;
+  final String inviteCode;
+  final String creatorId;
+  final List<GroupMemberModel> members;
+  final GroupCafeStatus status;
+  final String? winnerCafeId;
+  final DateTime? createdAt;
 
-class GroupMemberModel extends GroupMemberEntity {
-  const GroupMemberModel({
-    required super.userId,
-    required super.name,
-    super.imageUrl,
-    super.isReady,
-  });
-
-  factory GroupMemberModel.fromEntity(
-    GroupMemberEntity entity,
-  ) {
-    return GroupMemberModel(
-      userId: entity.userId,
-      name: entity.name,
-      imageUrl: entity.imageUrl,
-      isReady: entity.isReady,
-    );
-  }
-
-  factory GroupMemberModel.fromMap(
-    Map<String, dynamic> map,
-  ) {
-    return GroupMemberModel(
-      userId: map['userId'] ?? '',
-      name: map['name'] ?? 'User',
-      imageUrl: map['imageUrl'],
-      isReady: map['isReady'] ?? false,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'userId': userId,
-      'name': name,
-      'imageUrl': imageUrl,
-      'isReady': isReady,
-    };
-  }
-}
-
-class GroupCafePickModel extends GroupCafePickEntity {
-  const GroupCafePickModel({
-    required super.cafeId,
-    required super.cafeName,
-    super.imageUrl,
-    super.rating,
-    super.address,
-  });
-
-  factory GroupCafePickModel.fromEntity(
-    GroupCafePickEntity entity,
-  ) {
-    return GroupCafePickModel(
-      cafeId: entity.cafeId,
-      cafeName: entity.cafeName,
-      imageUrl: entity.imageUrl,
-      rating: entity.rating,
-      address: entity.address,
-    );
-  }
-
-  factory GroupCafePickModel.fromMap(
-    Map<String, dynamic> map,
-  ) {
-    return GroupCafePickModel(
-      cafeId: map['cafeId'] ?? '',
-      cafeName: map['cafeName'] ?? '',
-      imageUrl: map['imageUrl'] ?? '',
-      rating: (map['rating'] ?? 0).toDouble(),
-      address: map['address'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'cafeId': cafeId,
-      'cafeName': cafeName,
-      'imageUrl': imageUrl,
-      'rating': rating,
-      'address': address,
-    };
-  }
-}
-
-class GroupCafeModel extends GroupCafeEntity {
   const GroupCafeModel({
-    super.id,
-    required super.name,
-    required super.inviteCode,
-    required super.creatorId,
-    super.members,
-    super.status,
-    super.winnerCafeId,
-    super.createdAt,
+    this.id,
+    required this.name,
+    required this.inviteCode,
+    required this.creatorId,
+    this.members = const [],
+    this.status = GroupCafeStatus.picking,
+    this.winnerCafeId,
+    this.createdAt,
   });
 
   factory GroupCafeModel.fromEntity(
@@ -106,7 +31,9 @@ class GroupCafeModel extends GroupCafeEntity {
       name: entity.name,
       inviteCode: entity.inviteCode,
       creatorId: entity.creatorId,
-      members: entity.members,
+      members: entity.members
+          .map(GroupMemberModel.fromEntity)
+          .toList(),
       status: entity.status,
       winnerCafeId: entity.winnerCafeId,
       createdAt: entity.createdAt,
@@ -118,27 +45,66 @@ class GroupCafeModel extends GroupCafeEntity {
   ) {
     final data = doc.data() ?? {};
 
-    final membersData =
-        List<Map<String, dynamic>>.from(data['members'] ?? []);
+    final rawMembers = data['members'];
+
+    final members = rawMembers is List
+        ? rawMembers
+            .whereType<Map>()
+            .map(
+              (member) => GroupMemberModel.fromMap(
+                Map<String, dynamic>.from(member),
+              ),
+            )
+            .toList()
+        : <GroupMemberModel>[];
 
     return GroupCafeModel(
       id: doc.id,
       name: data['name'] ?? '',
       inviteCode: data['inviteCode'] ?? '',
       creatorId: data['creatorId'] ?? '',
-      members: membersData
-          .map(GroupMemberModel.fromMap)
-          .toList(),
+      members: members,
       status: GroupCafeStatus.values.firstWhere(
         (element) => element.name == data['status'],
         orElse: () => GroupCafeStatus.picking,
       ),
       winnerCafeId: data['winnerCafeId'],
-      createdAt: _parseDate(data['createdAt']),
+      createdAt: parseDate(data['createdAt']),
     );
   }
 
-  static DateTime? _parseDate(dynamic value) {
+  GroupCafeEntity toEntity() {
+    return GroupCafeEntity(
+      id: id ?? '',
+      name: name,
+      inviteCode: inviteCode,
+      creatorId: creatorId,
+      members: members
+          .map((member) => member.toEntity())
+          .toList(),
+      status: status,
+      winnerCafeId: winnerCafeId,
+      createdAt: createdAt,
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'inviteCode': inviteCode,
+      'creatorId': creatorId,
+      'members': members
+          .map((member) => member.toMap())
+          .toList(),
+      'status': status.name,
+      'winnerCafeId': winnerCafeId,
+      'createdAt': Timestamp.fromDate(
+        createdAt ?? DateTime.now(),
+      ),
+    };
+  }
+
+  static DateTime? parseDate(dynamic value) {
     if (value == null) return null;
 
     if (value is Timestamp) {
@@ -150,24 +116,5 @@ class GroupCafeModel extends GroupCafeEntity {
     }
 
     return DateTime.tryParse(value.toString());
-  }
-
-  Map<String, dynamic> toFirestore() {
-    return {
-      'name': name,
-      'inviteCode': inviteCode,
-      'creatorId': creatorId,
-      'members': members
-          .map(
-            (member) =>
-                GroupMemberModel.fromEntity(member).toMap(),
-          )
-          .toList(),
-      'status': status.name,
-      'winnerCafeId': winnerCafeId,
-      'createdAt': Timestamp.fromDate(
-        createdAt ?? DateTime.now(),
-      ),
-    };
   }
 }

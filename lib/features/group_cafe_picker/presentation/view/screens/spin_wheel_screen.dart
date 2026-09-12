@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 
-import '../../../domain/entities/group_cafe_entity.dart';
-import '../../view_model/group_cafe_picker_cubit.dart';
-import '../../view_model/group_cafe_picker_state.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/completed_group_view.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/spin_button.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/spin_wheel.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/spin_wheel_header.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/winner_bottom_sheet.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_state.dart';
 
 class SpinWheelScreen extends StatefulWidget {
   final String groupId;
@@ -23,28 +28,50 @@ class SpinWheelScreen extends StatefulWidget {
   State<SpinWheelScreen> createState() => _SpinWheelScreenState();
 }
 
-class _SpinWheelScreenState extends State<SpinWheelScreen> {
+class _SpinWheelScreenState extends State<SpinWheelScreen>
+    with SingleTickerProviderStateMixin {
   final StreamController<int> _selected = StreamController<int>();
+
+  late final ConfettiController _confettiController;
+
+  late final AnimationController _winnerAnimationController;
+
+  late final Animation<double> _winnerScaleAnimation;
 
   bool _isSpinning = false;
   bool _winnerDialogShown = false;
+
+  GroupCafePickEntity? _currentWinner;
 
   @override
   void initState() {
     super.initState();
 
     context.read<GroupCafeCubit>().watchGroup(widget.groupId);
+
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
+
+    _winnerAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    );
+
+    _winnerScaleAnimation = CurvedAnimation(
+      parent: _winnerAnimationController,
+      curve: Curves.elasticOut,
+    );
   }
 
   @override
   void dispose() {
     _selected.close();
+    _confettiController.dispose();
+    _winnerAnimationController.dispose();
+
     super.dispose();
   }
-
-  // ============================================================
-  // GET UNIQUE CAFES
-  // ============================================================
 
   List<GroupCafePickEntity> _getUniqueCafes(
     Map<String, List<GroupCafePickEntity>> picks,
@@ -60,10 +87,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     return uniqueCafes.values.toList();
   }
 
-  // ============================================================
-  // GET WEIGHTED CAFES
-  // ============================================================
-
   List<GroupCafePickEntity> _getWeightedCafes(
     Map<String, List<GroupCafePickEntity>> picks,
   ) {
@@ -75,10 +98,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
 
     return weightedCafes;
   }
-
-  // ============================================================
-  // FIND CAFE BY ID
-  // ============================================================
 
   GroupCafePickEntity? _findCafeById(
     Map<String, List<GroupCafePickEntity>> picks,
@@ -98,10 +117,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
 
     return null;
   }
-
-  // ============================================================
-  // GET MEMBERS WHO PICKED THE CAFE
-  // ============================================================
 
   List<String> _getPickedBy(
     Map<String, List<GroupCafePickEntity>> picks,
@@ -123,10 +138,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     return names;
   }
 
-  // ============================================================
-  // SPIN
-  // ============================================================
-
   Future<void> _spin(
     GroupCafeEntity group,
     Map<String, List<GroupCafePickEntity>> picks,
@@ -135,7 +146,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
       return;
     }
 
-    // Only creator can spin.
+    // Only creator can spin
     if (group.creatorId != widget.currentUser.userId) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -147,6 +158,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     }
 
     final uniqueCafes = _getUniqueCafes(picks);
+
     final weightedCafes = _getWeightedCafes(picks);
 
     if (uniqueCafes.isEmpty || weightedCafes.isEmpty) {
@@ -162,16 +174,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     });
 
     try {
-      // ========================================================
-      // WEIGHTED RANDOM
-      // ========================================================
-      //
-      // If a cafe was picked by 3 users,
-      // it appears 3 times in weightedCafes.
-      //
-      // So it gets a higher probability of winning.
-      // ========================================================
-
       final random = Random();
 
       final randomPick = weightedCafes[random.nextInt(weightedCafes.length)];
@@ -188,22 +190,13 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
         return;
       }
 
-      // ========================================================
-      // START WHEEL ANIMATION
-      // ========================================================
-
       _selected.add(winnerIndex);
 
-      // Give the wheel enough time to finish its animation.
       await Future.delayed(const Duration(seconds: 4));
 
       if (!mounted) {
         return;
       }
-
-      // ========================================================
-      // SAVE WINNER TO FIREBASE
-      // ========================================================
 
       await context.read<GroupCafeCubit>().spin(
         groupId: widget.groupId,
@@ -213,20 +206,24 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
       if (!mounted) {
         return;
       }
-
       setState(() {
         _isSpinning = false;
         _winnerDialogShown = true;
+        _currentWinner = randomPick;
       });
 
-      // Small delay so the wheel finishes visually.
-      await Future.delayed(const Duration(milliseconds: 400));
+      // Celebration 🎉
+      _confettiController.play();
+
+      _winnerAnimationController.forward();
+
+      await Future.delayed(const Duration(milliseconds: 250));
 
       if (!mounted) {
         return;
       }
 
-      _showWinnerDialog(group, picks, randomPick);
+      _showWinnerCelebration(group, picks, randomPick);
     } catch (e) {
       if (!mounted) {
         return;
@@ -242,243 +239,38 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     }
   }
 
-  // ============================================================
-  // WINNER DIALOG
-  // ============================================================
-
-  void _showWinnerDialog(
+  void _showWinnerCelebration(
     GroupCafeEntity group,
     Map<String, List<GroupCafePickEntity>> picks,
     GroupCafePickEntity winner,
   ) {
     final pickedBy = _getPickedBy(picks, group, winner.cafeId);
 
-    showModalBottomSheet(
+    WinnerBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return SafeArea(
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 14, 24, 30),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(30),
-              ),
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ------------------------------------------------
-                  // HANDLE
-                  // ------------------------------------------------
-                  Container(
-                    width: 45,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // ------------------------------------------------
-                  // TITLE
-                  // ------------------------------------------------
-                  const Text(
-                    '🎉 We Have a Winner!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ------------------------------------------------
-                  // IMAGE
-                  // ------------------------------------------------
-                  if (winner.imageUrl.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        winner.imageUrl,
-                        width: double.infinity,
-                        height: 180,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildImagePlaceholder();
-                        },
-                      ),
-                    )
-                  else
-                    _buildImagePlaceholder(),
-
-                  const SizedBox(height: 18),
-
-                  // ------------------------------------------------
-                  // CAFE NAME
-                  // ------------------------------------------------
-                  Text(
-                    winner.cafeName,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // ------------------------------------------------
-                  // RATING
-                  // ------------------------------------------------
-                  if (winner.rating > 0)
-                    Text(
-                      '⭐ ${winner.rating.toStringAsFixed(1)}',
-                      style: const TextStyle(fontSize: 15),
-                    ),
-
-                  // ------------------------------------------------
-                  // ADDRESS
-                  // ------------------------------------------------
-                  if (winner.address.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      winner.address,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 22),
-
-                  // ------------------------------------------------
-                  // PICKED BY
-                  // ------------------------------------------------
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Picked by',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  if (pickedBy.isEmpty)
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Group members'),
-                    )
-                  else
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: pickedBy.map((name) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              name,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                  const SizedBox(height: 25),
-
-                  // ------------------------------------------------
-                  // DONE
-                  // ------------------------------------------------
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        'Done 🎉',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+      winner: winner,
+      pickedBy: pickedBy,
+      confettiController: _confettiController,
+      winnerScaleAnimation: _winnerScaleAnimation,
     );
   }
-
-  // ============================================================
-  // IMAGE PLACEHOLDER
-  // ============================================================
-
-  Widget _buildImagePlaceholder() {
-    return Container(
-      width: double.infinity,
-      height: 180,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: const Center(child: Icon(Icons.local_cafe_rounded, size: 60)),
-    );
-  }
-
-  // ============================================================
-  // BUILD
-  // ============================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Spin The Wheel 🎡'), centerTitle: true),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: const Text('Choose Your Cafe 🎡'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+      ),
+
       body: BlocBuilder<GroupCafeCubit, GroupCafeState>(
         builder: (context, state) {
-          // ------------------------------------------------------
-          // LOADING
-          // ------------------------------------------------------
-
           if (state is GroupCafeLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-
-          // ------------------------------------------------------
-          // ERROR
-          // ------------------------------------------------------
 
           if (state is GroupCafeError) {
             return Center(
@@ -492,9 +284,13 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
                       size: 55,
                       color: Colors.redAccent,
                     ),
+
                     const SizedBox(height: 15),
+
                     Text(state.message, textAlign: TextAlign.center),
+
                     const SizedBox(height: 20),
+
                     ElevatedButton(
                       onPressed: () {
                         context.read<GroupCafeCubit>().watchGroup(
@@ -509,10 +305,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
             );
           }
 
-          // ------------------------------------------------------
-          // NO DATA
-          // ------------------------------------------------------
-
           if (state is! GroupCafeLoaded) {
             return const Center(child: Text('No group data available.'));
           }
@@ -522,10 +314,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
 
           final uniqueCafes = _getUniqueCafes(picks);
 
-          // ------------------------------------------------------
-          // ALREADY COMPLETED
-          // ------------------------------------------------------
-
           if (group.status == GroupCafeStatus.completed &&
               group.winnerCafeId != null) {
             final winner = _findCafeById(picks, group.winnerCafeId);
@@ -534,12 +322,14 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
               return const Center(child: Text('Winner data is not available.'));
             }
 
-            return _buildCompletedView(group, picks, winner);
-          }
+            final pickedBy = _getPickedBy(picks, group, winner.cafeId);
 
-          // ------------------------------------------------------
-          // NO CAFES
-          // ------------------------------------------------------
+            return CompletedGroupView(
+              winner: winner,
+              pickedBy: pickedBy,
+              confettiController: _confettiController,
+            );
+          }
 
           if (uniqueCafes.isEmpty) {
             return const Center(
@@ -552,239 +342,35 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
               ),
             );
           }
-
-          // ------------------------------------------------------
-          // WHEEL
-          // ------------------------------------------------------
-
           return SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 20),
-
-                // --------------------------------------------------
-                // HEADER
-                // --------------------------------------------------
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Let the wheel decide where you go! ☕🎡',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
+                SpinWheelHeader(cafeCount: uniqueCafes.length),
 
                 const SizedBox(height: 8),
 
-                Text(
-                  '${uniqueCafes.length} cafes are in the wheel',
-                  style: TextStyle(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // --------------------------------------------------
-                // WHEEL
-                // --------------------------------------------------
                 Expanded(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: FortuneWheel(
-                        selected: _selected.stream,
-                        animateFirst: false,
-                        items: [
-                          for (int i = 0; i < uniqueCafes.length; i++)
-                            FortuneItem(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: Text(
-                                  uniqueCafes[i].cafeName,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
                       ),
+                      child: SpinWheel(cafes: uniqueCafes, selected: _selected),
                     ),
                   ),
                 ),
 
-                // --------------------------------------------------
-                // SPIN BUTTON
-                // --------------------------------------------------
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 25),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      onPressed: _isSpinning ? null : () => _spin(group, picks),
-                      icon: Icon(
-                        _isSpinning
-                            ? Icons.hourglass_top_rounded
-                            : Icons.casino_rounded,
-                      ),
-                      label: Text(
-                        _isSpinning ? 'Spinning...' : 'Spin The Wheel',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
+                SpinButton(
+                  isSpinning: _isSpinning,
+                  onPressed: () {
+                    _spin(group, picks);
+                  },
                 ),
               ],
             ),
           );
         },
-      ),
-    );
-  }
-
-  // ============================================================
-  // COMPLETED VIEW
-  // ============================================================
-
-  Widget _buildCompletedView(
-    GroupCafeEntity group,
-    Map<String, List<GroupCafePickEntity>> picks,
-    GroupCafePickEntity winner,
-  ) {
-    final pickedBy = _getPickedBy(picks, group, winner.cafeId);
-
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-
-            // ----------------------------------------------------
-            // TITLE
-            // ----------------------------------------------------
-            const Text(
-              '🎉 The Winner',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ----------------------------------------------------
-            // IMAGE
-            // ----------------------------------------------------
-            if (winner.imageUrl.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Image.network(
-                  winner.imageUrl,
-                  width: double.infinity,
-                  height: 220,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildImagePlaceholder();
-                  },
-                ),
-              )
-            else
-              _buildImagePlaceholder(),
-
-            const SizedBox(height: 20),
-
-            // ----------------------------------------------------
-            // NAME
-            // ----------------------------------------------------
-            Text(
-              winner.cafeName,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 8),
-
-            // ----------------------------------------------------
-            // RATING
-            // ----------------------------------------------------
-            if (winner.rating > 0)
-              Text(
-                '⭐ ${winner.rating.toStringAsFixed(1)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-
-            // ----------------------------------------------------
-            // ADDRESS
-            // ----------------------------------------------------
-            if (winner.address.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                winner.address,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 25),
-
-            // ----------------------------------------------------
-            // PICKED BY
-            // ----------------------------------------------------
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Picked by',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    pickedBy.isEmpty ? 'Group members' : pickedBy.join(' • '),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            // ----------------------------------------------------
-            // BACK
-            // ----------------------------------------------------
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Back to Group',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

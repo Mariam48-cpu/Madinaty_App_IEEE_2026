@@ -213,9 +213,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       case 3:
         return const FavoritesScreen();
-
       case 4:
-        return const PlanWithFriendsScreen();
+        return PlanWithFriendsScreen();
       case 5:
         return _buildProfilePage();
 
@@ -814,10 +813,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
             size: 25,
 
-            color: _selectedNavIndex == 5
+            color: _selectedNavIndex == 4
                 ? Colors.white
                 : AppColors.textSecondary,
           ),
+
           Icon(
             _selectedNavIndex == 5
                 ? Icons.person_rounded
@@ -825,7 +825,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             size: 25,
 
-            color: _selectedNavIndex == 4
+            color: _selectedNavIndex == 5
                 ? Colors.white
                 : AppColors.textSecondary,
           ),

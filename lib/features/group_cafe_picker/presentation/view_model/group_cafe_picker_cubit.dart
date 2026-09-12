@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
@@ -11,7 +10,6 @@ import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cas
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/use_cases/watch_group_usecase.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_state.dart';
 
-
 @injectable
 class GroupCafeCubit extends Cubit<GroupCafeState> {
   final CreateGroupUseCase createGroupUseCase;
@@ -21,8 +19,8 @@ class GroupCafeCubit extends Cubit<GroupCafeState> {
   final WatchGroupPicksUseCase watchGroupPicksUseCase;
   final SpinGroupUseCase spinGroupUseCase;
 
-  StreamSubscription? _groupSubscription;
-  StreamSubscription? _picksSubscription;
+  StreamSubscription? groupSubscription;
+  StreamSubscription? picksSubscription;
 
   GroupCafeEntity? _currentGroup;
 
@@ -82,35 +80,28 @@ class GroupCafeCubit extends Cubit<GroupCafeState> {
   }
 
   void watchGroup(String groupId) {
-    _groupSubscription?.cancel();
-    _picksSubscription?.cancel();
+    groupSubscription?.cancel();
+    picksSubscription?.cancel();
 
-    _groupSubscription =
-        watchGroupUseCase(groupId).listen((group) {
+    groupSubscription = watchGroupUseCase(groupId).listen((group) {
       if (group == null) return;
 
       _currentGroup = group;
 
-      _emitLoaded();
+      emitLoaded();
     });
 
-    _picksSubscription =
-        watchGroupPicksUseCase(groupId).listen((picks) {
+    picksSubscription = watchGroupPicksUseCase(groupId).listen((picks) {
       _currentPicks = picks;
 
-      _emitLoaded();
+      emitLoaded();
     });
   }
 
-  void _emitLoaded() {
+  void emitLoaded() {
     if (_currentGroup == null) return;
 
-    emit(
-      GroupCafeLoaded(
-        group: _currentGroup!,
-        picks: _currentPicks,
-      ),
-    );
+    emit(GroupCafeLoaded(group: _currentGroup!, picks: _currentPicks));
   }
 
   Future<void> submitPicks({
@@ -134,10 +125,7 @@ class GroupCafeCubit extends Cubit<GroupCafeState> {
     required String winnerCafeId,
   }) async {
     try {
-      await spinGroupUseCase(
-        groupId: groupId,
-        winnerCafeId: winnerCafeId,
-      );
+      await spinGroupUseCase(groupId: groupId, winnerCafeId: winnerCafeId);
     } catch (e) {
       emit(GroupCafeError(e.toString()));
     }
@@ -145,8 +133,8 @@ class GroupCafeCubit extends Cubit<GroupCafeState> {
 
   @override
   Future<void> close() {
-    _groupSubscription?.cancel();
-    _picksSubscription?.cancel();
+    groupSubscription?.cancel();
+    picksSubscription?.cancel();
 
     return super.close();
   }

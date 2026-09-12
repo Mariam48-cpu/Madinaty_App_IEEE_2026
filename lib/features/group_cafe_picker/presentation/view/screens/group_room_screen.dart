@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
-import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/data/models/group_cafe_model.dart';
-
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/screens/cafe_picker_screen.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/screens/spin_wheel_screen.dart';
 import '../../../domain/entities/group_cafe_entity.dart';
 import '../../view_model/group_cafe_picker_cubit.dart';
 import '../../view_model/group_cafe_picker_state.dart';
-
-import 'cafe_picker_screen.dart';
-import 'spin_wheel_screen.dart';
 
 class GroupRoomScreen extends StatefulWidget {
   final String groupId;
@@ -80,7 +77,7 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
           final isCreator = group.creatorId == widget.currentUser.userId;
           final currentMember = group.members.firstWhere(
             (member) => member.userId == widget.currentUser.userId,
-            orElse: () => GroupMemberModel.fromEntity(widget.currentUser),
+            orElse: () => widget.currentUser,
           );
 
           final everyoneReady =
@@ -95,9 +92,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // =========================
-                  // GROUP HEADER
-                  // =========================
                   Container(
                     padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
@@ -126,10 +120,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                   ),
 
                   const SizedBox(height: 20),
-
-                  // =========================
-                  // INVITE CODE
-                  // =========================
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
@@ -174,10 +164,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                   ),
 
                   const SizedBox(height: 28),
-
-                  // =========================
-                  // MEMBERS TITLE
-                  // =========================
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -199,10 +185,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                   ),
 
                   const SizedBox(height: 14),
-
-                  // =========================
-                  // MEMBERS
-                  // =========================
                   ...group.members.map((member) {
                     final isCurrentUser =
                         member.userId == widget.currentUser.userId;
@@ -292,10 +274,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                   }),
 
                   const SizedBox(height: 12),
-
-                  // =========================
-                  // COMPLETED
-                  // =========================
                   if (isCompleted) ...[
                     Container(
                       padding: const EdgeInsets.all(18),
@@ -323,9 +301,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                       ),
                     ),
                   ] else ...[
-                    // =========================
-                    // STATUS
-                    // =========================
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -362,10 +337,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                     ),
 
                     const SizedBox(height: 22),
-
-                    // =========================
-                    // CHOOSE CAFES
-                    // =========================
                     if (!currentMember.isReady)
                       SizedBox(
                         height: 54,
@@ -394,10 +365,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                           ),
                         ),
                       ),
-
-                    // =========================
-                    // SPIN WHEEL
-                    // =========================
                     if (everyoneReady && isCreator) ...[
                       const SizedBox(height: 12),
                       SizedBox(
@@ -425,10 +392,6 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                         ),
                       ),
                     ],
-
-                    // =========================
-                    // WAIT FOR CREATOR
-                    // =========================
                     if (everyoneReady && !isCreator)
                       Container(
                         padding: const EdgeInsets.all(16),

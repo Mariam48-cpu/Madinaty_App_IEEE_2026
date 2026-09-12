@@ -1,7 +1,6 @@
 import 'package:injectable/injectable.dart';
-
-import '../entities/group_cafe_entity.dart';
-import '../repositories/group_cafe_repository_interface.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/repositories/group_cafe_repository_interface.dart';
 
 @injectable
 class WatchGroupUseCase {
@@ -9,9 +8,7 @@ class WatchGroupUseCase {
 
   WatchGroupUseCase(this.repository);
 
-  Stream<GroupCafeEntity?> call(
-    String groupId,
-  ) {
+  Stream<GroupCafeEntity?> call(String groupId) {
     return repository.watchGroup(groupId);
   }
 }
