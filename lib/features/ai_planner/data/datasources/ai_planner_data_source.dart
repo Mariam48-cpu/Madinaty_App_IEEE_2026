@@ -121,7 +121,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
       }
 
       throw Exception(AppLocale.aiServerError);
-    } on http.ClientException catch (e) {
+    } on http.ClientException catch (_) {
       throw Exception(AppLocale.aiNetworkConnectionError);
     } catch (e) {
       if (e is Exception) {

@@ -482,59 +482,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: AppColors.border),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: isBusy ? null : () {},
-                        icon: const Icon(
-                          Icons.vpn_key,
-                          color: AppColors.primary,
-                          size: 18,
-                        ),
-                        label: Text(
-                          AppLocale.changePasswordBtn.getString(context),
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 13,
-                          ),
-                        ),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: const BorderSide(color: AppColors.error),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: AppColors.error),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: isBusy ? null : _showDeleteAccountDialog,
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: AppColors.error,
-                          size: 18,
-                        ),
-                        label: Text(
-                          AppLocale.deleteAccountBtn.getString(context),
-                          style: const TextStyle(
-                            color: AppColors.error,
-                            fontSize: 13,
-                          ),
-                        ),
+                    onPressed: isBusy ? null : _showDeleteAccountDialog,
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: AppColors.error,
+                      size: 18,
+                    ),
+                    label: Text(
+                      AppLocale.deleteAccountBtn.getString(context),
+                      style: const TextStyle(
+                        color: AppColors.error,
+                        fontSize: 13,
                       ),
                     ),
-                  ],
+                  ),
                 ),
                 if (isDeleting) ...[
                   const SizedBox(height: 16),

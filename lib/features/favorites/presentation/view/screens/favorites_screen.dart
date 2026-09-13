@@ -28,12 +28,23 @@ import '../widgets/favorites_empty_view.dart';
 import '../widgets/favorites_tab_bar.dart';
 
 class FavoritesScreen extends StatelessWidget {
-  const FavoritesScreen({super.key});
+  final FavoriteTargetType initialTab;
+
+  const FavoritesScreen({
+    super.key,
+    this.initialTab = FavoriteTargetType.cafe,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<FavoritesCubit>(
-      create: (_) => sl<FavoritesCubit>()..initFavoritesWatcher(),
+      create: (_) {
+        final cubit = sl<FavoritesCubit>()..initFavoritesWatcher();
+        if (initialTab != FavoriteTargetType.cafe) {
+          cubit.selectTab(initialTab);
+        }
+        return cubit;
+      },
       child: const _FavoritesScreenContent(),
     );
   }

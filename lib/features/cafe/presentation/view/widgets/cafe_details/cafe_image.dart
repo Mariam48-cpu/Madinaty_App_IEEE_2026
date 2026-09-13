@@ -95,7 +95,7 @@ class CafeImage extends StatelessWidget {
             top: 14,
             right: 14,
             child: CircleButton(
-              icon: Icons.arrow_forward,
+              icon: Icons.arrow_forward_ios_rounded,
               onTap: onBack ?? () => Navigator.pop(context),
             ),
           ),

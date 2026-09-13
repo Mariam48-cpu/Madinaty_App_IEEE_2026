@@ -30,6 +30,7 @@ class UserEntity {
   final DateTime? birthDate;
   final UserRole role;
   final String? cafeId;
+  final int points;
 
   const UserEntity({
     required this.uid,
@@ -40,6 +41,7 @@ class UserEntity {
     this.birthDate,
     this.role = UserRole.customer,
     this.cafeId,
+    this.points = 0,
   });
 
   bool get isCafeOwner => role == UserRole.cafeOwner;

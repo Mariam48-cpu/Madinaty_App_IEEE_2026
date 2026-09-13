@@ -18,11 +18,11 @@ class BookingCubit extends Cubit<BookingState> {
   final CreateNotificationUseCase createNotificationUseCase;
 
   BookingCubit(
-      this.createBookingUseCase,
-      this.getBookingUseCase,
-      this.updateBookingStatusUseCase,
-      this.createNotificationUseCase,
-      ) : super(BookingInitial());
+    this.createBookingUseCase,
+    this.getBookingUseCase,
+    this.updateBookingStatusUseCase,
+    this.createNotificationUseCase,
+  ) : super(BookingInitial());
 
   String? cafeId;
   String? cafeName;
@@ -45,6 +45,7 @@ class BookingCubit extends Cubit<BookingState> {
     occasion = null;
     seatingPreference = null;
     bookingId = null;
+
     emit(BookingInitial());
   }
 
@@ -56,11 +57,14 @@ class BookingCubit extends Cubit<BookingState> {
     cafeId = id;
     cafeName = name;
     cafeLocation = location;
+
     emit(BookingInitial());
   }
 
-  void setCafeId(String id) {
+  void setCafeId(String id, {String? name}) {
     cafeId = id;
+    cafeName = name;
+
     emit(BookingInitial());
   }
 
@@ -70,33 +74,42 @@ class BookingCubit extends Cubit<BookingState> {
       selectedDate.month,
       selectedDate.day,
     );
+
     emit(BookingInitial());
   }
 
   void selectTime(String selectedTime) {
     time = selectedTime;
+
     emit(BookingInitial());
   }
 
   void incrementGuests() {
     if (guests >= 10) return;
+
     guests++;
+
     emit(BookingInitial());
   }
 
   void decrementGuests() {
     if (guests <= 1) return;
+
     guests--;
+
     emit(BookingInitial());
   }
 
   void selectOccasion(String selectedOccasion) {
     occasion = selectedOccasion;
+
     emit(BookingInitial());
   }
 
   void selectSeatingPreference(String preference) {
     seatingPreference = preference;
+
+    emit(BookingInitial());
   }
 
   bool validateDateTime() {
@@ -168,6 +181,7 @@ class BookingCubit extends Cubit<BookingState> {
           e.toString().replaceFirst('Exception: ', ''),
         ),
       );
+
       return null;
     }
   }
@@ -197,8 +211,8 @@ class BookingCubit extends Cubit<BookingState> {
           );
 
           notificationResult.fold(
-                (failure) {},
-                (_) {},
+            (failure) {},
+            (_) {},
           );
         }
       }

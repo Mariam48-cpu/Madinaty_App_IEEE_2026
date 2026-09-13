@@ -81,7 +81,7 @@ class _CartViewState extends State<_CartView> {
             backgroundColor: AppColors.surfaceVariant,
             child: IconButton(
               icon: const Icon(
-                Icons.arrow_back,
+                Icons.arrow_back_ios_new,
                 color: AppColors.textPrimary,
                 size: 20,
               ),
@@ -151,7 +151,7 @@ class _CartViewState extends State<_CartView> {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRoutes.home,
-                        (route) => false,
+                    (route) => false,
                   );
                 },
               );

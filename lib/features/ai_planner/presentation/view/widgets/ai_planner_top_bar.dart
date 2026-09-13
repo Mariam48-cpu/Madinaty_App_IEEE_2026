@@ -22,7 +22,7 @@ class AIPlannerTopBar extends StatelessWidget {
               backgroundColor: AppColors.surface,
             ),
             icon: const Icon(
-              Icons.arrow_back_rounded,
+              Icons.arrow_back_ios_new,
               color: AppColors.textPrimary,
               size: 20,
             ),

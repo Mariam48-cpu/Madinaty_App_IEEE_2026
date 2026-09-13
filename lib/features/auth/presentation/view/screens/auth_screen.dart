@@ -14,6 +14,8 @@ import '../../../../discovery/data/data_sources/google_places_datasource.dart';
 import '../../../../discovery/data/repositories/cafe_repository_impl.dart';
 import '../../../../discovery/domain/entities/cafe_entity.dart';
 import '../../../../discovery/domain/use_cases/get_nearby_cafes.dart';
+import 'package:toastification/toastification.dart';
+
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
 import '../../../domain/entities/user_entity.dart';
@@ -24,9 +26,11 @@ import '../../../domain/use_cases/register_usecase.dart';
 import '../../../domain/use_cases/reset_password_usecase.dart';
 import '../../../domain/use_cases/send_otp_usecase.dart';
 import '../../../domain/use_cases/verify_otp_usecase.dart';
+
 import '../../view_model/auth_cubit.dart';
 import '../../view_model/auth_intent.dart';
 import '../../view_model/auth_state.dart';
+
 import '../widgets/custom_auth_button.dart';
 import '../widgets/custom_text_field.dart';
 import 'forget_password_screen.dart';
@@ -63,6 +67,7 @@ class _AuthScreenBody extends StatefulWidget {
 
 class _AuthScreenBodyState extends State<_AuthScreenBody> {
   bool isLogin = true;
+
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
@@ -480,6 +485,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
           );
         } else if (state is AuthSuccessState) {
           final userName = state.user.name ?? '';
+
           AppToast.showToast(
             context: context,
             title: AppLocale.toastSuccess.getString(context),
@@ -500,6 +506,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               isLogin ? AppRoutes.home : AppRoutes.personalization,
             );
           }
+          // After successful authentication,
+          // go to Personalization before entering Home.
+          Navigator.pushReplacementNamed(context, AppRoutes.personalization);
         }
       },
       builder: (context, state) {
@@ -549,15 +558,21 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           onPressed: () {
                             final localization = FlutterLocalization.instance;
                             if (localization.currentLocale?.languageCode == 'ar') {
+
+                            if (localization.currentLocale?.languageCode ==
+                                'ar') {
                               localization.translate('en');
                             } else {
                               localization.translate('ar');
                             }
+
                             setState(() {});
-                          },
+                          }},
                         ),
                       ),
+
                       const SizedBox(height: 10),
+
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: const BoxDecoration(
@@ -570,7 +585,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           size: 28,
                         ),
                       ),
+
                       const SizedBox(height: 16),
+
                       Text(
                         isLogin
                             ? AppLocale.welcome.getString(context)
@@ -582,7 +599,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           color: AppColors.textPrimary,
                         ),
                       ),
+
                       const SizedBox(height: 6),
+
                       Text(
                         AppLocale.subtitle.getString(context),
                         style: const TextStyle(
@@ -590,7 +609,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           fontSize: 13,
                         ),
                       ),
+
                       const SizedBox(height: 20),
+
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -631,6 +652,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                       ),
                                     ),
                                   ),
+
                                   Expanded(
                                     child: GestureDetector(
                                       onTap: () => setState(() => isLogin = true),
@@ -658,7 +680,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 ],
                               ),
                             ),
+
                             const SizedBox(height: 20),
+
                             if (!isLogin) ...[
                               CustomTextField(
                                 controller: _nameController,
@@ -671,6 +695,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               ),
                               const SizedBox(height: 14),
                             ],
+
                             CustomTextField(
                               controller: _emailOrPhoneController,
                               label: AppLocale.emailOrPhone.getString(context),
@@ -683,7 +708,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ? AppLocale.enterEmailError.getString(context)
                                   : null,
                             ),
+
                             const SizedBox(height: 14),
+
                             CustomTextField(
                               controller: _passwordController,
                               label: AppLocale.password.getString(context),
@@ -693,6 +720,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ? AppLocale.passwordMinLengthError.getString(context)
                                   : null,
                             ),
+
                             if (!isLogin) ...[
                               const SizedBox(height: 14),
                               CustomTextField(
@@ -705,6 +733,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                     : null,
                               ),
                             ],
+
                             if (isLogin)
                               Align(
                                 alignment: AlignmentDirectional.centerStart,
@@ -729,7 +758,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ),
                                 ),
                               ),
+
                             const SizedBox(height: 16),
+
                             CustomAuthButton(
                               text: isLogin
                                   ? AppLocale.login.getString(context)
@@ -737,7 +768,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               isLoading: isLoading,
                               onPressed: _submit,
                             ),
+
                             const SizedBox(height: 16),
+
                             Row(
                               children: [
                                 const Expanded(child: Divider()),
@@ -754,7 +787,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 const Expanded(child: Divider()),
                               ],
                             ),
+
                             const SizedBox(height: 16),
+
                             OutlinedButton(
                               onPressed: isLoading
                                   ? null
@@ -792,7 +827,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 ],
                               ),
                             ),
+
                             const SizedBox(height: 12),
+
                             TextButton(
                               onPressed: () => setState(() => isLogin = !isLogin),
                               child: Text(

@@ -5,7 +5,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
-import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view/screens/explore_map_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 
 class MapPickerScreen extends StatefulWidget {
@@ -98,18 +97,17 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                 onPressed: () async {
                   if (tappedPosition != null) {
                     final cubit = getIt<DiscoveryCubit>();
+
                     await cubit.loadCafesByManualLocation(
                       latitude: tappedPosition!.latitude,
                       longitude: tappedPosition!.longitude,
                     );
+
+                    widget.onLocationSelected(tappedPosition!);
+
                     if (!context.mounted) return;
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ExploreMapScreen(cubit: cubit),
-                      ),
-                          (route) => false,
-                    );
+
+                    Navigator.pop(context);
                   }
                 },
                 child: Text(

@@ -287,7 +287,7 @@ class CafeCard extends StatelessWidget {
                             title: cafe.name.toString(),
                             imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
                             rating: cafe.rating > 0 ? cafe.rating : null,
-                            address: cafe.location?.toString(),
+                            address: cafe.location.toString(),
                             tagText: cafe.interests.isNotEmpty
                                 ? cafe.interests.first
                                 : null,
@@ -576,7 +576,7 @@ class CategoryCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.arrow_forward_rounded,
+                  Icons.arrow_forward_ios_rounded,
                   size: 15,
                   color: AppColors.primary,
                 ),

@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:get_it/get_it.dart';
 
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
-import '../../../../../core/di/injection_container.dart';
+
 import '../../../../auth/presentation/view/screens/auth_screen.dart';
 import '../../../../auth/presentation/view/screens/owner_dashboard_screen.dart';
 import '../../../../discovery/presentation/view_model/cubit/discovery_cubit.dart';
@@ -44,7 +46,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     _textAnimation = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.35, 1.0, curve: Curves.easeIn),
+      curve: const Interval(
+        0.35,
+        1.0,
+        curve: Curves.easeIn,
+      ),
     );
 
     _controller.forward();
@@ -53,33 +59,61 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _handleNavigation() async {
+    print('========== SPLASH START ==========');
+
     await Future.delayed(const Duration(seconds: 2));
 
+    print('1 - Delay finished');
+
     if (!mounted) return;
+
+    print('2 - Getting onboarding status');
 
     final isOnboardingSeen = await GetIt.I<IsOnboardingSeen>().call();
 
+    print('3 - Onboarding seen: $isOnboardingSeen');
+
     if (!mounted) return;
 
+    // First launch -> Onboarding
     if (!isOnboardingSeen) {
+      print('4 - Going to Onboarding');
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+        MaterialPageRoute(
+          builder: (_) => const OnboardingScreen(),
+        ),
       );
+
       return;
     }
+
+    print('5 - Checking Firebase user');
 
     final currentUser = FirebaseAuth.instance.currentUser;
 
+    print('6 - Current user: $currentUser');
+
     if (!mounted) return;
 
+    // User is not logged in
     if (currentUser == null) {
+      print('7 - User NOT logged in');
+      print('8 - Going to Auth');
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
+        MaterialPageRoute(
+          builder: (_) => const AuthScreen(),
+        ),
       );
+
       return;
     }
+
+    // User is logged in
+    print('7 - User logged in');
 
     try {
       final userDoc = await FirebaseFirestore.instance
@@ -91,37 +125,70 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (userDoc.exists && userDoc.data() != null) {
         final data = userDoc.data()!;
+
         final role = (data['role'] as String?)?.trim().toLowerCase();
+
         final cafeId = data['cafeId'] as String?;
+
         final interests = data['interests'] as List<dynamic>?;
 
+        // Cafe owner
         if (role == 'cafe_owner' || role == 'cafeowner') {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) => OwnerDashboardScreen(cafeId: cafeId ?? ''),
+              builder: (_) => OwnerDashboardScreen(
+                cafeId: cafeId ?? '',
+              ),
             ),
           );
+
           return;
         }
 
+        // Existing customer with interests
         if (interests != null && interests.isNotEmpty) {
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.home,
+          );
+
           return;
         }
       }
 
+      // Logged-in user without personalization data
+      print('8 - Getting DiscoveryCubit');
+
+      final discoveryCubit = sl<DiscoveryCubit>();
+
+      print('9 - DiscoveryCubit created');
+      print(
+        '10 - Current location: ${discoveryCubit.currentLocation}',
+      );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => PersonalizationScreen(
-            userLocation: sl<DiscoveryCubit>().currentLocation,
+          builder: (_) => BlocProvider<DiscoveryCubit>.value(
+            value: discoveryCubit,
+            child: PersonalizationScreen(
+              userLocation: discoveryCubit.currentLocation,
+            ),
           ),
         ),
       );
-    } catch (_) {
+
+      print('11 - Navigation to Personalization done');
+    } catch (e) {
+      print('Splash navigation error: $e');
+
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.home,
+      );
     }
   }
 

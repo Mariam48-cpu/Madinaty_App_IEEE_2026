@@ -3,6 +3,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/utils/cafe_name_resolver.dart';
 import '../../../../booking/domain/entities/booking_entity.dart';
 
 class ReservationDetailsCard extends StatelessWidget {
@@ -28,6 +29,9 @@ class ReservationDetailsCard extends StatelessWidget {
     final String resolvedCafeLocation = (booking.cafeLocation != null && booking.cafeLocation!.trim().isNotEmpty)
         ? booking.cafeLocation!
         : AppLocale.locationNotSpecified.getString(context);
+
+    final String? directName =
+        booking.cafeName ?? CafeNameResolver.getCachedName(booking.cafeId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,6 +76,29 @@ class ReservationDetailsCard extends StatelessWidget {
                             color: AppColors.textPrimary,
                           ),
                         ),
+                        directName != null && directName.isNotEmpty
+                            ? Text(
+                                directName,
+                                style: AppTypography.titleLarge,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            : FutureBuilder<String>(
+                                future: CafeNameResolver.resolveCafeName(
+                                  booking.cafeId,
+                                ),
+                                builder: (context, snapshot) {
+                                  return Text(
+                                    snapshot.data ??
+                                        booking.cafeId
+                                            .replaceAll('cafe_', '')
+                                            .toUpperCase(),
+                                    style: AppTypography.titleLarge,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  );
+                                },
+                              ),
                         const SizedBox(height: 4),
                         Row(
                           children: [

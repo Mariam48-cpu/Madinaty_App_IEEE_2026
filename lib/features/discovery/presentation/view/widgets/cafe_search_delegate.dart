@@ -27,7 +27,7 @@ class CafeSearchDelegate extends SearchDelegate<String> {
   Widget? buildLeading(BuildContext context) {
     return IconButton(
       onPressed: () => close(context, ''),
-      icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+      icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
     );
   }
 

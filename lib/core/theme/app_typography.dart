@@ -4,170 +4,210 @@ import 'app_colors.dart';
 abstract class AppTypography {
   const AppTypography._();
 
-  /// Primary font family used across the application.
-  /// Falls back to standard clean Arabic system fonts if not loaded.
-  static const String fontFamily = 'Cairo';
+  // ============================================================
+  // FONT FAMILIES
+  // ============================================================
 
-  /// Fallback font families for Arabic text rendering across platforms.
-  static const List<String> fontFamilyFallback = [
+  /// Arabic primary font.
+  static const String arabicFontFamily = 'ReemKufi';
+
+  /// English primary font.
+  static const String englishFontFamily = 'Tajawal';
+
+  /// Decorative font - use only for special headings / branding.
+  static const String decorativeFontFamily = 'BerkshireSwash';
+
+  /// Kept for backward compatibility with existing code.
+  /// The actual application font is selected dynamically by locale
+  /// inside AppTheme.
+  static const String fontFamily = arabicFontFamily;
+
+  /// Arabic fallback fonts.
+  static const List<String> arabicFontFamilyFallback = [
+    'ReemKufi',
+    'Tajawal',
     'Cairo',
-    'Almarai',
+    'Roboto',
+    'sans-serif',
+  ];
+
+  /// English fallback fonts.
+  static const List<String> englishFontFamilyFallback = [
     'Tajawal',
     'Roboto',
     'sans-serif',
   ];
 
-  /// Display Large - 32sp, Bold, Height 1.3
+  /// Decorative font fallback.
+  static const List<String> decorativeFontFamilyFallback = [
+    'BerkshireSwash',
+    'Tajawal',
+    'ReemKufi',
+    'Roboto',
+    'sans-serif',
+  ];
+
+  /// Returns the correct primary font for the current locale.
+  static String fontFamilyForLocale(Locale locale) {
+    return locale.languageCode == 'ar' ? arabicFontFamily : englishFontFamily;
+  }
+
+  /// Returns the correct fallback fonts for the current locale.
+  static List<String> fontFamilyFallbackForLocale(Locale locale) {
+    return locale.languageCode == 'ar'
+        ? arabicFontFamilyFallback
+        : englishFontFamilyFallback;
+  }
+
+  // ============================================================
+  // DECORATIVE STYLE
+  // ============================================================
+
+  /// Use this only for special branding / hero headings.
+  ///
+  /// Example:
+  /// Text(
+  ///   'Madinaty AI',
+  ///   style: AppTypography.decorative,
+  /// )
+  static const TextStyle decorative = TextStyle(
+    fontFamily: decorativeFontFamily,
+    fontFamilyFallback: decorativeFontFamilyFallback,
+    fontSize: 28,
+    fontWeight: FontWeight.w400,
+    height: 1.2,
+    color: AppColors.textPrimary,
+  );
+
+  // ============================================================
+  // DISPLAY
+  // ============================================================
+
   static const TextStyle displayLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 32,
     fontWeight: FontWeight.bold,
     height: 1.3,
     color: AppColors.textPrimary,
   );
 
-  /// Display Medium - 28sp, Bold, Height 1.3
   static const TextStyle displayMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 28,
     fontWeight: FontWeight.bold,
     height: 1.3,
     color: AppColors.textPrimary,
   );
 
-  /// Display Small - 24sp, SemiBold, Height 1.35
   static const TextStyle displaySmall = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 24,
     fontWeight: FontWeight.w600,
     height: 1.35,
     color: AppColors.textPrimary,
   );
 
-  /// Headline Large - 22sp, Bold, Height 1.35
+  // ============================================================
+  // HEADLINES
+  // ============================================================
+
   static const TextStyle headlineLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 22,
     fontWeight: FontWeight.bold,
     height: 1.35,
     color: AppColors.textPrimary,
   );
 
-  /// Headline Medium - 20sp, Bold, Height 1.35
   static const TextStyle headlineMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 20,
     fontWeight: FontWeight.w700,
     height: 1.35,
     color: AppColors.textPrimary,
   );
 
-  /// Headline Small - 18sp, SemiBold, Height 1.4
   static const TextStyle headlineSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 18,
     fontWeight: FontWeight.w600,
     height: 1.4,
     color: AppColors.textPrimary,
   );
 
-  /// Title Large - 16sp, Bold, Height 1.4
+  // ============================================================
+  // TITLES
+  // ============================================================
+
   static const TextStyle titleLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 16,
     fontWeight: FontWeight.w700,
     height: 1.4,
     color: AppColors.textPrimary,
   );
 
-  /// Title Medium - 14sp, SemiBold, Height 1.4
   static const TextStyle titleMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 1.4,
     color: AppColors.textPrimary,
   );
 
-  /// Title Small - 13sp, Medium, Height 1.4
   static const TextStyle titleSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 13,
     fontWeight: FontWeight.w500,
     height: 1.4,
     color: AppColors.textSecondary,
   );
 
-  /// Body Large - 16sp, Regular, Height 1.5
+  // ============================================================
+  // BODY
+  // ============================================================
+
   static const TextStyle bodyLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 1.5,
     color: AppColors.textPrimary,
   );
 
-  /// Body Medium - 14sp, Regular, Height 1.5
   static const TextStyle bodyMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 1.5,
     color: AppColors.textSecondary,
   );
 
-  /// Body Small - 12sp, Regular, Height 1.5
   static const TextStyle bodySmall = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 1.5,
     color: AppColors.textMuted,
   );
 
-  /// Label Large - 14sp, SemiBold, Height 1.4 (Used for Buttons)
+  // ============================================================
+  // LABELS
+  // ============================================================
+
   static const TextStyle labelLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 1.4,
     color: AppColors.textPrimary,
   );
 
-  /// Label Medium - 12sp, Medium, Height 1.4 (Used for Chips, Badges)
   static const TextStyle labelMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 12,
     fontWeight: FontWeight.w500,
     height: 1.4,
     color: AppColors.textPrimary,
   );
 
-  /// Label Small - 11sp, Medium, Height 1.4 (Used for Captions, Nav Labels)
   static const TextStyle labelSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontFamilyFallback: fontFamilyFallback,
     fontSize: 11,
     fontWeight: FontWeight.w500,
     height: 1.4,
     color: AppColors.textMuted,
   );
 
-  /// Complete [TextTheme] object configured for Material 3.
+  // ============================================================
+  // COMPLETE MATERIAL 3 TEXT THEME
+  // ============================================================
+
   static const TextTheme textTheme = TextTheme(
     displayLarge: displayLarge,
     displayMedium: displayMedium,

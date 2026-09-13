@@ -6,6 +6,7 @@ class BookingEntity extends Equatable {
   final String id;
   final String userId;
   final String cafeId;
+  final String? cafeName;
   final DateTime? date;
   final String? time;
   final int guests;
@@ -15,13 +16,13 @@ class BookingEntity extends Equatable {
   final DateTime? createdAt;
   final double totalAmount;
   final double reservationFee;
-  final String? cafeName;
   final String? cafeLocation;
 
   const BookingEntity({
     this.id = '',
     this.userId = '',
     required this.cafeId,
+    this.cafeName,
     this.date,
     this.time,
     this.guests = 1,
@@ -31,7 +32,6 @@ class BookingEntity extends Equatable {
     this.createdAt,
     this.totalAmount = 50.0,
     this.reservationFee = 50.0,
-    this.cafeName,
     this.cafeLocation,
   });
 
@@ -75,6 +75,7 @@ class BookingEntity extends Equatable {
     id,
     userId,
     cafeId,
+    cafeName,
     date,
     time,
     guests,

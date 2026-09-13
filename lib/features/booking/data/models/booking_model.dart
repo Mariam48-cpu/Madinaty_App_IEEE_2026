@@ -6,6 +6,7 @@ class BookingModel extends BookingEntity {
     super.id,
     super.userId,
     required super.cafeId,
+    super.cafeName,
     super.date,
     super.time,
     super.guests,
@@ -15,7 +16,6 @@ class BookingModel extends BookingEntity {
     super.createdAt,
     super.totalAmount,
     super.reservationFee,
-    super.cafeName,
     super.cafeLocation,
   });
 
