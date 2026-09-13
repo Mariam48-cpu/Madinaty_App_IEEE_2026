@@ -10,19 +10,23 @@ class UserModel extends UserEntity {
     super.phone,
     super.profileImageUrl,
     super.birthDate,
+    super.role = UserRole.customer,
+    super.cafeId,
     this.createdAt,
   });
 
   factory UserModel.fromMap(
-    Map<String, dynamic> map,
-    String uid,
-  ) {
+      Map<String, dynamic> map,
+      String uid,
+      ) {
     return UserModel(
       uid: uid,
       name: map['name'] as String?,
       email: map['email'] as String?,
       phone: map['phone'] as String?,
       profileImageUrl: map['profileImageUrl'] as String?,
+      role: UserRole.fromString(map['role'] as String?),
+      cafeId: map['cafeId'] as String?,
       birthDate: map['birthDate'] != null
           ? DateTime.tryParse(map['birthDate'].toString())
           : null,
@@ -39,6 +43,8 @@ class UserModel extends UserEntity {
       'email': email,
       'phone': phone,
       'profileImageUrl': profileImageUrl,
+      'role': role.toMapValue(),
+      'cafeId': cafeId,
     };
 
     if (birthDate != null) {

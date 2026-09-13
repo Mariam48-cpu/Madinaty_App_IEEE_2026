@@ -4,91 +4,75 @@ import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
 class PreOrderTableBanner extends StatelessWidget {
   final BookingEntity? booking;
-  final String cafeName;
-  final VoidCallback? onEdit;
+  final String? cafeName;
+  final CafeEntity? cafe;
 
   const PreOrderTableBanner({
     super.key,
     this.booking,
-    required this.cafeName,
-    this.onEdit,
+    this.cafeName,
+    this.cafe,
   });
-
-  static const _arabicMonths = [
-    'يناير',
-    'فبراير',
-    'مارس',
-    'أبريل',
-    'مايو',
-    'يونيو',
-    'يوليو',
-    'أغسطس',
-    'سبتمبر',
-    'أكتوبر',
-    'نوفمبر',
-    'ديسمبر'
-  ];
-
-  String _formatBookingInfo(BuildContext context) {
-    if (booking == null) {
-      return 'حجز طاولة • صالة داخلية';
-    }
-
-    String dateStr = '20 أكتوبر';
-    if (booking!.date != null) {
-      final month = _arabicMonths[booking!.date!.month - 1];
-      dateStr = '${booking!.date!.day} $month';
-    }
-
-    final timeStr = booking!.time ?? '7:30 مساءً';
-    final guestsStr =
-        '${booking!.guests} ${AppLocale.guestsCountText.getString(context)}';
-    final seatingStr = booking!.seatingPreference ?? 'ركن هادئ';
-
-    return '$dateStr • $timeStr • $guestsStr • $seatingStr';
-  }
 
   @override
   Widget build(BuildContext context) {
+    final String displayCafeName = (cafe?.name != null && cafe!.name.isNotEmpty)
+        ? cafe!.name
+        : (booking?.cafeName != null && booking!.cafeName!.isNotEmpty)
+        ? booking!.cafeName!
+        : (cafeName != null && cafeName!.isNotEmpty)
+        ? cafeName!
+        : AppLocale.cafeLabel.getString(context);
+
+    final String displayCafeAddress = (cafe?.address != null && cafe!.address.isNotEmpty)
+        ? cafe!.address
+        : (booking?.cafeLocation != null && booking!.cafeLocation!.isNotEmpty)
+        ? booking!.cafeLocation!
+        : AppLocale.locationNotSpecified.getString(context);
+
+    final String table = booking?.seatingPreference ?? 'T3';
+    final String time = booking?.time ?? '--:--';
+    final int guests = booking?.guests ?? 1;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (onEdit != null)
-            GestureDetector(
-              onTap: onEdit,
-              child: Text(
-                AppLocale.edit.getString(context),
-                style: AppTypography.labelLarge.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          else
-            const SizedBox(width: 32),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.table_restaurant_outlined,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  cafeName,
+                  displayCafeName,
                   style: AppTypography.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -96,31 +80,42 @@ class PreOrderTableBanner extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 1),
+                const SizedBox(height: 2),
                 Text(
-                  _formatBookingInfo(context),
+                  displayCafeAddress,
                   style: AppTypography.bodySmall.copyWith(
-                    fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      '${AppLocale.seating.getString(context)}: $table',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Text(' • ', style: TextStyle(color: AppColors.divider)),
+                    Text(
+                      time,
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const Text(' • ', style: TextStyle(color: AppColors.divider)),
+                    Text(
+                      '$guests ${AppLocale.guestsSuffix.getString(context)}',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF9EAE1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.chair_alt_rounded,
-              color: Color(0xFFC07343),
-              size: 24,
             ),
           ),
         ],

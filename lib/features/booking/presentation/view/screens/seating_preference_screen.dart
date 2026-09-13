@@ -71,10 +71,13 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
         listener: (context, state) {
           if (state is BookingSuccess) {
             final cubit = context.read<BookingCubit>();
+
             final booking = BookingEntity(
               id: state.bookingId,
               userId: FirebaseAuth.instance.currentUser?.uid ?? 'guest_user',
               cafeId: widget.cafe.id,
+              cafeName: widget.cafe.name,
+              cafeLocation: widget.cafe.address,
               date: cubit.date ?? DateTime.now(),
               time: cubit.time ?? '18:00',
               guests: cubit.guests,
@@ -91,6 +94,7 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                 'booking': booking,
                 'cafeId': widget.cafe.id,
                 'cafeName': widget.cafe.name,
+                'cafeLocation': widget.cafe.address,
                 'cafe': widget.cafe,
               },
             );
@@ -173,8 +177,8 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                       SizedBox(
                         height: 38,
                         child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
                           itemCount: filters.length,
+                          scrollDirection: Axis.horizontal,
                           separatorBuilder: (context, index) =>
                           const SizedBox(width: 7),
                           itemBuilder: (context, index) {

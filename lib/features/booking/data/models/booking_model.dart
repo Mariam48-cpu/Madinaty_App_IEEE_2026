@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../domain/entities/booking_entity.dart';
 
 class BookingModel extends BookingEntity {
@@ -16,6 +15,8 @@ class BookingModel extends BookingEntity {
     super.createdAt,
     super.totalAmount,
     super.reservationFee,
+    super.cafeName,
+    super.cafeLocation,
   });
 
   factory BookingModel.fromEntity(BookingEntity entity) {
@@ -23,6 +24,8 @@ class BookingModel extends BookingEntity {
       id: entity.id,
       userId: entity.userId,
       cafeId: entity.cafeId,
+      cafeName: entity.cafeName,
+      cafeLocation: entity.cafeLocation,
       date: entity.date,
       time: entity.time,
       guests: entity.guests,
@@ -47,6 +50,8 @@ class BookingModel extends BookingEntity {
       id: docId,
       userId: map['userId'] as String? ?? '',
       cafeId: map['cafeId'] as String? ?? '',
+      cafeName: map['cafeName'] as String?,
+      cafeLocation: map['cafeLocation'] as String?,
       date: _parseDate(map['date']),
       time: map['time'] as String?,
       guests: (map['guests'] ?? 1).toInt(),
@@ -80,6 +85,8 @@ class BookingModel extends BookingEntity {
     return {
       'userId': userId,
       'cafeId': cafeId,
+      'cafeName': cafeName,
+      'cafeLocation': cafeLocation,
       'date': date?.toIso8601String(),
       'time': time,
       'guests': guests,
@@ -96,6 +103,8 @@ class BookingModel extends BookingEntity {
     return {
       'userId': userId,
       'cafeId': cafeId,
+      'cafeName': cafeName,
+      'cafeLocation': cafeLocation,
       'date': date != null ? Timestamp.fromDate(date!) : null,
       'time': time,
       'guests': guests,

@@ -22,7 +22,7 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
     http.Client? client,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? FirebaseAuth.instance,
         _client = client ?? http.Client();
 
@@ -236,6 +236,8 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
       id: docRef.id,
       userId: user.uid,
       cafeId: booking.cafeId,
+      cafeName: booking.cafeName,
+      cafeLocation: booking.cafeLocation,
       date: booking.date,
       time: booking.time,
       guests: booking.guests,
@@ -243,6 +245,8 @@ class PaymentRemoteDataSourceImpl implements PaymentDataSourceInterface {
       seatingPreference: booking.seatingPreference,
       status: BookingStatus.approved,
       createdAt: DateTime.now(),
+      totalAmount: booking.totalAmount,
+      reservationFee: booking.reservationFee,
     );
 
     await docRef.set(confirmedBooking.toFirestore());

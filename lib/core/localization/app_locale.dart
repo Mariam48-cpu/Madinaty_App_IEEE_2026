@@ -373,14 +373,181 @@ mixin AppLocale {
   static const String quickPickDate = 'quickPickDate';
   static const String quickPickHangout = 'quickPickHangout';
   static const String iWantPrefix = 'iWantPrefix';
-
   static const String aiEmptyResponse = 'aiEmptyResponse';
   static const String aiInvalidResponseFormat = 'aiInvalidResponseFormat';
   static const String aiAuthError = 'aiAuthError';
   static const String aiRateLimitError = 'aiRateLimitError';
   static const String aiServerError = 'aiServerError';
   static const String aiNetworkConnectionError = 'aiNetworkConnectionError';
+  static const String accountTypeTitle = 'accountTypeTitle';
+  static const String accountTypeSubtitle = 'accountTypeSubtitle';
+  static const String customerRoleTitle = 'customerRoleTitle';
+  static const String customerRoleSubtitle = 'customerRoleSubtitle';
+  static const String cafeOwnerRoleTitle = 'cafeOwnerRoleTitle';
+  static const String cafeOwnerRoleSubtitle = 'cafeOwnerRoleSubtitle';
+  static const String ownerDashboardTitle = 'ownerDashboardTitle';
+  static const String scanQrTitle = 'scanQrTitle';
+  static const String editCafeDataTitle = 'editCafeDataTitle';
+  static const String activeBookingsTitle = 'activeBookingsTitle';
+  static const String manageMenuTitle = 'manageMenuTitle';
+  static const String invalidReservationCode = 'invalidReservationCode';
+  static const String unauthorizedReservation = 'unauthorizedReservation';
+  static const String reservationAlreadyCheckedIn = 'reservationAlreadyCheckedIn';
+  static const String checkInSuccessMessage = 'checkInSuccessMessage';
+  static const String checkInFailedMessage = 'checkInFailedMessage';
+  static const String ok = 'ok';
+  static const String editCafeTitle = 'editCafeTitle';
+  static const String cafeNameLabel = 'cafeNameLabel';
+  static const String cafeDescLabel = 'cafeDescLabel';
+  static const String cafePhoneLabel = 'cafePhoneLabel';
+  static const String openTimeLabel = 'openTimeLabel';
+  static const String closeTimeLabel = 'closeTimeLabel';
+  static const String cafeUpdatedSuccess = 'cafeUpdatedSuccess';
+  static const String menuUnderDevelopment = 'menuUnderDevelopment';
+  static const String currentCafePrefix = 'currentCafePrefix';
+  static const String notSpecified = 'notSpecified';
+  // Active Reservations
+  static const String activeReservationsTitle = 'activeReservationsTitle';
+  static const String noCafeIdProvided = 'noCafeIdProvided';
+  static const String reservationsLoadError = 'reservationsLoadError';
+  static const String noReservationsFound = 'noReservationsFound';
+  static const String currentCafeIdPrefix = 'currentCafeIdPrefix';
+  static const String defaultCustomerName = 'defaultCustomerName';
+  static const String today = 'today';
+  static const String guestsSuffix = 'guestsSuffix';
+  static const String cancelReservation = 'cancelReservation';
+  static const String confirmReservation = 'confirmReservation';
+  static const String noCafeLinked = 'noCafeLinked';
+  static const String addNewCategory = 'addNewCategory';
+  static const String addNewItem = 'addNewItem';
+  static const String noCategoriesFound = 'noCategoriesFound';
+  static const String itemsCountSuffix = 'itemsCountSuffix';
+  static const String editCategoryTitle = 'editCategoryTitle';
+  static const String deleteCategoryTitle = 'deleteCategoryTitle';
+  static const String deleteCategoryConfirm = 'deleteCategoryConfirm';
+  static const String noItemsInCategory = 'noItemsInCategory';
+  static const String addFirstItemHere = 'addFirstItemHere';
+  static const String egpCurrency = 'egpCurrency';
+  static const String editItemTooltip = 'editItemTooltip';
+  static const String deleteItemTooltip = 'deleteItemTooltip';
+  static const String categoryNameLabel = 'categoryNameLabel';
+  static const String categoryNameHint = 'categoryNameHint';
+  static const String delete = 'delete';
+  static const String save = 'save';
+  static const String add = 'add';
+  static const String parentCategoryLabel = 'parentCategoryLabel';
+  static const String itemNameLabel = 'itemNameLabel';
+  static const String itemPriceLabel = 'itemPriceLabel';
+  static const String itemDescLabel = 'itemDescLabel';
+  static const String editItemTitle = 'editItemTitle';
+  static const String shareCafeSubject = 'share_cafe_subject';
+  static const String shareRating = 'share_rating';
+  static const String shareAddress = 'share_address';
+  static const String shareFooter = 'share_footer';
+  static const String bookingConfirmedTitle = 'booking_confirmed_title';
+  static const String bookingConfirmedSubtitle = 'booking_confirmed_subtitle';
+  static const String bookingNumberLabel = 'booking_number_label';
+  static const String cafeLabel = 'cafe_label';
+  static const String dateTimeLabel = 'date_time_label';
+  static const String detailsLabel = 'details_label';
+  static const String indoorSeating = 'indoor_seating';
+  static const String paidAmountLabel = 'paid_amount_label';
+  static const String currencyEgp = 'currency_egp';
+  static const String viewDigitalPassBtn = 'view_digital_pass_btn';
+  static const String backToHomeBtn = 'back_to_home_btn';
+  static const String viewMyBookingsBtn = 'view_my_bookings_btn';
+  static const String defaultCafeTitle = 'default_cafe_title';
+  static const String locationNotSpecified = 'location_not_specified';
+  static const String aboutCafeLabel = 'aboutCafeLabel';
   static const Map<String, dynamic> AR = {
+    aboutCafeLabel: 'عن الكافيه',
+    AppLocale.today: 'اليوم',
+    AppLocale.bookingConfirmedTitle: 'تم تأكيد الحجز بنجاح!',
+    AppLocale.bookingConfirmedSubtitle: 'تم إرسال تفاصيل الحجز والإشعار إلى حسابك',
+    AppLocale.bookingNumberLabel: 'رقم الحجز',
+    AppLocale.cafeLabel: 'الكافيه',
+    AppLocale.dateTimeLabel: 'الموعد',
+    AppLocale.detailsLabel: 'التفاصيل',
+    AppLocale.guestsSuffix: 'أفراد',
+    AppLocale.indoorSeating: 'صالة داخلية',
+    AppLocale.paidAmountLabel: 'المبلغ المدفوع',
+    AppLocale.currencyEgp: 'ج.م',
+    AppLocale.viewDigitalPassBtn: 'عرض التذكرة الرقمية (QR Pass)',
+    AppLocale.backToHomeBtn: 'العودة للرئيسية',
+    AppLocale.viewMyBookingsBtn: 'عرض قائمة حجوزاتي',
+    AppLocale.defaultCafeTitle: 'الكافيه',
+    AppLocale.locationNotSpecified: 'الموقع غير محدد',
+    AppLocale.digitalPassSearchHint: 'ابحث عن تفاصيل الحجز أو الخدمات...',
+    AppLocale.addToCalendar: 'إضافة للتقويم',
+    AppLocale.directions: 'الاتجاهات',
+    AppLocale.reservationAddedToCalendar: 'تمت إضافة الحجز إلى التقويم بنجاح',
+    shareCafeSubject: 'كافيه %a',
+    shareRating: 'التقييم',
+    shareAddress: 'العنوان',
+    shareFooter: 'اكتشف تفاصيل أكثر عبر تطبيق مدينتي!',
+    activeReservationsTitle: 'الحجوزات النشطة',
+    noCafeIdProvided: 'لم يتم تحديد معرف الكافيه',
+    reservationsLoadError: 'حدث خطأ في تحميل الحجوزات: ',
+    noReservationsFound: 'لا توجد حجوزات حالية لهذا الكافيه',
+    currentCafeIdPrefix: 'معرف الكافيه: ',
+    defaultCustomerName: 'عميل',
+    notSpecified: 'غير محدد',
+    cancelReservation: 'إلغاء الحجز',
+    confirmReservation: 'تأكيد الحجز',
+    statusConfirmed: 'مؤكد',
+    statusCancelled: 'ملغي',
+    statusPending: 'قيد الانتظار',
+
+    manageMenuTitle: 'إدارة المنيو',
+    noCafeLinked: 'لم يتم العثور على كافيه مرتبط بهذا الحساب',
+    addNewCategory: 'إضافة قسم جديد',
+    addNewItem: 'إضافة صنف',
+    noCategoriesFound: 'لا توجد تصنيفات منيو مضافة بعد',
+    itemsCountSuffix: 'أصناف',
+    editCategoryTitle: 'تعديل اسم القسم',
+    deleteCategoryTitle: 'تأكيد حذف القسم',
+    deleteCategoryConfirm: 'هل أنت متأكد من رغبتك في حذف هذا القسم بجميع محتوياته؟',
+    noItemsInCategory: 'لا توجد عناصر مضافة داخل هذا القسم',
+    addFirstItemHere: 'أضف أول صنف هنا',
+    egpCurrency: 'ج.م',
+    editItemTooltip: 'تعديل الصنف',
+    deleteItemTooltip: 'حذف الصنف',
+    categoryNameLabel: 'اسم القسم',
+    categoryNameHint: 'مثلاً: مشروبات مثلجة، حلويات',
+    cancel: 'إلغاء',
+    delete: 'حذف',
+    save: 'حفظ التعديل',
+    add: 'إضافة',
+    parentCategoryLabel: 'القسم التابع له',
+    itemNameLabel: 'اسم الصنف',
+    itemPriceLabel: 'السعر (ج.م)',
+    itemDescLabel: 'الوصف (اختياري)',
+    editItemTitle: 'تعديل صنف',
+    menuUnderDevelopment: 'قائمة المنيو قيد التطوير',
+    currentCafePrefix: 'الكافيه الحالي:',
+    editCafeTitle: 'تعديل بيانات الكافيه',
+    cafeNameLabel: 'اسم الكافيه',
+    cafeDescLabel: 'وصف المكان',
+    cafePhoneLabel: 'رقم هاتف التواصل',
+    openTimeLabel: 'وقت الفتح (مثال: 08:00 AM)',
+    closeTimeLabel: 'وقت الإغلاق (مثال: 12:00 AM)',
+    cafeUpdatedSuccess: 'تم تحديث بيانات الكافيه بنجاح',
+    accountTypeTitle: 'نوع الحساب',
+    accountTypeSubtitle: 'اختر نوع الحساب للمتابعة:',
+    customerRoleTitle: 'عميل / مستخدم',
+    customerRoleSubtitle: 'لتصفح الكافيهات وحجز الطاولات',
+    cafeOwnerRoleTitle: 'صاحب كافيه',
+    cafeOwnerRoleSubtitle: 'لإدارة بيانات المكان ومسح الـ QR',
+    ownerDashboardTitle: 'لوحة إدارة الكافيه',
+    scanQrTitle: 'مسح QR الحجز',
+    editCafeDataTitle: 'تعديل بيانات الكافيه',
+    activeBookingsTitle: 'الحجوزات النشطة',
+    invalidReservationCode: 'رمز الحجز غير صالح أو غير موجود.',
+    unauthorizedReservation: 'هذا الحجز لا يتبع هذا الكافيه!',
+    reservationAlreadyCheckedIn: 'تم تأكيد هذا الحجز بالفعل في وقت سابق.',
+    checkInSuccessMessage: 'تم التحقق من الحجز وتأكيد الحضور بنجاح للعميل: ',
+    checkInFailedMessage: 'تعذر التحقق من الحجز: ',
+    ok: 'موافق',
     appTitle: 'مدينتي',
     nextButtonText: 'التالي',
     previousButton: 'السابق',
@@ -398,7 +565,6 @@ mixin AppLocale {
     all: 'الكل',
     or: 'أو',
     send: 'إرسال',
-    cancel: 'إلغاء',
     close: 'إغلاق',
     clear: 'مسح',
     openSettings: 'فتح الإعدادات',
@@ -615,16 +781,8 @@ mixin AppLocale {
     occasionWork: 'شغل ومذاكرة',
     occasionCasualCoffee: 'قهوة سريعة',
     occasionOther: 'أخرى',
-
-    statusConfirmed: 'مؤكد',
-    statusPending: 'قيد الانتظار',
-    statusCancelled: 'ملغي',
     waitingForConfirmation: 'في انتظار التأكيد',
     showQrOnArrival: 'اعرض الـ QR Code عند الوصول',
-    digitalPassSearchHint: 'ابحث عن تفاصيل الحجز أو الخدمات...',
-    addToCalendar: 'إضافة للتقويم',
-    reservationAddedToCalendar: 'تمت إضافة الحجز إلى تقويمك بنجاح',
-    directions: 'الاتجاهات',
     defaultCafeName: 'الكافيه',
     defaultCafeLocation: 'الموقع غير محدد',
     date: 'التاريخ',
@@ -783,6 +941,94 @@ mixin AppLocale {
   };
 
   static const Map<String, dynamic> EN = {
+    aboutCafeLabel: 'About Cafe',
+    AppLocale.today: 'Today',
+    AppLocale.bookingConfirmedTitle: 'Booking Confirmed Successfully!',
+    AppLocale.bookingConfirmedSubtitle: 'Booking details and notification have been sent to your account',
+    AppLocale.bookingNumberLabel: 'Booking Number',
+    AppLocale.cafeLabel: 'Café',
+    AppLocale.dateTimeLabel: 'Date & Time',
+    AppLocale.detailsLabel: 'Details',
+    AppLocale.guestsSuffix: 'Guests',
+    AppLocale.indoorSeating: 'Indoor Hall',
+    AppLocale.paidAmountLabel: 'Amount Paid',
+    AppLocale.currencyEgp: 'EGP',
+    AppLocale.viewDigitalPassBtn: 'View Digital Pass (QR Pass)',
+    AppLocale.backToHomeBtn: 'Back to Home',
+    AppLocale.viewMyBookingsBtn: 'View My Bookings',
+    AppLocale.defaultCafeTitle: 'Café',
+    AppLocale.locationNotSpecified: 'Location not specified',
+    AppLocale.digitalPassSearchHint: 'Search booking details or services...',
+    AppLocale.addToCalendar: 'Add to Calendar',
+    AppLocale.directions: 'Directions',
+    AppLocale.reservationAddedToCalendar: 'Reservation added to calendar successfully',
+    shareCafeSubject: '%a Cafe',
+    shareRating: 'Rating',
+    shareAddress: 'Address',
+    shareFooter: 'Discover more details on Madinaty App!',
+    activeReservationsTitle: 'Active Reservations',
+    noCafeIdProvided: 'No cafe ID provided',
+    reservationsLoadError: 'Error loading reservations: ',
+    noReservationsFound: 'No active reservations for this cafe',
+    currentCafeIdPrefix: 'Cafe ID: ',
+    defaultCustomerName: 'Customer',
+    notSpecified: 'Not specified',
+    cancelReservation: 'Cancel',
+    confirmReservation: 'Confirm',
+    statusConfirmed: 'Confirmed',
+    statusCancelled: 'Cancelled',
+    statusPending: 'Pending',
+
+    manageMenuTitle: 'Manage Menu',
+    noCafeLinked: 'No cafe linked to this account',
+    addNewCategory: 'Add Category',
+    addNewItem: 'Add Item',
+    noCategoriesFound: 'No menu categories added yet',
+    itemsCountSuffix: 'items',
+    editCategoryTitle: 'Edit Category Name',
+    deleteCategoryTitle: 'Confirm Category Deletion',
+    deleteCategoryConfirm: 'Are you sure you want to delete this category with all its items?',
+    noItemsInCategory: 'No items inside this category',
+    addFirstItemHere: 'Add first item here',
+    egpCurrency: 'EGP',
+    editItemTooltip: 'Edit Item',
+    deleteItemTooltip: 'Delete Item',
+    categoryNameLabel: 'Category Name',
+    categoryNameHint: 'e.g. Cold Drinks, Desserts',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    save: 'Save Changes',
+    add: 'Add',
+    parentCategoryLabel: 'Category',
+    itemNameLabel: 'Item Name',
+    itemPriceLabel: 'Price (EGP)',
+    itemDescLabel: 'Description (Optional)',
+    editItemTitle: 'Edit Item',
+    menuUnderDevelopment: 'Menu Under Development',
+    currentCafePrefix: 'Current Cafe:',
+    editCafeTitle: 'Edit Cafe Details',
+    cafeNameLabel: 'Cafe Name',
+    cafeDescLabel: 'Description',
+    cafePhoneLabel: 'Contact Phone',
+    openTimeLabel: 'Opening Time (e.g. 08:00 AM)',
+    closeTimeLabel: 'Closing Time (e.g. 12:00 AM)',
+    cafeUpdatedSuccess: 'Cafe details updated successfully',
+    accountTypeTitle: 'Account Type',
+    accountTypeSubtitle: 'Select account type to continue:',
+    customerRoleTitle: 'Customer / User',
+    customerRoleSubtitle: 'Browse cafes and reserve tables',
+    cafeOwnerRoleTitle: 'Cafe Owner',
+    cafeOwnerRoleSubtitle: 'Manage cafe details & scan QR codes',
+    ownerDashboardTitle: 'Cafe Management Dashboard',
+    scanQrTitle: 'Scan Booking QR',
+    editCafeDataTitle: 'Edit Cafe Details',
+    activeBookingsTitle: 'Active Reservations',
+    invalidReservationCode: 'Reservation code is invalid or not found.',
+    unauthorizedReservation: 'This booking does not belong to this cafe!',
+    reservationAlreadyCheckedIn: 'This reservation has already been checked in.',
+    checkInSuccessMessage: 'Reservation verified and checked in successfully for: ',
+    checkInFailedMessage: 'Failed to verify reservation: ',
+    ok: 'OK',
     appTitle: 'Madinaty',
     nextButtonText: 'Next',
     previousButton: 'Previous',
@@ -800,7 +1046,6 @@ mixin AppLocale {
     all: 'All',
     or: 'OR',
     send: 'Send',
-    cancel: 'Cancel',
     close: 'Close',
     clear: 'Clear',
     openSettings: 'Open Settings',
@@ -1017,16 +1262,8 @@ mixin AppLocale {
     occasionWork: 'Work / Study',
     occasionCasualCoffee: 'Casual Coffee',
     occasionOther: 'Other',
-
-    statusConfirmed: 'Confirmed',
-    statusPending: 'Pending',
-    statusCancelled: 'Cancelled',
     waitingForConfirmation: 'Awaiting Confirmation',
     showQrOnArrival: 'Show QR Code on arrival',
-    digitalPassSearchHint: 'Search reservation details or services...',
-    addToCalendar: 'Add to Calendar',
-    reservationAddedToCalendar: 'Reservation successfully added to your calendar',
-    directions: 'Directions',
     defaultCafeName: 'Cafe',
     defaultCafeLocation: 'Location not specified',
     date: 'Date',

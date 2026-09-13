@@ -25,14 +25,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ProfileCubit>().fetchUserProfile(widget.uid);
 
-    // الاستماع لأي تغيير في اللغة وإعادة بناء الشاشة فوراً
-    _localization.onTranslatedLanguage = (locale) {
-      if (mounted) {
-        setState(() {});
-      }
-    };
+    context.read<ProfileCubit>().fetchUserProfile(widget.uid);
   }
 
   @override
@@ -59,6 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
 
             String name = AppLocale.defaultUser.getString(context);
+
             String email = "";
             String phone = "";
             String? profileImageUrl;
@@ -79,6 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ================= HEADER =================
                   Row(
                     children: [
                       Text(
@@ -89,9 +85,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: AppColors.textPrimary,
                         ),
                       ),
+
                       const Spacer(),
+
                       _HeaderLanguageSwitch(localization: _localization),
+
                       const SizedBox(width: 8),
+
                       IconButton(
                         icon: const Icon(
                           Icons.settings_outlined,
@@ -104,6 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(height: 20),
 
+                  // ================= PROFILE CARD =================
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -119,6 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Column(
                       children: [
+                        // ================= PROFILE IMAGE =================
                         Stack(
                           alignment: AlignmentDirectional.bottomEnd,
                           children: [
@@ -126,18 +128,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               radius: 45,
                               backgroundColor: AppColors.surfaceVariant,
                               backgroundImage:
-                              profileImageUrl != null &&
-                                  profileImageUrl.isNotEmpty
+                                  profileImageUrl != null &&
+                                      profileImageUrl.isNotEmpty
                                   ? NetworkImage(profileImageUrl)
                                   : null,
                               child:
-                              profileImageUrl == null ||
-                                  profileImageUrl.isEmpty
+                                  profileImageUrl == null ||
+                                      profileImageUrl.isEmpty
                                   ? const Icon(
-                                Icons.person,
-                                size: 50,
-                                color: AppColors.primary,
-                              )
+                                      Icons.person,
+                                      size: 50,
+                                      color: AppColors.primary,
+                                    )
                                   : null,
                             ),
 
@@ -177,7 +179,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         const SizedBox(height: 12),
-
                         Text(
                           name,
                           style: const TextStyle(
@@ -188,7 +189,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         const SizedBox(height: 4),
-
                         Text(
                           email,
                           style: const TextStyle(
@@ -201,7 +201,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: EdgeInsets.symmetric(vertical: 16.0),
                           child: Divider(color: AppColors.border),
                         ),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -209,12 +208,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               title: AppLocale.bookingsTitle.getString(context),
                               value: "12",
                             ),
+
                             const _VerticalDivider(),
+
                             _ProfileStatItem(
                               title: AppLocale.navFavorites.getString(context),
                               value: "8",
                             ),
+
                             const _VerticalDivider(),
+
                             _ProfileStatItem(
                               title: AppLocale.ordersTitle.getString(context),
                               value: "45",
@@ -226,7 +229,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   const SizedBox(height: 16),
-
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -243,6 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         AppColors.surfaceVariant,
                         AppColors.primary,
                       ),
+
                       _buildMenuCard(
                         context,
                         AppLocale.navFavorites.getString(context),
@@ -251,6 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         AppColors.error.withValues(alpha: 0.1),
                         AppColors.error,
                       ),
+
                       _buildMenuCard(
                         context,
                         AppLocale.favoriteProducts.getString(context),
@@ -259,6 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         AppColors.surfaceVariant,
                         AppColors.primary,
                       ),
+
                       _buildMenuCard(
                         context,
                         AppLocale.loyaltyPoints.getString(context),
@@ -272,6 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(height: 16),
 
+                  // ================= SETTINGS LIST =================
                   Material(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(16),
@@ -282,22 +288,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           AppLocale.paymentMethods.getString(context),
                           Icons.credit_card_outlined,
                         ),
+
                         const Divider(
                           height: 1,
                           indent: 16,
                           endIndent: 16,
                           color: AppColors.border,
                         ),
+
                         _buildListTile(
                           AppLocale.savedAddresses.getString(context),
                           Icons.location_on_outlined,
                         ),
+
                         const Divider(
                           height: 1,
                           indent: 16,
                           endIndent: 16,
                           color: AppColors.border,
                         ),
+
                         _buildListTile(
                           AppLocale.helpAndSupport.getString(context),
                           Icons.help_outline,
@@ -308,6 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(height: 20),
 
+                  // ================= LOGOUT =================
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -342,14 +353,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ================= MENU CARD =================
+
   Widget _buildMenuCard(
-      BuildContext context,
-      String title,
-      String subtitle,
-      IconData icon,
-      Color bgColor,
-      Color iconColor,
-      ) {
+    BuildContext context,
+    String title,
+    String subtitle,
+    IconData icon,
+    Color bgColor,
+    Color iconColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -375,6 +388,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -385,7 +399,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
+
           const SizedBox(height: 6),
+
           Text(
             subtitle,
             style: const TextStyle(
@@ -399,6 +415,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  // ================= LIST TILE =================
 
   Widget _buildListTile(String title, IconData icon) {
     return ListTile(
@@ -421,6 +439,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
+// ============================================================
+// LANGUAGE SWITCH
+// ============================================================
+
 class _HeaderLanguageSwitch extends StatelessWidget {
   final FlutterLocalization localization;
 
@@ -429,6 +451,7 @@ class _HeaderLanguageSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentCode = localization.currentLocale?.languageCode ?? 'ar';
+
     final isArabic = currentCode == 'ar';
 
     return Container(
@@ -452,6 +475,7 @@ class _HeaderLanguageSwitch extends StatelessWidget {
                 }
               },
             ),
+
             _buildLangBtn(
               title: 'EN',
               isSelected: !isArabic,
@@ -495,6 +519,10 @@ class _HeaderLanguageSwitch extends StatelessWidget {
   }
 }
 
+// ============================================================
+// PROFILE STAT ITEM
+// ============================================================
+
 class _ProfileStatItem extends StatelessWidget {
   final String title;
   final String value;
@@ -513,7 +541,9 @@ class _ProfileStatItem extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
+
         const SizedBox(height: 4),
+
         Text(
           title,
           style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -522,6 +552,10 @@ class _ProfileStatItem extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// VERTICAL DIVIDER
+// ============================================================
 
 class _VerticalDivider extends StatelessWidget {
   const _VerticalDivider();

@@ -8,8 +8,6 @@ import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/pre_order_skeleton.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
-import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/screens/book_table_screen.dart';
-import 'package:madinaty_app_ieee_2026/features/booking/presentation/view_model/cubit/booking_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/product_datails_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/domain/entities/cart_item_entity.dart';
@@ -17,7 +15,6 @@ import 'package:madinaty_app_ieee_2026/features/cart/presentation/view_model/cub
 import 'package:madinaty_app_ieee_2026/features/cart/presentation/view_model/cubit/cart_state.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view/screens/checkout_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
-import 'package:latlong2/latlong.dart';
 import '../../view_model/cubit/pre_order_cubit.dart';
 import '../../view_model/cubit/pre_order_state.dart';
 import '../widgets/pre_order_bottom_bar.dart';
@@ -41,8 +38,19 @@ class PreOrderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveCafeId = booking?.cafeId ?? cafe?.id ?? cafeId;
-    final effectiveCafeName = cafeName ?? cafe?.name ?? 'روستري لب';
+    final effectiveCafeId = (cafe?.id != null && cafe!.id.isNotEmpty)
+        ? cafe!.id
+        : (booking?.cafeId != null && booking!.cafeId.isNotEmpty)
+        ? booking!.cafeId
+        : cafeId;
+
+    final effectiveCafeName = (cafe?.name != null && cafe!.name.isNotEmpty)
+        ? cafe!.name
+        : (booking?.cafeName != null && booking!.cafeName!.isNotEmpty)
+        ? booking!.cafeName!
+        : (cafeName != null && cafeName!.isNotEmpty)
+        ? cafeName!
+        : AppLocale.defaultCafeTitle.getString(context);
 
     return MultiBlocProvider(
       providers: [
@@ -56,7 +64,7 @@ class PreOrderScreen extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) =>
-              getIt<CartCubit>()..initCartWatcher(cafeName: effectiveCafeName),
+          getIt<CartCubit>()..initCartWatcher(cafeName: effectiveCafeName),
         ),
       ],
       child: _PreOrderView(
@@ -107,17 +115,17 @@ class _PreOrderViewState extends State<_PreOrderView> {
       return cartState.items
           .where(
             (item) =>
-                item.id == product.id || item.id.startsWith('${product.id}_'),
-          )
+        item.id == product.id || item.id.startsWith('${product.id}_'),
+      )
           .fold(0, (sum, item) => sum + item.quantity);
     }
     return 0;
   }
 
   CartItemEntity? _findItemForRemoval(
-    List<CartItemEntity> items,
-    String productId,
-  ) {
+      List<CartItemEntity> items,
+      String productId,
+      ) {
     for (final item in items) {
       if (item.id == productId) {
         return item;
@@ -131,10 +139,57 @@ class _PreOrderViewState extends State<_PreOrderView> {
     return null;
   }
 
+  BookingEntity? _buildSynchronizedBooking() {
+    final effectiveLocation = (widget.cafe?.address != null && widget.cafe!.address.isNotEmpty)
+        ? widget.cafe!.address
+        : (widget.booking?.cafeLocation != null && widget.booking!.cafeLocation!.isNotEmpty)
+        ? widget.booking!.cafeLocation
+        : null;
+
+    final effectiveName = widget.cafeName.isNotEmpty
+        ? widget.cafeName
+        : (widget.cafe?.name ?? widget.booking?.cafeName);
+
+    if (widget.booking != null) {
+      return BookingEntity(
+        id: widget.booking!.id,
+        userId: widget.booking!.userId,
+        cafeId: widget.cafeId.isNotEmpty ? widget.cafeId : widget.booking!.cafeId,
+        cafeName: effectiveName,
+        cafeLocation: effectiveLocation,
+        date: widget.booking!.date,
+        time: widget.booking!.time,
+        guests: widget.booking!.guests,
+        occasion: widget.booking!.occasion,
+        seatingPreference: widget.booking!.seatingPreference,
+        status: widget.booking!.status,
+        createdAt: widget.booking!.createdAt,
+        totalAmount: widget.booking!.totalAmount,
+        reservationFee: widget.booking!.reservationFee,
+      );
+    }
+
+    return BookingEntity(
+      id: '',
+      userId: '',
+      cafeId: widget.cafeId,
+      cafeName: effectiveName,
+      cafeLocation: effectiveLocation,
+      date: DateTime.now(),
+      time: '18:00',
+      guests: 2,
+      seatingPreference: 'صالة داخلية',
+      occasion: 'عام',
+      status: BookingStatus.pending,
+      createdAt: DateTime.now(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final preOrderCubit = context.read<PreOrderCubit>();
     final cartCubit = context.read<CartCubit>();
+    final synchronizedBooking = _buildSynchronizedBooking();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF9F6),
@@ -166,36 +221,36 @@ class _PreOrderViewState extends State<_PreOrderView> {
         ),
         title: _isSearching
             ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: (query) => preOrderCubit.setSearchQuery(query),
-                decoration: InputDecoration(
-                  hintText: AppLocale.searchMenuPlaceholder.getString(context),
-                  hintStyle: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textMuted,
-                  ),
-                  border: InputBorder.none,
-                  isDense: true,
-                ),
-              )
+          controller: _searchController,
+          autofocus: true,
+          onChanged: (query) => preOrderCubit.setSearchQuery(query),
+          decoration: InputDecoration(
+            hintText: AppLocale.searchMenuPlaceholder.getString(context),
+            hintStyle: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textMuted,
+            ),
+            border: InputBorder.none,
+            isDense: true,
+          ),
+        )
             : Column(
-                children: [
-                  Text(
-                    AppLocale.preOrderMenuTitle.getString(context),
-                    style: AppTypography.titleLarge.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    widget.cafeName,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
+          children: [
+            Text(
+              AppLocale.preOrderMenuTitle.getString(context),
+              style: AppTypography.titleLarge.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
+            ),
+            Text(
+              widget.cafeName,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -244,8 +299,8 @@ class _PreOrderViewState extends State<_PreOrderView> {
                     ElevatedButton(
                       onPressed: () {
                         preOrderCubit.loadMenu(
-                          cafeId: widget.booking?.cafeId ?? 'cafe_default',
-                          booking: widget.booking,
+                          cafeId: widget.cafeId,
+                          booking: synchronizedBooking,
                           cafeName: widget.cafeName,
                         );
                       },
@@ -278,76 +333,20 @@ class _PreOrderViewState extends State<_PreOrderView> {
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                               child: PreOrderTableBanner(
-                                booking: widget.booking,
+                                booking: synchronizedBooking,
                                 cafeName: widget.cafeName,
-                                onEdit: () {
-                                  final cafeEntity =
-                                      widget.cafe ??
-                                      CafeEntity(
-                                        id: widget.cafeId,
-                                        name: widget.cafeName,
-                                        location: const LatLng(
-                                          30.0131,
-                                          31.4913,
-                                        ),
-                                        address: '',
-                                        description: '',
-                                        rating: 4.5,
-                                        photos: const [],
-                                      );
-
-                                  final bookingCubit = getIt<BookingCubit>()
-                                    ..setCafeId(cafeEntity.id);
-                                  if (widget.booking != null) {
-                                    if (widget.booking!.date != null) {
-                                      bookingCubit.selectDate(
-                                        widget.booking!.date!,
-                                      );
-                                    }
-                                    if (widget.booking!.time != null) {
-                                      bookingCubit.selectTime(
-                                        widget.booking!.time!,
-                                      );
-                                    }
-                                    bookingCubit.guests =
-                                        widget.booking!.guests;
-                                    if (widget.booking!.occasion != null) {
-                                      bookingCubit.selectOccasion(
-                                        widget.booking!.occasion!,
-                                      );
-                                    }
-                                    if (widget.booking!.seatingPreference !=
-                                        null) {
-                                      bookingCubit.selectSeatingPreference(
-                                        widget.booking!.seatingPreference!,
-                                      );
-                                    }
-                                  }
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => BlocProvider.value(
-                                        value: bookingCubit,
-                                        child: BookTableScreen(
-                                          cafe: cafeEntity,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                                cafe: widget.cafe,
                               ),
                             ),
                           ),
 
-                          // Horizontal Category Chips Filter
                           SliverToBoxAdapter(
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 12.0),
                               child: PreOrderCategoryChips(
                                 categories: preOrderState.categories,
                                 selectedCategoryId:
-                                    preOrderState.selectedCategoryId,
+                                preOrderState.selectedCategoryId,
                                 onCategorySelected: (catId) {
                                   preOrderCubit.selectCategory(catId);
                                 },
@@ -355,7 +354,6 @@ class _PreOrderViewState extends State<_PreOrderView> {
                             ),
                           ),
 
-                          // 2-Column Product Grid
                           if (products.isEmpty)
                             SliverFillRemaining(
                               hasScrollBody: false,
@@ -375,16 +373,16 @@ class _PreOrderViewState extends State<_PreOrderView> {
                               padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                               sliver: SliverGrid(
                                 gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      childAspectRatio: 0.65,
-                                      crossAxisSpacing: 12,
-                                      mainAxisSpacing: 12,
-                                    ),
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisExtent: 255,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                ),
                                 delegate: SliverChildBuilderDelegate((
-                                  context,
-                                  index,
-                                ) {
+                                    context,
+                                    index,
+                                    ) {
                                   final product = products[index];
                                   final quantity = _getProductQuantity(
                                     cartState,
@@ -410,10 +408,10 @@ class _PreOrderViewState extends State<_PreOrderView> {
                                     onRemove: () {
                                       if (cartState is CartLoaded) {
                                         final itemToRemove =
-                                            _findItemForRemoval(
-                                              cartState.items,
-                                              product.id,
-                                            );
+                                        _findItemForRemoval(
+                                          cartState.items,
+                                          product.id,
+                                        );
                                         if (itemToRemove != null) {
                                           cartCubit.decrementQuantity(
                                             itemToRemove,
@@ -443,23 +441,37 @@ class _PreOrderViewState extends State<_PreOrderView> {
                       totalPrice: cartSubtotal,
                       itemCount: cartItemCount,
                       onSkip: () {
-                        if (widget.booking != null) {
+                        if (synchronizedBooking != null) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  CheckoutScreen(booking: widget.booking!),
+                                  CheckoutScreen(booking: synchronizedBooking),
                             ),
                           );
                         } else {
-                          Navigator.pushNamed(context, AppRoutes.checkout);
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.checkout,
+                            arguments: {
+                              'cafeId': widget.cafeId,
+                              'cafeName': widget.cafeName,
+                              'cafeLocation': widget.cafe?.address,
+                            },
+                          );
                         }
                       },
                       onProceed: () {
                         Navigator.pushNamed(
                           context,
                           AppRoutes.cart,
-                          arguments: widget.cafeName,
+                          arguments: {
+                            'booking': synchronizedBooking,
+                            'cafeName': widget.cafeName,
+                            'cafeId': widget.cafeId,
+                            'cafeLocation': synchronizedBooking?.cafeLocation ?? widget.cafe?.address,
+                            'cafe': widget.cafe,
+                          },
                         );
                       },
                     ),

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:madinaty_app_ieee_2026/features/auth/data/data_sources/auth_data_source_interface.dart';
 
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repo_interface.dart';
+import '../data_sources/auth_data_source_interface.dart';
 
 class AuthRepoImpl implements AuthRepoInterface {
   final AuthRemoteDataSourceInterface _remoteDataSource;
@@ -12,8 +12,7 @@ class AuthRepoImpl implements AuthRepoInterface {
   }) : _remoteDataSource = remoteDataSource;
 
   @override
-  bool get isAuthenticated =>
-      _remoteDataSource.currentUser != null;
+  bool get isAuthenticated => _remoteDataSource.currentUser != null;
 
   @override
   Future<UserEntity> register({
@@ -21,24 +20,17 @@ class AuthRepoImpl implements AuthRepoInterface {
     required String password,
     required String name,
     String? phone,
+    UserRole role = UserRole.customer,
+    String? cafeId,
   }) async {
-    try {
-      return await _remoteDataSource
-          .registerWithEmailAndPassword(
-        email: email,
-        password: password,
-        name: name,
-        phone: phone,
-      );
-    } on FirebaseAuthException catch (e) {
-      throw Exception(
-        _handleFirebaseAuthException(e),
-      );
-    } catch (e) {
-      throw Exception(
-        'حدث خطأ غير متوقع: $e',
-      );
-    }
+    return await _remoteDataSource.registerWithEmailAndPassword(
+      email: email,
+      password: password,
+      name: name,
+      phone: phone,
+      role: role,
+      cafeId: cafeId,
+    );
   }
 
   @override
@@ -47,57 +39,39 @@ class AuthRepoImpl implements AuthRepoInterface {
     required String password,
   }) async {
     try {
-      return await _remoteDataSource
-          .loginWithEmailAndPassword(
+      return await _remoteDataSource.loginWithEmailAndPassword(
         email: email,
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      throw Exception(
-        _handleFirebaseAuthException(e),
-      );
+      throw Exception(_handleFirebaseAuthException(e));
     } catch (e) {
-      throw Exception(
-        'حدث خطأ غير متوقع: $e',
-      );
+      throw Exception('حدث خطأ غير متوقع: $e');
     }
   }
 
   @override
-  Future<void> resetPassword(
-    String email,
-  ) async {
+  Future<void> resetPassword(String email) async {
     try {
-      await _remoteDataSource
-          .sendPasswordResetEmail(email);
+      await _remoteDataSource.sendPasswordResetEmail(email);
     } on FirebaseAuthException catch (e) {
-      throw Exception(
-        _handleFirebaseAuthException(e),
-      );
+      throw Exception(_handleFirebaseAuthException(e));
     } catch (e) {
-      throw Exception(
-        'حدث خطأ غير متوقع: $e',
-      );
+      throw Exception('حدث خطأ غير متوقع: $e');
     }
   }
 
   @override
   Future<void> sendOtp({
     required String phoneNumber,
-    required Function(
-      String verificationId,
-      int? resendToken,
-    ) onCodeSent,
-    required Function(String error)
-        onVerificationFailed,
+    required Function(String verificationId, int? resendToken) onCodeSent,
+    required Function(String error) onVerificationFailed,
   }) async {
     await _remoteDataSource.sendPhoneOtp(
       phoneNumber: phoneNumber,
       onCodeSent: onCodeSent,
       onVerificationFailed: (error) {
-        onVerificationFailed(
-          _handleFirebaseAuthException(error),
-        );
+        onVerificationFailed(_handleFirebaseAuthException(error));
       },
       onVerificationCompleted: (_) {},
       onCodeAutoRetrievalTimeout: (_) {},
@@ -110,19 +84,14 @@ class AuthRepoImpl implements AuthRepoInterface {
     required String smsCode,
   }) async {
     try {
-      return await _remoteDataSource
-          .verifyOtpAndSignIn(
+      return await _remoteDataSource.verifyOtpAndSignIn(
         verificationId: verificationId,
         smsCode: smsCode,
       );
     } on FirebaseAuthException catch (e) {
-      throw Exception(
-        _handleFirebaseAuthException(e),
-      );
+      throw Exception(_handleFirebaseAuthException(e));
     } catch (e) {
-      throw Exception(
-        'حدث خطأ غير متوقع: $e',
-      );
+      throw Exception('حدث خطأ غير متوقع: $e');
     }
   }
 
@@ -131,74 +100,54 @@ class AuthRepoImpl implements AuthRepoInterface {
     await _remoteDataSource.signOut();
   }
 
-
   @override
   Future<void> deleteAccount() async {
     try {
       await _remoteDataSource.deleteAccount();
     } on FirebaseAuthException catch (e) {
-      throw Exception(
-        _handleFirebaseAuthException(e),
-      );
+      throw Exception(_handleFirebaseAuthException(e));
     } catch (e) {
-      throw Exception(
-        e.toString().replaceAll(
-              'Exception: ',
-              '',
-            ),
-      );
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
     }
   }
 
-  String _handleFirebaseAuthException(
-    FirebaseAuthException e,
-  ) {
+  String _handleFirebaseAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
       case 'wrong-password':
       case 'invalid-credential':
         return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-
       case 'email-already-in-use':
         return 'البريد الإلكتروني مستخدم بالفعل بحساب آخر';
-
       case 'invalid-email':
         return 'صيغة البريد الإلكتروني غير صحيحة';
-
       case 'weak-password':
         return 'كلمة المرور ضعيفة جداً';
-
       case 'invalid-verification-code':
         return 'رمز التحقق (OTP) غير صحيح';
-
       case 'session-expired':
         return 'انتهت صلاحية رمز التحقق، يرجى إعادة المحاولة';
-
       case 'requires-recent-login':
         return 'لأسباب أمنية، يرجى تسجيل الدخول مرة أخرى ثم محاولة حذف الحساب';
-
       default:
-        return e.message ??
-            'حدث خطأ في عملية تسجيل الدخول';
+        return e.message ?? 'حدث خطأ في عملية تسجيل الدخول';
     }
   }
 
   @override
-  Future<UserEntity> signInWithGoogle() async {
+  Future<UserEntity> signInWithGoogle({
+    UserRole role = UserRole.customer,
+    String? cafeId,
+  }) async {
     try {
-      return await _remoteDataSource
-          .signInWithGoogle();
+      return await _remoteDataSource.signInWithGoogle(
+        role: role,
+        cafeId: cafeId,
+      );
     } on FirebaseAuthException catch (e) {
-      throw Exception(
-        _handleFirebaseAuthException(e),
-      );
+      throw Exception(_handleFirebaseAuthException(e));
     } catch (e) {
-      throw Exception(
-        e.toString().replaceAll(
-              'Exception: ',
-              '',
-            ),
-      );
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
     }
   }
 }

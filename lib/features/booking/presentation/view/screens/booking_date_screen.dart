@@ -54,7 +54,7 @@ class BookingDateScreen extends StatelessWidget {
               children: [
                 CafeHeaderCard(
                   cafeName: cafe.name,
-                  cafeAddress: cafe.address,
+                  cafeAddress: cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
                   cafeImageUrl: cafe.photos.isNotEmpty
                       ? cafe.photos.first
                       : null,
@@ -143,6 +143,14 @@ class BookingDateScreen extends StatelessWidget {
                     onPressed: cubit.date == null || cubit.time == null
                         ? null
                         : () {
+                      cubit.setCafeDetails(
+                        id: cafe.id,
+                        name: cafe.name,
+                        location: cafe.address.isNotEmpty
+                            ? cafe.address
+                            : 'بنها، الفلل',
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

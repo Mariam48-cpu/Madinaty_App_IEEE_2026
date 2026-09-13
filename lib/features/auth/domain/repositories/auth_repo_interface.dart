@@ -6,6 +6,8 @@ abstract class AuthRepoInterface {
     required String password,
     required String name,
     String? phone,
+    UserRole role = UserRole.customer,
+    String? cafeId,
   });
 
   Future<UserEntity> login({
@@ -18,11 +20,10 @@ abstract class AuthRepoInterface {
   Future<void> sendOtp({
     required String phoneNumber,
     required Function(
-      String verificationId,
-      int? resendToken,
-    ) onCodeSent,
-    required Function(String error)
-        onVerificationFailed,
+        String verificationId,
+        int? resendToken,
+        ) onCodeSent,
+    required Function(String error) onVerificationFailed,
   });
 
   Future<UserEntity> verifyOtp({
@@ -36,5 +37,8 @@ abstract class AuthRepoInterface {
 
   bool get isAuthenticated;
 
-  Future<UserEntity> signInWithGoogle();
+  Future<UserEntity> signInWithGoogle({
+    UserRole role = UserRole.customer,
+    String? cafeId,
+  });
 }

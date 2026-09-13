@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
@@ -10,10 +11,9 @@ import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/domain/entities/cart_item_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/cart/domain/use_cases/clear_cart_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/presentation/view_model/cubit/cart_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/presentation/view_model/cubit/cart_state.dart';
-import 'package:madinaty_app_ieee_2026/features/cart/domain/use_cases/clear_cart_use_case.dart';
-import 'package:madinaty_app_ieee_2026/features/pre_order/domain/use_cases/create_pre_order_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/data/data_sources/payment_remote_data_source_impl.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/data/repositories/payment_repo_impl.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/domain/entities/payment_method_entity.dart';
@@ -28,10 +28,9 @@ import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view/widge
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view/widgets/reservation_details_card.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view_model/checkout_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view_model/checkout_state.dart';
-import 'package:toastification/toastification.dart';
-import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/domain/use_cases/create_notification_use_case.dart';
-
+import 'package:madinaty_app_ieee_2026/features/pre_order/domain/use_cases/create_pre_order_use_case.dart';
+import 'package:toastification/toastification.dart';
 
 class CheckoutScreen extends StatelessWidget {
   final BookingEntity booking;
@@ -61,16 +60,18 @@ class CheckoutScreen extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) =>
-              sl<CartCubit>()..initCartWatcher(cafeName: booking.cafeId),
+          sl<CartCubit>()..initCartWatcher(cafeName: booking.cafeName ?? booking.cafeId),
         ),
       ],
-      child: const _CheckoutView(),
+      child: _CheckoutView(originalBooking: booking),
     );
   }
 }
 
 class _CheckoutView extends StatefulWidget {
-  const _CheckoutView();
+  final BookingEntity originalBooking;
+
+  const _CheckoutView({required this.originalBooking});
 
   @override
   State<_CheckoutView> createState() => _CheckoutViewState();
@@ -78,7 +79,6 @@ class _CheckoutView extends StatefulWidget {
 
 class _CheckoutViewState extends State<_CheckoutView> {
   late final TextEditingController _phoneWalletController;
-  BookingEntity? _cachedBooking;
 
   @override
   void initState() {
@@ -92,8 +92,33 @@ class _CheckoutViewState extends State<_CheckoutView> {
     super.dispose();
   }
 
+  BookingEntity _resolveLiveBooking(BookingEntity base) {
+    return BookingEntity(
+      id: base.id.isNotEmpty ? base.id : widget.originalBooking.id,
+      userId: base.userId.isNotEmpty ? base.userId : widget.originalBooking.userId,
+      cafeId: widget.originalBooking.cafeId.isNotEmpty ? widget.originalBooking.cafeId : base.cafeId,
+      cafeName: (widget.originalBooking.cafeName != null && widget.originalBooking.cafeName!.isNotEmpty)
+          ? widget.originalBooking.cafeName
+          : base.cafeName,
+      cafeLocation: (widget.originalBooking.cafeLocation != null && widget.originalBooking.cafeLocation!.isNotEmpty)
+          ? widget.originalBooking.cafeLocation
+          : base.cafeLocation,
+      date: widget.originalBooking.date ?? base.date,
+      time: widget.originalBooking.time ?? base.time,
+      guests: widget.originalBooking.guests > 0 ? widget.originalBooking.guests : base.guests,
+      occasion: widget.originalBooking.occasion ?? base.occasion,
+      seatingPreference: widget.originalBooking.seatingPreference ?? base.seatingPreference,
+      status: base.status,
+      createdAt: base.createdAt,
+      totalAmount: base.totalAmount,
+      reservationFee: base.reservationFee,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final booking = _resolveLiveBooking(widget.originalBooking);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -136,18 +161,18 @@ class _CheckoutViewState extends State<_CheckoutView> {
               MaterialPageRoute(
                 builder: (_) => PaymobWebViewScreen(
                   paymentUrl: state.paymentUrl,
-                  booking: state.booking,
+                  booking: _resolveLiveBooking(state.booking),
                 ),
               ),
             );
 
             if (isSuccess == true && context.mounted) {
-              context.read<CheckoutCubit>().finalizePaymobSuccess(state.booking);
+              context.read<CheckoutCubit>().finalizePaymobSuccess(booking);
             } else if (isSuccess == false && context.mounted) {
               AppToast.showToast(
                 context: context,
-                title: 'فشلت عملية الدفع',
-                description: 'يرجى المحاولة مرة أخرى أو اختيار طريقة دفع أخرى',
+                title: AppLocale.toastError.getString(context),
+                description: 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى',
                 type: ToastificationType.error,
               );
             }
@@ -156,54 +181,43 @@ class _CheckoutViewState extends State<_CheckoutView> {
           if (state is CheckoutSuccessState) {
             AppToast.showToast(
               context: context,
-              title: AppLocale.successTitle.getString(context),
+              title: AppLocale.toastSuccess.getString(context),
               description: AppLocale.reservationSuccessDesc.getString(context),
               type: ToastificationType.success,
             );
+
+            final finalBooking = _resolveLiveBooking(state.confirmedBooking);
+
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (_) =>
-                    ReservationConfirmedScreen(booking: state.confirmedBooking),
+                builder: (_) => ReservationConfirmedScreen(
+                  booking: finalBooking,
+                ),
               ),
             );
           }
         },
         builder: (context, state) {
-          if (state is CheckoutLoadingState) {
-            _cachedBooking = state.booking;
-          }
-
-          if (_cachedBooking == null) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
-          }
-
-          final booking = _cachedBooking!;
           final checkoutCubit = context.read<CheckoutCubit>();
-          final isSubmitting =
-              state is CheckoutLoadingState && state.isSubmitting;
+          final isSubmitting = state is CheckoutLoadingState && state.isSubmitting;
           final selectedMethod = state is CheckoutLoadingState
               ? state.selectedPaymentMethod
               : const PaymentMethodEntity(
-                  id: 'card',
-                  title: 'بطاقة ائتمان / خصم مباشر',
-                  type: PaymentType.card,
-                  isSelected: true,
-                );
+            id: 'card',
+            title: 'بطاقة ائتمان / خصم مباشر',
+            type: PaymentType.card,
+            isSelected: true,
+          );
 
           return BlocBuilder<CartCubit, CartState>(
             builder: (context, cartState) {
               final cartCubit = context.read<CartCubit>();
-              final List<CartItemEntity> cartItems = cartState is CartLoaded
-                  ? cartState.items
-                  : [];
-              final String orderNotes = cartState is CartLoaded
-                  ? cartState.orderNotes
-                  : '';
-              final double preOrdersAmount = cartState is CartLoaded
-                  ? cartState.subtotal
-                  : 0.0;
+              final List<CartItemEntity> cartItems =
+              cartState is CartLoaded ? cartState.items : [];
+              final String orderNotes =
+              cartState is CartLoaded ? cartState.orderNotes : '';
+              final double preOrdersAmount =
+              cartState is CartLoaded ? cartState.subtotal : 0.0;
 
               const double reservationFee = 50.0;
               const double taxRate = 0.14;
@@ -233,7 +247,11 @@ class _CheckoutViewState extends State<_CheckoutView> {
                           Navigator.pushNamed(
                             context,
                             AppRoutes.cart,
-                            arguments: booking.cafeId,
+                            arguments: {
+                              'booking': booking,
+                              'cafeName': booking.cafeName,
+                              'cafeId': booking.cafeId,
+                            },
                           );
                         },
                       ),
@@ -261,29 +279,29 @@ class _CheckoutViewState extends State<_CheckoutView> {
                         onPressed: isSubmitting
                             ? null
                             : () {
-                                WalletPaymentDetails? walletDetails;
-                                if (selectedMethod.type == PaymentType.wallet ||
-                                    selectedMethod.id == 'wallet') {
-                                  walletDetails = WalletPaymentDetails(
-                                    phoneNumber: _phoneWalletController.text
-                                        .trim(),
-                                  );
-                                }
+                          WalletPaymentDetails? walletDetails;
+                          if (selectedMethod.type == PaymentType.wallet ||
+                              selectedMethod.id == 'wallet') {
+                            walletDetails = WalletPaymentDetails(
+                              phoneNumber:
+                              _phoneWalletController.text.trim(),
+                            );
+                          }
 
-                                final user = FirebaseAuth.instance.currentUser;
+                          final user = FirebaseAuth.instance.currentUser;
 
-                                checkoutCubit.confirmAndPay(
-                                  walletDetails: walletDetails,
-                                  totalAmount: totalAmount,
-                                  userEmail:
-                                      user?.email ?? 'customer@madinaty.com',
-                                  userPhone:
-                                      user?.phoneNumber ?? '+201000000000',
-                                  userName: user?.displayName ?? 'عميل مدينتي',
-                                  cartItems: cartItems,
-                                  orderNotes: orderNotes,
-                                );
-                              },
+                          checkoutCubit.confirmAndPay(
+                            walletDetails: walletDetails,
+                            totalAmount: totalAmount,
+                            userEmail:
+                            user?.email ?? 'customer@madinaty.com',
+                            userPhone:
+                            user?.phoneNumber ?? '+201000000000',
+                            userName: user?.displayName ?? 'عميل مدينتي',
+                            cartItems: cartItems,
+                            orderNotes: orderNotes,
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.darkButton,
                           foregroundColor: AppColors.onDarkButton,
@@ -294,30 +312,30 @@ class _CheckoutViewState extends State<_CheckoutView> {
                         ),
                         child: isSubmitting
                             ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: AppColors.textWhite,
-                                ),
-                              )
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: AppColors.textWhite,
+                          ),
+                        )
                             : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.lock_outline_rounded,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    AppLocale.confirmAndPay.getString(context),
-                                    style: AppTypography.labelLarge.copyWith(
-                                      color: AppColors.onDarkButton,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.lock_outline_rounded,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              AppLocale.confirmAndPay.getString(context),
+                              style: AppTypography.labelLarge.copyWith(
+                                color: AppColors.onDarkButton,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),

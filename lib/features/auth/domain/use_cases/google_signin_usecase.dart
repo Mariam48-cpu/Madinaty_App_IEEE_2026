@@ -6,5 +6,13 @@ class GoogleSignInUseCase {
 
   GoogleSignInUseCase(this.repository);
 
-  Future<UserEntity> call() => repository.signInWithGoogle();
+  Future<UserEntity> call({
+    UserRole role = UserRole.customer,
+    String? cafeId,
+  }) {
+    return repository.signInWithGoogle(
+      role: role,
+      cafeId: cafeId,
+    );
+  }
 }

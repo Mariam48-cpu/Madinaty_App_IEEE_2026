@@ -12,7 +12,6 @@ import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/c
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_info_section.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_main_card.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/widgets/cafe_details/cafe_menu_section.dart';
-import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view_model/cubit/cafe_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view_model/cubit/cafe_state.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
@@ -23,6 +22,9 @@ import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/is_fa
 import 'package:madinaty_app_ieee_2026/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/pre_order/presentation/view/screens/pre_order_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/reviews/presentation/view/screens/reviews_screen.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../view_model/cubit/cafe_cubit.dart';
 
 class CafeDetailsScreen extends StatefulWidget {
   final CafeEntity cafe;
@@ -61,39 +63,60 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
     }
   }
 
+  void _shareCafe(CafeEntity cafe) {
+    final ratingLabel = AppLocale.shareRating.getString(context);
+    final addressLabel = AppLocale.shareAddress.getString(context);
+    final footer = AppLocale.shareFooter.getString(context);
+    final subject = AppLocale.shareCafeSubject.getString(context).replaceAll('%a', cafe.name);
+
+    final text = '''
+☕ ${cafe.name}
+⭐ $ratingLabel: ${cafe.rating.toStringAsFixed(1)} / 5
+📍 $addressLabel: ${cafe.address}
+
+$footer
+''';
+
+    Share.share(
+      text,
+      subject: subject,
+      sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, 100),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<CafeCubit>()..getCafeExperience(widget.cafe),
       child: Scaffold(
-        backgroundColor: Color(0xFFFFF9F6),
+        backgroundColor: const Color(0xFFFFF9F6),
         body: BlocBuilder<CafeCubit, CafeState>(
           builder: (context, state) {
             if (state is CafeLoading) {
-              return CafeDetailsSkeleton();
+              return const CafeDetailsSkeleton();
             }
 
             if (state is CafeError) {
               return Center(
                 child: Padding(
-                  padding: EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.error_outline,
                         size: 55,
                         color: Colors.redAccent,
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       Text(
-                        'حدث خطأ أثناء تحميل الكافيه',
-                        style: TextStyle(
+                        AppLocale.toastError.getString(context),
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         state.message,
                         textAlign: TextAlign.center,
@@ -102,7 +125,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                           color: Colors.grey.shade600,
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
                           context.read<CafeCubit>().getCafeExperience(
@@ -110,10 +133,10 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF17120F),
+                          backgroundColor: const Color(0xFF17120F),
                           foregroundColor: Colors.white,
                         ),
-                        child: Text('إعادة المحاولة'),
+                        child: Text(AppLocale.retry.getString(context)),
                       ),
                     ],
                   ),
@@ -131,7 +154,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                       children: [
                         Positioned.fill(
                           child: SingleChildScrollView(
-                            physics: BouncingScrollPhysics(),
+                            physics: const BouncingScrollPhysics(),
                             child: Column(
                               children: [
                                 SafeArea(
@@ -139,18 +162,18 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                     photos: cafe.photos,
                                     isFavorite: _isFavorite,
                                     onFavorite: () => _toggleFavorite(cafe),
-                                    onShare: () {},
+                                    onShare: () => _shareCafe(cafe),
                                     onBack: () => Navigator.pop(context),
                                   ),
                                 ),
 
                                 Transform.translate(
-                                  offset: Offset(0, -60),
+                                  offset: const Offset(0, -60),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
                                         ),
                                         child: Container(
@@ -166,20 +189,20 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                 ),
                                                 blurRadius: 24,
                                                 spreadRadius: 2,
-                                                offset: Offset(0, 10),
+                                                offset: const Offset(0, 10),
                                               ),
                                             ],
                                           ),
                                           child: CafeMainCard(
                                             child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
+                                              CrossAxisAlignment.end,
                                               children: [
                                                 CafeHeader(
                                                   name: cafe.name,
                                                   rating: cafe.rating,
                                                   reviewsCount:
-                                                      cafe.reviewsCount,
+                                                  cafe.reviewsCount,
                                                   onReviewsTap: () {
                                                     Navigator.push(
                                                       context,
@@ -188,7 +211,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                             ReviewsScreen(
                                                               cafeId: cafe.id,
                                                               cafeName:
-                                                                  cafe.name,
+                                                              cafe.name,
                                                             ),
                                                       ),
                                                     );
@@ -210,11 +233,11 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                           ),
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.end,
+                                            CrossAxisAlignment.end,
                                             children: [
-                                              const Text(
-                                                'عن الكافيه',
-                                                style: TextStyle(
+                                              Text(
+                                                AppLocale.aboutCafeLabel.getString(context),
+                                                style: const TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
                                                   color: Color(0xFF2D2521),
@@ -258,7 +281,6 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                       ),
 
                                       const SizedBox(height: 24),
-                                      // --- Reviews & Ratings Quick Access Card ---
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
@@ -286,7 +308,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius:
-                                                  BorderRadius.circular(16),
+                                              BorderRadius.circular(16),
                                               border: Border.all(
                                                 color: const Color(0xFFF0E5DA),
                                               ),
@@ -309,7 +331,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                 const Spacer(),
                                                 Column(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
+                                                  CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
                                                       AppLocale
@@ -318,7 +340,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                       style: const TextStyle(
                                                         fontSize: 15,
                                                         fontWeight:
-                                                            FontWeight.bold,
+                                                        FontWeight.bold,
                                                         color: Color(
                                                           0xFF2D2521,
                                                         ),
@@ -326,14 +348,14 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                     ),
                                                     const SizedBox(height: 2),
                                                     Text(
-                                                      '${cafe.rating.toStringAsFixed(1)} ★  (${cafe.reviewsCount} ${AppLocale.ratingsCountSuffix.getString(context)})',
+                                                      '${cafe.rating.toStringAsFixed(1)} ★ (${cafe.reviewsCount} ${AppLocale.ratingsCountSuffix.getString(context)})',
                                                       style: const TextStyle(
                                                         fontSize: 12,
                                                         color: Color(
                                                           0xFF8A5A36,
                                                         ),
                                                         fontWeight:
-                                                            FontWeight.w600,
+                                                        FontWeight.w600,
                                                       ),
                                                     ),
                                                   ],
@@ -348,9 +370,9 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                                       0xFFFFF3EB,
                                                     ),
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                          10,
-                                                        ),
+                                                    BorderRadius.circular(
+                                                      10,
+                                                    ),
                                                   ),
                                                   child: const Icon(
                                                     Icons.rate_review_outlined,
@@ -363,7 +385,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                                           ),
                                         ),
                                       ),
-                                      SizedBox(height: 20),
+                                      const SizedBox(height: 20),
                                     ],
                                   ),
                                 ),
@@ -378,24 +400,36 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
                   CafeBottomButtons(
                     onCall: () {},
                     onDirections: () {
+                      final bookingCubit = sl<BookingCubit>();
+                      bookingCubit.setCafeDetails(
+                        id: cafe.id,
+                        name: cafe.name,
+                        location: cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => BlocProvider(
-                            create: (_) =>
-                                sl<BookingCubit>()..setCafeId(cafe.id),
+                          builder: (_) => BlocProvider.value(
+                            value: bookingCubit,
                             child: BookTableScreen(cafe: cafe),
                           ),
                         ),
                       );
                     },
                     onDirectionPreOrder: () {
+                      final bookingCubit = sl<BookingCubit>();
+                      bookingCubit.setCafeDetails(
+                        id: cafe.id,
+                        name: cafe.name,
+                        location: cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => BlocProvider(
-                            create: (_) =>
-                                sl<BookingCubit>()..setCafeId(cafe.id),
+                          builder: (_) => BlocProvider.value(
+                            value: bookingCubit,
                             child: PreOrderScreen(cafe: cafe),
                           ),
                         ),
@@ -406,7 +440,7 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
               );
             }
 
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           },
         ),
       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import '../../../../booking/domain/entities/booking_entity.dart';
@@ -10,15 +12,30 @@ class ReservationDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String notSpecified = AppLocale.notSpecifiedText.getString(context);
+
     final String bookingDateStr = booking.date != null
         ? '${booking.date!.day}/${booking.date!.month}/${booking.date!.year}'
-        : 'غير محدد';
-    final String bookingTimeStr = booking.time ?? 'غير محدد';
+        : notSpecified;
+    final String bookingTimeStr = booking.time ?? notSpecified;
+
+    // جلب اسم الكافيه الحقيقي من الحجز ديناميكياً
+    final String resolvedCafeName = (booking.cafeName != null && booking.cafeName!.trim().isNotEmpty)
+        ? booking.cafeName!
+        : (booking.cafeId.isNotEmpty ? booking.cafeId : AppLocale.cafeLabel.getString(context));
+
+    // جلب عنوان الكافيه الحقيقي من الحجز ديناميكياً
+    final String resolvedCafeLocation = (booking.cafeLocation != null && booking.cafeLocation!.trim().isNotEmpty)
+        ? booking.cafeLocation!
+        : AppLocale.locationNotSpecified.getString(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('تفاصيل الحجز', style: AppTypography.titleLarge),
+        Text(
+          AppLocale.detailsLabel.getString(context),
+          style: AppTypography.titleLarge,
+        ),
         const SizedBox(height: 12),
 
         Container(
@@ -49,22 +66,27 @@ class ReservationDetailsCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          booking.cafeId.replaceAll('cafe_', '').toUpperCase(),
-                          style: AppTypography.titleLarge,
+                          resolvedCafeName,
+                          style: AppTypography.titleLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                         const SizedBox(height: 4),
-                        const Row(
+                        Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.location_on_outlined,
                               size: 14,
                               color: AppColors.textSecondary,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                'مدينتي، القاهرة',
-                                style: AppTypography.bodySmall,
+                                resolvedCafeLocation,
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -87,14 +109,14 @@ class ReservationDetailsCard extends StatelessWidget {
                   Expanded(
                     child: _buildInfoItem(
                       icon: Icons.calendar_today_outlined,
-                      title: 'التاريخ',
+                      title: AppLocale.date.getString(context),
                       value: bookingDateStr,
                     ),
                   ),
                   Expanded(
                     child: _buildInfoItem(
                       icon: Icons.access_time_rounded,
-                      title: 'الوقت',
+                      title: AppLocale.time.getString(context),
                       value: bookingTimeStr,
                     ),
                   ),
@@ -106,15 +128,15 @@ class ReservationDetailsCard extends StatelessWidget {
                   Expanded(
                     child: _buildInfoItem(
                       icon: Icons.people_outline_rounded,
-                      title: 'الضيوف',
-                      value: '${booking.guests} أشخاص',
+                      title: AppLocale.numberOfGuestsLabel.getString(context),
+                      value: '${booking.guests} ${AppLocale.guestsSuffix.getString(context)}',
                     ),
                   ),
                   Expanded(
                     child: _buildInfoItem(
                       icon: Icons.chair_outlined,
-                      title: 'الجلوس',
-                      value: booking.seatingPreference ?? 'صالة داخلية',
+                      title: AppLocale.seating.getString(context),
+                      value: booking.seatingPreference ?? AppLocale.indoorSeating.getString(context),
                     ),
                   ),
                 ],
@@ -143,7 +165,7 @@ class ReservationDetailsCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'مناسبة: ${booking.occasion}',
+                        '${AppLocale.occasionOptionalLabel.getString(context)}: ${booking.occasion}',
                         style: AppTypography.labelMedium.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.onPrimaryContainer,

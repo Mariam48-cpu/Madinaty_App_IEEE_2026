@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../domain/entities/user_entity.dart';
 import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSourceInterface {
@@ -8,6 +9,8 @@ abstract class AuthRemoteDataSourceInterface {
     required String password,
     required String name,
     String? phone,
+    required UserRole role,
+    String? cafeId,
   });
 
   Future<UserModel> loginWithEmailAndPassword({
@@ -21,10 +24,8 @@ abstract class AuthRemoteDataSourceInterface {
     required String phoneNumber,
     required Function(String verificationId, int? resendToken) onCodeSent,
     required Function(FirebaseAuthException error) onVerificationFailed,
-    required Function(PhoneAuthCredential credential)
-        onVerificationCompleted,
-    required Function(String verificationId)
-        onCodeAutoRetrievalTimeout,
+    required Function(PhoneAuthCredential credential) onVerificationCompleted,
+    required Function(String verificationId) onCodeAutoRetrievalTimeout,
   });
 
   Future<UserModel> verifyOtpAndSignIn({
@@ -38,5 +39,8 @@ abstract class AuthRemoteDataSourceInterface {
 
   User? get currentUser;
 
-  Future<UserModel> signInWithGoogle();
+  Future<UserModel> signInWithGoogle({
+    UserRole role = UserRole.customer,
+    String? cafeId,
+  });
 }

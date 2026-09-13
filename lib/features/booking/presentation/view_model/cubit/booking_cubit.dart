@@ -25,6 +25,8 @@ class BookingCubit extends Cubit<BookingState> {
       ) : super(BookingInitial());
 
   String? cafeId;
+  String? cafeName;
+  String? cafeLocation;
   DateTime? date;
   String? time;
   int guests = 1;
@@ -32,6 +34,30 @@ class BookingCubit extends Cubit<BookingState> {
   String? seatingPreference;
 
   String? bookingId;
+
+  void reset() {
+    cafeId = null;
+    cafeName = null;
+    cafeLocation = null;
+    date = null;
+    time = null;
+    guests = 1;
+    occasion = null;
+    seatingPreference = null;
+    bookingId = null;
+    emit(BookingInitial());
+  }
+
+  void setCafeDetails({
+    required String id,
+    String? name,
+    String? location,
+  }) {
+    cafeId = id;
+    cafeName = name;
+    cafeLocation = location;
+    emit(BookingInitial());
+  }
 
   void setCafeId(String id) {
     cafeId = id;
@@ -44,33 +70,28 @@ class BookingCubit extends Cubit<BookingState> {
       selectedDate.month,
       selectedDate.day,
     );
-
     emit(BookingInitial());
   }
 
   void selectTime(String selectedTime) {
     time = selectedTime;
-
     emit(BookingInitial());
   }
 
   void incrementGuests() {
     if (guests >= 10) return;
-
     guests++;
     emit(BookingInitial());
   }
 
   void decrementGuests() {
     if (guests <= 1) return;
-
     guests--;
     emit(BookingInitial());
   }
 
   void selectOccasion(String selectedOccasion) {
     occasion = selectedOccasion;
-
     emit(BookingInitial());
   }
 
@@ -79,9 +100,7 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   bool validateDateTime() {
-    return date != null &&
-        time != null &&
-        guests > 0;
+    return date != null && time != null && guests > 0;
   }
 
   bool validateBooking() {
@@ -99,23 +118,14 @@ class BookingCubit extends Cubit<BookingState> {
 
   Future<void> createBooking() async {
     if (!validateBooking()) {
-      emit(
-        BookingFailure(
-          'complete_booking_data_error',
-        ),
-      );
+      emit(BookingFailure('complete_booking_data_error'));
       return;
     }
 
-    final user =
-        FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      emit(
-        BookingFailure(
-          'login_required_booking_error',
-        ),
-      );
+      emit(BookingFailure('login_required_booking_error'));
       return;
     }
 
@@ -126,48 +136,38 @@ class BookingCubit extends Cubit<BookingState> {
         id: '',
         userId: user.uid,
         cafeId: cafeId!,
+        cafeName: cafeName,
+        cafeLocation: cafeLocation,
         date: date!,
         time: time!,
         guests: guests,
         occasion: occasion!,
         seatingPreference: seatingPreference!,
-        status: BookingStatus.pending,
+        status: BookingStatus.approved,
         createdAt: DateTime.now(),
       );
 
-      bookingId =
-      await createBookingUseCase(booking);
+      bookingId = await createBookingUseCase(booking);
 
-      emit(
-        BookingSuccess(bookingId!),
-      );
+      emit(BookingSuccess(bookingId!));
     } catch (e) {
       emit(
         BookingFailure(
-          e.toString().replaceFirst(
-            'Exception: ',
-            '',
-          ),
+          e.toString().replaceFirst('Exception: ', ''),
         ),
       );
     }
   }
 
-  Future<BookingEntity?> getBooking(
-      String id,
-      ) async {
+  Future<BookingEntity?> getBooking(String id) async {
     try {
       return await getBookingUseCase(id);
     } catch (e) {
       emit(
         BookingFailure(
-          e.toString().replaceFirst(
-            'Exception: ',
-            '',
-          ),
+          e.toString().replaceFirst('Exception: ', ''),
         ),
       );
-
       return null;
     }
   }
@@ -185,39 +185,29 @@ class BookingCubit extends Cubit<BookingState> {
       );
 
       if (status == BookingStatus.completed) {
-        final booking =
-        await getBookingUseCase(id);
+        final booking = await getBookingUseCase(id);
 
-        if (booking != null &&
-            booking.userId.isNotEmpty) {
-          final notificationResult =
-          await createNotificationUseCase(
+        if (booking != null && booking.userId.isNotEmpty) {
+          final notificationResult = await createNotificationUseCase(
             uid: booking.userId,
             title: 'Booking Completed',
-            body:
-            'Your booking has been completed successfully.',
+            body: 'Your booking has been completed successfully.',
             type: 'booking_completed',
             bookingId: id,
           );
 
           notificationResult.fold(
-                (failure) {
-            },
+                (failure) {},
                 (_) {},
           );
         }
       }
 
-      emit(
-        BookingSuccess(id),
-      );
+      emit(BookingSuccess(id));
     } catch (e) {
       emit(
         BookingFailure(
-          e.toString().replaceFirst(
-            'Exception: ',
-            '',
-          ),
+          e.toString().replaceFirst('Exception: ', ''),
         ),
       );
     }

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../../core/localization/app_locale.dart';
+import '../../domain/entities/user_entity.dart';
 import '../models/user_model.dart';
 import 'auth_data_source_interface.dart';
 
@@ -15,7 +17,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
     GoogleSignIn? googleSignIn,
-  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         _firestore = firestore ?? FirebaseFirestore.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
@@ -28,6 +30,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     required String password,
     required String name,
     String? phone,
+    required UserRole role,
+    String? cafeId,
   }) async {
     final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
@@ -45,9 +49,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
       name: name,
       email: email,
       phone: phone,
+      role: role,
+      cafeId: cafeId,
+      createdAt: DateTime.now(),
     );
 
-    await _firestore.collection('users').doc(user.uid).set(userModel.toMap());
+    debugPrint('>>> REGISTERING: ${user.uid} | Role: ${role.name} | CafeId: $cafeId');
+
+    await _firestore.collection('users').doc(user.uid).set(
+      userModel.toMap(),
+      SetOptions(merge: true),
+    );
 
     return userModel;
   }
@@ -63,7 +75,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     );
 
     final user = userCredential.user!;
-
     final doc = await _firestore.collection('users').doc(user.uid).get();
 
     if (doc.exists && doc.data() != null) {
@@ -75,6 +86,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
       email: user.email,
       name: user.displayName,
       phone: user.phoneNumber,
+      role: UserRole.customer,
     );
   }
 
@@ -111,9 +123,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     );
 
     final userCredential = await _firebaseAuth.signInWithCredential(credential);
-
     final user = userCredential.user!;
-
     final doc = await _firestore.collection('users').doc(user.uid).get();
 
     if (doc.exists && doc.data() != null) {
@@ -133,15 +143,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
   @override
   Future<void> deleteAccount() async {
     final user = _firebaseAuth.currentUser;
-
     if (user == null) {
       throw Exception(AppLocale.noLoggedInUserError);
     }
 
     final uid = user.uid;
-
     await _firestore.collection('users').doc(uid).delete();
-
     await user.delete();
 
     try {
@@ -155,9 +162,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
   }
 
   @override
-  Future<UserModel> signInWithGoogle() async {
+  Future<UserModel> signInWithGoogle({
+    UserRole role = UserRole.customer,
+    String? cafeId,
+  }) async {
     await _googleSignIn.initialize();
-
     final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
 
     if (googleUser == null) {
@@ -172,9 +181,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     );
 
     final userCredential = await _firebaseAuth.signInWithCredential(credential);
-
     final user = userCredential.user!;
-
     final doc = await _firestore.collection('users').doc(user.uid).get();
 
     if (doc.exists && doc.data() != null) {
@@ -186,6 +193,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
       name: user.displayName,
       email: user.email,
       phone: user.phoneNumber,
+      role: role,
+      cafeId: cafeId,
     );
 
     await _firestore

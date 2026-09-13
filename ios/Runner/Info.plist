@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<key>NSCameraUsageDescription</key>
+    <string>نحتاج إلى الوصول للكاميرا لمسح رمز الـ QR والتحقق من حجز الكافيه.</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+    <string>نحتاج لموقعك لعرض الكافيهات القريبة منك وحساب المسافة بدقة.</string>
 <key>NSCalendarsUsageDescription</key>
     <string>نحتاج الوصول للتقويم لإضافة مواعيد حجوزاتك.</string>
     <key>NSCalendarsWriteOnlyAccessUsageDescription</key>

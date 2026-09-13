@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/localization/app_locale.dart';
+import '../../domain/entities/user_entity.dart';
 import '../../domain/use_cases/google_signin_usecase.dart';
 import '../../domain/use_cases/login_usecase.dart';
 import '../../domain/use_cases/logout_usecase.dart';
@@ -30,7 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
     required VerifyOtpUseCase verifyOtpUseCase,
     required LogoutUseCase logoutUseCase,
     required GoogleSignInUseCase googleSignInUseCase,
-  }) : _loginUseCase = loginUseCase,
+  })  : _loginUseCase = loginUseCase,
         _registerUseCase = registerUseCase,
         _resetPasswordUseCase = resetPasswordUseCase,
         _sendOtpUseCase = sendOtpUseCase,
@@ -53,7 +54,10 @@ class AuthCubit extends Cubit<AuthState> {
     } else if (intent is LogoutIntent) {
       _handleLogout();
     } else if (intent is GoogleSignInIntent) {
-      _handleGoogleSignIn();
+      _handleGoogleSignIn(
+        intent.role ?? UserRole.customer,
+        cafeId: intent.cafeId,
+      );
     }
   }
 
@@ -78,7 +82,19 @@ class AuthCubit extends Cubit<AuthState> {
         password: intent.password,
         name: intent.name,
         phone: intent.phone,
+        role: intent.role,
+        cafeId: intent.cafeId,
       );
+      emit(AuthSuccessState(user));
+    } catch (e) {
+      emit(AuthErrorState(e.toString().replaceAll('Exception: ', '')));
+    }
+  }
+
+  Future<void> _handleGoogleSignIn(UserRole role, {String? cafeId}) async {
+    emit(const AuthLoadingState());
+    try {
+      final user = await _googleSignInUseCase(role: role, cafeId: cafeId);
       emit(AuthSuccessState(user));
     } catch (e) {
       emit(AuthErrorState(e.toString().replaceAll('Exception: ', '')));
@@ -117,11 +133,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> _handleVerifyOtp(VerifyOtpIntent intent) async {
     if (currentVerificationId == null) {
-      emit(
-        const AuthErrorState(
-          AppLocale.verificationCodeNotFound,
-        ),
-      );
+      emit(const AuthErrorState(AppLocale.verificationCodeNotFound));
       return;
     }
 
@@ -131,16 +143,6 @@ class AuthCubit extends Cubit<AuthState> {
         verificationId: currentVerificationId!,
         smsCode: intent.smsCode,
       );
-      emit(AuthSuccessState(user));
-    } catch (e) {
-      emit(AuthErrorState(e.toString().replaceAll('Exception: ', '')));
-    }
-  }
-
-  Future<void> _handleGoogleSignIn() async {
-    emit(const AuthLoadingState());
-    try {
-      final user = await _googleSignInUseCase();
       emit(AuthSuccessState(user));
     } catch (e) {
       emit(AuthErrorState(e.toString().replaceAll('Exception: ', '')));

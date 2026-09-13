@@ -15,6 +15,8 @@ class BookingEntity extends Equatable {
   final DateTime? createdAt;
   final double totalAmount;
   final double reservationFee;
+  final String? cafeName;
+  final String? cafeLocation;
 
   const BookingEntity({
     this.id = '',
@@ -29,7 +31,44 @@ class BookingEntity extends Equatable {
     this.createdAt,
     this.totalAmount = 50.0,
     this.reservationFee = 50.0,
+    this.cafeName,
+    this.cafeLocation,
   });
+
+
+  BookingEntity copyWith({
+    String? id,
+    String? userId,
+    String? cafeId,
+    DateTime? date,
+    String? time,
+    int? guests,
+    String? occasion,
+    String? seatingPreference,
+    BookingStatus? status,
+    DateTime? createdAt,
+    double? totalAmount,
+    double? reservationFee,
+    String? cafeName,
+    String? cafeLocation,
+  }) {
+    return BookingEntity(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      cafeId: cafeId ?? this.cafeId,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      guests: guests ?? this.guests,
+      occasion: occasion ?? this.occasion,
+      seatingPreference: seatingPreference ?? this.seatingPreference,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      totalAmount: totalAmount ?? this.totalAmount,
+      reservationFee: reservationFee ?? this.reservationFee,
+      cafeName: cafeName ?? this.cafeName,
+      cafeLocation: cafeLocation ?? this.cafeLocation,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -45,5 +84,7 @@ class BookingEntity extends Equatable {
     createdAt,
     totalAmount,
     reservationFee,
+    cafeName,
+    cafeLocation,
   ];
 }

@@ -1,13 +1,22 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:toastification/toastification.dart';
+
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
-import 'package:toastification/toastification.dart';
+import '../../../../../core/di/injection.dart';
+import '../../../../cafe/data/data_sources/cafe_firestore_data_source.dart';
+import '../../../../discovery/data/data_sources/google_places_datasource.dart';
+import '../../../../discovery/data/repositories/cafe_repository_impl.dart';
+import '../../../../discovery/domain/entities/cafe_entity.dart';
+import '../../../../discovery/domain/use_cases/get_nearby_cafes.dart';
 import '../../../data/data_sources/auth_data_source_imp.dart';
 import '../../../data/repositories/auth_repo_imp.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../../../domain/use_cases/google_signin_usecase.dart';
 import '../../../domain/use_cases/login_usecase.dart';
 import '../../../domain/use_cases/logout_usecase.dart';
@@ -91,14 +100,371 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
         return;
       }
 
-      context.read<AuthCubit>().processIntent(
-        RegisterIntent(
-          name: _nameController.text.trim(),
-          email: email,
-          password: password,
+      _showRoleSelectionDialog(
+        name: _nameController.text.trim(),
+        email: email,
+        password: password,
+      );
+    }
+  }
+
+  void _showRoleSelectionDialog({
+    required String name,
+    required String email,
+    required String password,
+  }) {
+    final authCubit = context.read<AuthCubit>();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            AppLocale.accountTypeTitle.getString(context),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocale.accountTypeSubtitle.getString(context),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 18),
+              ListTile(
+                tileColor: const Color(0xFFF5F1EC),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                leading: const Icon(Icons.person_pin, color: AppColors.textPrimary),
+                title: Text(
+                  AppLocale.customerRoleTitle.getString(context),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                subtitle: Text(
+                  AppLocale.customerRoleSubtitle.getString(context),
+                ),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  authCubit.processIntent(
+                    RegisterIntent(
+                      name: name,
+                      email: email,
+                      password: password,
+                      role: UserRole.customer,
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                tileColor: const Color(0xFFF5F1EC),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                leading: const Icon(Icons.storefront, color: AppColors.textPrimary),
+                title: Text(
+                  AppLocale.cafeOwnerRoleTitle.getString(context),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                subtitle: Text(
+                  AppLocale.cafeOwnerRoleSubtitle.getString(context),
+                ),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  _showCafeSelectionDialog(
+                    name: name,
+                    email: email,
+                    password: password,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCafeSelectionDialog({
+    required String name,
+    required String email,
+    required String password,
+    bool isGoogle = false,
+  }) {
+    GetNearbyCafes getNearbyCafesUseCase;
+    try {
+      getNearbyCafesUseCase = getIt<GetNearbyCafes>();
+    } catch (_) {
+      getNearbyCafesUseCase = GetNearbyCafes(
+        CafeRepositoryImpl(
+          googlePlacesDataSource: GooglePlacesDataSource(),
+          firebaseDataSource: CafeFirestoreDataSource(),
         ),
       );
     }
+
+    final authCubit = context.read<AuthCubit>();
+    final searchController = TextEditingController();
+
+    Future.microtask(() {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (context, setModalState) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                title: Text(
+                  AppLocale.cafeLabel.getString(context),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  height: MediaQuery.of(context).size.height * 0.55,
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          hintText: AppLocale.digitalPassSearchHint.getString(context),
+                          prefixIcon: const Icon(Icons.search, size: 20),
+                          filled: true,
+                          fillColor: const Color(0xFFF5F1EC),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        onChanged: (_) => setModalState(() {}),
+                      ),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: FutureBuilder<List<CafeEntity>>(
+                          future: getNearbyCafesUseCase(
+                            latitude: 30.4658,
+                            longitude: 31.1852,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(color: AppColors.primary),
+                              );
+                            }
+
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    snapshot.error.toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 12, color: Colors.red),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return Center(
+                                child: Text(AppLocale.noReservationsFound.getString(context)),
+                              );
+                            }
+
+                            final allCafes = snapshot.data!;
+                            final query = searchController.text.trim().toLowerCase();
+                            final cafes = query.isEmpty
+                                ? allCafes
+                                : allCafes.where((c) => c.name.toLowerCase().contains(query)).toList();
+
+                            return Scrollbar(
+                              thumbVisibility: true,
+                              child: ListView.separated(
+                                itemCount: cafes.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                                itemBuilder: (context, index) {
+                                  final cafe = cafes[index];
+
+                                  return ListTile(
+                                    tileColor: const Color(0xFFF5F1EC),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    leading: const CircleAvatar(
+                                      backgroundColor: Color(0xFFEBE3D8),
+                                      child: Icon(Icons.storefront, color: AppColors.textPrimary),
+                                    ),
+                                    title: Text(
+                                      cafe.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      Navigator.of(dialogContext).pop();
+
+                                      await FirebaseFirestore.instance
+                                          .collection('cafes')
+                                          .doc(cafe.id)
+                                          .set({
+                                        'name': cafe.name,
+                                        'address': cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
+                                        'latitude': cafe.latitude,
+                                        'longitude': cafe.longitude,
+                                        'updatedAt': FieldValue.serverTimestamp(),
+                                      }, SetOptions(merge: true));
+
+                                      if (isGoogle) {
+                                        authCubit.processIntent(
+                                          GoogleSignInIntent(
+                                            role: UserRole.cafeOwner,
+                                            cafeId: cafe.id,
+                                          ),
+                                        );
+                                      } else {
+                                        authCubit.processIntent(
+                                          RegisterIntent(
+                                            name: name,
+                                            email: email,
+                                            password: password,
+                                            role: UserRole.cafeOwner,
+                                            cafeId: cafe.id,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      );
+    });
+  }
+
+  void _showGoogleRoleSelectionDialog() {
+    final authCubit = context.read<AuthCubit>();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            AppLocale.accountTypeTitle.getString(context),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocale.accountTypeSubtitle.getString(context),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 18),
+              ListTile(
+                tileColor: const Color(0xFFF5F1EC),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                leading: const Icon(Icons.person_pin, color: AppColors.textPrimary),
+                title: Text(
+                  AppLocale.customerRoleTitle.getString(context),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                subtitle: Text(
+                  AppLocale.customerRoleSubtitle.getString(context),
+                ),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  authCubit.processIntent(
+                    GoogleSignInIntent(role: UserRole.customer),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                tileColor: const Color(0xFFF5F1EC),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                leading: const Icon(Icons.storefront, color: AppColors.textPrimary),
+                title: Text(
+                  AppLocale.cafeOwnerRoleTitle.getString(context),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                subtitle: Text(
+                  AppLocale.cafeOwnerRoleSubtitle.getString(context),
+                ),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  _showCafeSelectionDialog(
+                    name: '',
+                    email: '',
+                    password: '',
+                    isGoogle: true,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -118,10 +484,22 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
             context: context,
             title: AppLocale.toastSuccess.getString(context),
             description:
-                '${AppLocale.welcomeUserPrefix.getString(context)} $userName',
+            '${AppLocale.welcomeUserPrefix.getString(context)} $userName',
             type: ToastificationType.success,
           );
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+
+          if (state.user.isCafeOwner) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.ownerDashboard,
+              arguments: state.user.cafeId,
+            );
+          } else {
+            Navigator.pushReplacementNamed(
+              context,
+              isLogin ? AppRoutes.home : AppRoutes.personalization,
+            );
+          }
         }
       },
       builder: (context, state) {
@@ -159,11 +537,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                             color: AppColors.textPrimary,
                           ),
                           label: Text(
-                            FlutterLocalization
-                                        .instance
-                                        .currentLocale
-                                        ?.languageCode ==
-                                    'ar'
+                            FlutterLocalization.instance.currentLocale?.languageCode == 'ar'
                                 ? 'English'
                                 : 'العربية',
                             style: const TextStyle(
@@ -174,8 +548,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                           ),
                           onPressed: () {
                             final localization = FlutterLocalization.instance;
-                            if (localization.currentLocale?.languageCode ==
-                                'ar') {
+                            if (localization.currentLocale?.languageCode == 'ar') {
                               localization.translate('en');
                             } else {
                               localization.translate('ar');
@@ -236,19 +609,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () =>
-                                          setState(() => isLogin = false),
+                                      onTap: () => setState(() => isLogin = false),
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8,
-                                        ),
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
                                         decoration: BoxDecoration(
                                           color: !isLogin
                                               ? AppColors.textPrimary
                                               : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           AppLocale.register.getString(context),
@@ -265,19 +633,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ),
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () =>
-                                          setState(() => isLogin = true),
+                                      onTap: () => setState(() => isLogin = true),
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8,
-                                        ),
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
                                         decoration: BoxDecoration(
                                           color: isLogin
                                               ? AppColors.textPrimary
                                               : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           AppLocale.login.getString(context),
@@ -302,11 +665,8 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                 label: AppLocale.name.getString(context),
                                 hint: AppLocale.nameHint.getString(context),
                                 suffixIcon: Icons.person_outline,
-                                validator: (v) =>
-                                    (v == null || v.trim().isEmpty)
-                                    ? AppLocale.enterNameError.getString(
-                                        context,
-                                      )
+                                validator: (v) => (v == null || v.trim().isEmpty)
+                                    ? AppLocale.enterNameError.getString(context)
                                     : null,
                               ),
                               const SizedBox(height: 14),
@@ -330,25 +690,18 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               hint: AppLocale.passwordHint.getString(context),
                               isPassword: true,
                               validator: (v) => (v == null || v.length < 6)
-                                  ? AppLocale.passwordMinLengthError.getString(
-                                      context,
-                                    )
+                                  ? AppLocale.passwordMinLengthError.getString(context)
                                   : null,
                             ),
                             if (!isLogin) ...[
                               const SizedBox(height: 14),
                               CustomTextField(
                                 controller: _confirmPasswordController,
-                                label: AppLocale.confirmPassword.getString(
-                                  context,
-                                ),
-                                hint: AppLocale.confirmPasswordHint.getString(
-                                  context,
-                                ),
+                                label: AppLocale.confirmPassword.getString(context),
+                                hint: AppLocale.confirmPasswordHint.getString(context),
                                 isPassword: true,
                                 validator: (v) => (v == null || v.isEmpty)
-                                    ? AppLocale.confirmPasswordRequiredError
-                                          .getString(context)
+                                    ? AppLocale.confirmPasswordRequiredError.getString(context)
                                     : null,
                               ),
                             ],
@@ -389,9 +742,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               children: [
                                 const Expanded(child: Divider()),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                   child: Text(
                                     AppLocale.or.getString(context),
                                     style: const TextStyle(
@@ -408,10 +759,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               onPressed: isLoading
                                   ? null
                                   : () {
-                                      context.read<AuthCubit>().processIntent(
-                                        GoogleSignInIntent(),
-                                      );
-                                    },
+                                if (isLogin) {
+                                  context.read<AuthCubit>().processIntent(
+                                    GoogleSignInIntent(),
+                                  );
+                                } else {
+                                  _showGoogleRoleSelectionDialog();
+                                }
+                              },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 48),
                                 shape: RoundedRectangleBorder(
@@ -428,9 +783,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    AppLocale.continueWithGoogle.getString(
-                                      context,
-                                    ),
+                                    AppLocale.continueWithGoogle.getString(context),
                                     style: const TextStyle(
                                       color: AppColors.textPrimary,
                                       fontSize: 13,
@@ -441,8 +794,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                             ),
                             const SizedBox(height: 12),
                             TextButton(
-                              onPressed: () =>
-                                  setState(() => isLogin = !isLogin),
+                              onPressed: () => setState(() => isLogin = !isLogin),
                               child: Text(
                                 isLogin
                                     ? AppLocale.noAccount.getString(context)

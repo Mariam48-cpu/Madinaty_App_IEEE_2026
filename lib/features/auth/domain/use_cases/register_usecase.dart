@@ -11,10 +11,14 @@ class RegisterUseCase {
     required String password,
     required String name,
     String? phone,
+    UserRole role = UserRole.customer,
+    String? cafeId,
   }) => repository.register(
     email: email,
     password: password,
     name: name,
     phone: phone,
+    role: role,
+    cafeId: cafeId,
   );
 }

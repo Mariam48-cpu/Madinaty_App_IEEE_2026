@@ -90,7 +90,7 @@ class BookTableScreen extends StatelessWidget {
               children: [
                 CafeHeaderCard(
                   cafeName: cafe.name,
-                  cafeAddress: cafe.address,
+                  cafeAddress: cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
                   cafeImageUrl:
                   cafe.photos.isNotEmpty ? cafe.photos.first : null,
                 ),
@@ -191,6 +191,14 @@ class BookTableScreen extends StatelessWidget {
                   height: 54,
                   child: ElevatedButton(
                     onPressed: () {
+                      cubit.setCafeDetails(
+                        id: cafe.id,
+                        name: cafe.name,
+                        location: cafe.address.isNotEmpty
+                            ? cafe.address
+                            : 'بنها، الفلل',
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

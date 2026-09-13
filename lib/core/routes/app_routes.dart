@@ -33,6 +33,11 @@ import 'package:madinaty_app_ieee_2026/features/personalization/presentation/vie
 
 import 'package:madinaty_app_ieee_2026/features/pre_order/presentation/view/screens/pre_order_screen.dart';
 
+import '../../features/auth/presentation/view/screens/QrScannerScreen.dart';
+import '../../features/auth/presentation/view/screens/active_reservations_screen.dart';
+import '../../features/auth/presentation/view/screens/edit_cafe_screen.dart';
+import '../../features/auth/presentation/view/screens/manage_menu_screen.dart';
+import '../../features/auth/presentation/view/screens/owner_dashboard_screen.dart';
 
 abstract class AppRoutes {
   const AppRoutes._();
@@ -51,13 +56,16 @@ abstract class AppRoutes {
   static const String checkout = '/checkout';
   static const String cart = '/cart';
   static const String preOrder = '/pre_order';
-
   static const String aiPlanner = '/ai_planner';
 
+  static const String ownerDashboard = '/owner_dashboard';
+  static const String qrScanner = '/qr_scanner';
+  static const String editCafe = '/edit-cafe';
+  static const String manageMenu = '/manage-menu';
+  static const String activeReservations = '/active-reservations';
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-
       case initial:
       case splash:
         return MaterialPageRoute(
@@ -65,11 +73,49 @@ abstract class AppRoutes {
           settings: settings,
         );
 
-
       case auth:
         return MaterialPageRoute(
           builder: (_) => const AuthScreen(),
           settings: settings,
+        );
+
+      case ownerDashboard:
+        final cafeId = settings.arguments is String
+            ? settings.arguments as String
+            : '';
+        return MaterialPageRoute(
+          builder: (_) => OwnerDashboardScreen(cafeId: cafeId),
+          settings: settings,
+        );
+
+      case qrScanner:
+        final cafeId = settings.arguments is String
+            ? settings.arguments as String
+            : '';
+        return MaterialPageRoute(
+          builder: (_) => QrScannerScreen(cafeId: cafeId),
+          settings: settings,
+        );
+
+      case AppRoutes.manageMenu:
+        final cafeId = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => ManageMenuScreen(cafeId: cafeId),
+        );
+
+      case editCafe:
+        final cafeId = settings.arguments is String
+            ? settings.arguments as String
+            : '';
+        return MaterialPageRoute(
+          builder: (_) => EditCafeScreen(cafeId: cafeId),
+          settings: settings,
+        );
+
+      case AppRoutes.activeReservations:
+        final cafeId = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => ActiveReservationsScreen(cafeId: cafeId),
         );
 
       case home:
@@ -152,8 +198,7 @@ abstract class AppRoutes {
 
         return MaterialPageRoute(
           builder: (_) => BlocProvider<ProfileCubit>(
-            create: (_) => sl<ProfileCubit>()
-              ..fetchUserProfile(user.uid),
+            create: (_) => sl<ProfileCubit>()..fetchUserProfile(user.uid),
             child: ProfileScreen(
               uid: user.uid,
             ),
@@ -162,6 +207,17 @@ abstract class AppRoutes {
         );
 
       case cart:
+        if (settings.arguments is Map<String, dynamic>) {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => CartScreen(
+              cafeName: args['cafeName'] as String?,
+              booking: args['booking'] as BookingEntity?,
+            ),
+            settings: settings,
+          );
+        }
+
         final cafeNameArg = settings.arguments is String
             ? settings.arguments as String
             : null;
@@ -181,6 +237,7 @@ abstract class AppRoutes {
             builder: (_) => PreOrderScreen(
               booking: args,
               cafeId: args.cafeId,
+              cafeName: args.cafeName,
             ),
             settings: settings,
           );
@@ -189,8 +246,7 @@ abstract class AppRoutes {
           return MaterialPageRoute(
             builder: (_) => PreOrderScreen(
               booking: args['booking'] as BookingEntity?,
-              cafeId:
-                  args['cafeId'] as String? ?? 'cafe_default',
+              cafeId: args['cafeId'] as String? ?? 'cafe_default',
               cafeName: args['cafeName'] as String?,
               cafe: args['cafe'] as CafeEntity?,
             ),
@@ -202,29 +258,92 @@ abstract class AppRoutes {
           builder: (_) => const PreOrderScreen(),
           settings: settings,
         );
+
       case checkout:
-        final bookingArg = settings.arguments is BookingEntity
-            ? settings.arguments as BookingEntity
-            : null;
+        BookingEntity resolvedBooking = dummyBooking;
+        if (settings.arguments is BookingEntity) {
+          resolvedBooking = settings.arguments as BookingEntity;
+        } else if (settings.arguments is Map<String, dynamic>) {
+          final args = settings.arguments as Map<String, dynamic>;
+          if (args['booking'] is BookingEntity) {
+            final base = args['booking'] as BookingEntity;
+            resolvedBooking = BookingEntity(
+              id: base.id,
+              userId: base.userId,
+              cafeId: (args['cafeId'] as String?)?.isNotEmpty == true
+                  ? (args['cafeId'] as String)
+                  : base.cafeId,
+              cafeName: (args['cafeName'] as String?)?.isNotEmpty == true
+                  ? (args['cafeName'] as String)
+                  : base.cafeName,
+              cafeLocation: (args['cafeLocation'] as String?)?.isNotEmpty == true
+                  ? (args['cafeLocation'] as String)
+                  : base.cafeLocation,
+              date: base.date,
+              time: base.time,
+              guests: base.guests,
+              occasion: base.occasion,
+              seatingPreference: base.seatingPreference,
+              status: base.status,
+              createdAt: base.createdAt,
+              totalAmount: base.totalAmount,
+              reservationFee: base.reservationFee,
+            );
+          } else {
+            resolvedBooking = BookingEntity(
+              id: '',
+              userId: FirebaseAuth.instance.currentUser?.uid ?? 'user_123',
+              cafeId: args['cafeId'] as String? ?? '',
+              cafeName: args['cafeName'] as String? ?? '',
+              cafeLocation: args['cafeLocation'] as String? ?? '',
+              date: DateTime.now().add(const Duration(days: 1)),
+              time: '18:00',
+              guests: 2,
+              seatingPreference: 'صالة داخلية',
+              occasion: 'عام',
+              status: BookingStatus.approved,
+              createdAt: DateTime.now(),
+            );
+          }
+        }
 
         return MaterialPageRoute(
           builder: (_) => CheckoutScreen(
-            booking: bookingArg ?? dummyBooking,
+            booking: resolvedBooking,
           ),
           settings: settings,
         );
 
       case digitalPass:
+        if (settings.arguments is Map<String, dynamic>) {
+          final args = settings.arguments as Map<String, dynamic>;
+          final bookingObj = args['booking'] as BookingEntity? ?? dummyBooking;
+          return MaterialPageRoute(
+            builder: (_) => DigitalPassScreen(
+              booking: bookingObj,
+              cafe: args['cafe'] as CafeEntity?,
+              cafeName: args['cafeName'] as String? ?? bookingObj.cafeName,
+              cafeLocation: args['cafeLocation'] as String? ?? bookingObj.cafeLocation,
+              cafeLatitude: args['cafeLatitude'] as double?,
+              cafeLongitude: args['cafeLongitude'] as double?,
+            ),
+            settings: settings,
+          );
+        }
+
         final bookingArg = settings.arguments is BookingEntity
             ? settings.arguments as BookingEntity
-            : null;
+            : dummyBooking;
 
         return MaterialPageRoute(
           builder: (_) => DigitalPassScreen(
-            booking: bookingArg ?? dummyBooking,
+            booking: bookingArg,
+            cafeName: bookingArg.cafeName,
+            cafeLocation: bookingArg.cafeLocation,
           ),
           settings: settings,
         );
+
       case notifications:
         final user = FirebaseAuth.instance.currentUser;
 
@@ -251,8 +370,7 @@ abstract class AppRoutes {
 
         return MaterialPageRoute(
           builder: (_) => BlocProvider<NotificationCubit>(
-            create: (_) => sl<NotificationCubit>()
-              ..fetchNotifications(user.uid),
+            create: (_) => sl<NotificationCubit>()..fetchNotifications(user.uid),
             child: NotificationsScreen(
               uid: user.uid,
             ),
@@ -286,7 +404,9 @@ abstract class AppRoutes {
 final dummyBooking = BookingEntity(
   id: 'booking_dummy_001',
   userId: 'user_123',
-  cafeId: 'cafe_tbs',
+  cafeId: '',
+  cafeName: '',
+  cafeLocation: '',
   date: DateTime.now().add(
     const Duration(days: 2),
   ),
@@ -294,6 +414,6 @@ final dummyBooking = BookingEntity(
   guests: 4,
   seatingPreference: 'صالة داخلية',
   occasion: 'جلسة عمل',
-  status: BookingStatus.pending,
+  status: BookingStatus.approved,
   createdAt: DateTime.now(),
 );

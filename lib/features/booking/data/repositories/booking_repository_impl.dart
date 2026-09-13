@@ -62,6 +62,8 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
     }
 
     final bookingModel = BookingModel(
+      cafeName: booking.cafeName,
+      cafeLocation: booking.cafeLocation,
       id: bookingId,
       userId: booking.userId,
       cafeId: booking.cafeId,
@@ -70,7 +72,7 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       guests: booking.guests,
       occasion: booking.occasion,
       seatingPreference: booking.seatingPreference,
-      status: BookingStatus.pending,
+      status: booking.status,
       createdAt: DateTime.now(),
       totalAmount: booking.totalAmount,
       reservationFee: booking.reservationFee,

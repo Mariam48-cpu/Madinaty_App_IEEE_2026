@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:get_it/get_it.dart';
+
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../auth/presentation/view/screens/auth_screen.dart';
+import '../../../../auth/presentation/view/screens/owner_dashboard_screen.dart';
 import '../../../../discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import '../../../../personalization/presentation/view/screens/personalization_screen.dart';
 import '../../../domain/use_cases/is_onboarding_seen.dart';
@@ -70,7 +73,44 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    if (currentUser != null) {
+    if (currentUser == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+      );
+      return;
+    }
+
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+      if (!mounted) return;
+
+      if (userDoc.exists && userDoc.data() != null) {
+        final data = userDoc.data()!;
+        final role = (data['role'] as String?)?.trim().toLowerCase();
+        final cafeId = data['cafeId'] as String?;
+        final interests = data['interests'] as List<dynamic>?;
+
+        if (role == 'cafe_owner' || role == 'cafeowner') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OwnerDashboardScreen(cafeId: cafeId ?? ''),
+            ),
+          );
+          return;
+        }
+
+        if (interests != null && interests.isNotEmpty) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+          return;
+        }
+      }
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -79,11 +119,9 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ),
       );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
-      );
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
   }
 

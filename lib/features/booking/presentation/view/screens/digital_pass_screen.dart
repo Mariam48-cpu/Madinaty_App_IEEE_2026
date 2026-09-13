@@ -33,13 +33,28 @@ class DigitalPassScreen extends StatelessWidget {
     this.onAddToCalendarPressed,
   });
 
-  String get _resolvedCafeName => cafe?.name ?? cafeName ?? '';
-  String get _resolvedCafeLocation => cafe?.address ?? cafeLocation ?? '';
+  String _resolvedCafeName(BuildContext context) {
+    if (cafe?.name != null && cafe!.name.isNotEmpty) return cafe!.name;
+    if (cafeName != null && cafeName!.isNotEmpty) return cafeName!;
+    if (booking.cafeName != null && booking.cafeName!.isNotEmpty) return booking.cafeName!;
+    return AppLocale.defaultCafeTitle.getString(context);
+  }
+
+  String _resolvedCafeLocation(BuildContext context) {
+    if (cafe?.address != null && cafe!.address.isNotEmpty) return cafe!.address;
+    if (cafeLocation != null && cafeLocation!.isNotEmpty) return cafeLocation!;
+    if (booking.cafeLocation != null && booking.cafeLocation!.isNotEmpty) return booking.cafeLocation!;
+    return 'بنها، الفلل';
+  }
+
   double? get _resolvedLatitude => cafe?.latitude ?? cafeLatitude;
   double? get _resolvedLongitude => cafe?.longitude ?? cafeLongitude;
 
   @override
   Widget build(BuildContext context) {
+    final name = _resolvedCafeName(context);
+    final location = _resolvedCafeLocation(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -49,7 +64,11 @@ class DigitalPassScreen extends StatelessWidget {
             children: [
               _buildTopSearchBar(context),
               const SizedBox(height: 20),
-              BookingPassWidget(booking: booking),
+              BookingPassWidget(
+                booking: booking,
+                cafeName: name,
+                cafeLocation: location,
+              ),
               const SizedBox(height: 24),
               _buildActionButtons(context),
               const SizedBox(height: 16),
@@ -64,7 +83,7 @@ class DigitalPassScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant.withOpacity(0.6),
+        color: AppColors.surfaceVariant.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -90,6 +109,9 @@ class DigitalPassScreen extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
+    final name = _resolvedCafeName(context);
+    final location = _resolvedCafeLocation(context);
+
     return Row(
       children: [
         Expanded(
@@ -99,8 +121,8 @@ class DigitalPassScreen extends StatelessWidget {
                   await CalendarHelper.addBookingToCalendar(
                     context: context,
                     booking: booking,
-                    cafeName: _resolvedCafeName.isNotEmpty ? _resolvedCafeName : null,
-                    cafeLocation: _resolvedCafeLocation.isNotEmpty ? _resolvedCafeLocation : null,
+                    cafeName: name.isNotEmpty ? name : null,
+                    cafeLocation: location.isNotEmpty ? location : null,
                   );
                   if (context.mounted) {
                     AppToast.showToast(
@@ -142,7 +164,7 @@ class DigitalPassScreen extends StatelessWidget {
                     context: context,
                     latitude: _resolvedLatitude,
                     longitude: _resolvedLongitude,
-                    cafeLocationName: _resolvedCafeLocation.isNotEmpty ? _resolvedCafeLocation : _resolvedCafeName,
+                    cafeLocationName: location.isNotEmpty ? location : name,
                   );
                 },
             style: ElevatedButton.styleFrom(

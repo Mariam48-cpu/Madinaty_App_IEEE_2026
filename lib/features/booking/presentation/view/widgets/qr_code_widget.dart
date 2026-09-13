@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
@@ -6,7 +5,6 @@ import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../domain/entities/booking_entity.dart';
-import '../../utils/qr_data_builder.dart';
 
 class QrCodeWidget extends StatelessWidget {
   final BookingEntity booking;
@@ -18,8 +16,7 @@ class QrCodeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isApproved = booking.status == BookingStatus.approved;
-    final String qrData = QrDataBuilder().buildQrData(booking);
+    final String qrData = booking.id;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -36,54 +33,18 @@ class QrCodeWidget extends StatelessWidget {
             ),
           ),
           child: Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                QrImageView(
-                  data: qrData,
-                  version: QrVersions.auto,
-                  size: 150,
-                  eyeStyle: const QrEyeStyle(
-                    eyeShape: QrEyeShape.square,
-                    color: AppColors.textPrimary,
-                  ),
-                  dataModuleStyle: const QrDataModuleStyle(
-                    dataModuleShape: QrDataModuleShape.square,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                if (!isApproved) ...[
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                        child: Container(
-                          color: AppColors.surface.withOpacity(0.7),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.lock_outline_rounded,
-                                size: 28,
-                                color: AppColors.textSecondary,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                AppLocale.waitingForConfirmation.getString(context),
-                                style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
+            child: QrImageView(
+              data: qrData,
+              version: QrVersions.auto,
+              size: 150,
+              eyeStyle: const QrEyeStyle(
+                eyeShape: QrEyeShape.square,
+                color: AppColors.textPrimary,
+              ),
+              dataModuleStyle: const QrDataModuleStyle(
+                dataModuleShape: QrDataModuleShape.square,
+                color: AppColors.textPrimary,
+              ),
             ),
           ),
         ),

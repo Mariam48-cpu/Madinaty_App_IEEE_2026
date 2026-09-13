@@ -7,6 +7,7 @@ import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_typography.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/cart_skeleton.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import '../../view_model/cubit/cart_cubit.dart';
 import '../../view_model/cubit/cart_state.dart';
 import '../widgets/cart_empty_view.dart';
@@ -17,20 +18,26 @@ import '../widgets/cart_summary_card.dart';
 
 class CartScreen extends StatelessWidget {
   final String? cafeName;
+  final BookingEntity? booking;
 
-  const CartScreen({super.key, this.cafeName});
+  const CartScreen({super.key, this.cafeName, this.booking});
 
   @override
   Widget build(BuildContext context) {
+    final effectiveCafe = booking?.cafeName ?? cafeName;
+
     return BlocProvider(
-      create: (_) => getIt<CartCubit>()..initCartWatcher(cafeName: cafeName),
-      child: const _CartView(),
+      create: (_) => getIt<CartCubit>()..initCartWatcher(cafeName: effectiveCafe),
+      child: _CartView(booking: booking, cafeName: effectiveCafe),
     );
   }
 }
 
 class _CartView extends StatefulWidget {
-  const _CartView();
+  final BookingEntity? booking;
+  final String? cafeName;
+
+  const _CartView({this.booking, this.cafeName});
 
   @override
   State<_CartView> createState() => _CartViewState();
@@ -146,7 +153,7 @@ class _CartViewState extends State<_CartView> {
                     AppRoutes.home,
                         (route) => false,
                   );
-                }
+                },
               );
             }
 
@@ -164,7 +171,7 @@ class _CartViewState extends State<_CartView> {
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: state.items.length,
                         separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final item = state.items[index];
                           return CartItemCard(
@@ -211,7 +218,21 @@ class _CartViewState extends State<_CartView> {
                       height: 54,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.checkout);
+                          if (widget.booking != null) {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.checkout,
+                              arguments: widget.booking,
+                            );
+                          } else {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.checkout,
+                              arguments: {
+                                'cafeName': widget.cafeName,
+                              },
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.darkButton,
