@@ -112,34 +112,54 @@ class CheckoutSummaryCard extends StatelessWidget {
     required String value,
   }) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            if (subtitle != null) ...[
-              const SizedBox(width: 4),
-              Text(
-                subtitle,
-                style: AppTypography.bodySmall.copyWith(
-                  fontSize: 10,
-                  color: AppColors.textMuted,
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
+
+              if (subtitle != null) ...[
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.bodySmall.copyWith(
+                      fontSize: 10,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
-        Text(
-          value,
-          style: AppTypography.titleSmall.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+
+        const SizedBox(width: 12),
+
+        Flexible(
+          flex: 0,
+          child: Text(
+            value,
+            maxLines: 2,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.titleSmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
           ),
         ),
       ],

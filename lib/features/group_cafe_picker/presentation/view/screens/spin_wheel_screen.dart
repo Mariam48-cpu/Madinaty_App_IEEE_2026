@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/completed_group_view.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/spin_button.dart';
