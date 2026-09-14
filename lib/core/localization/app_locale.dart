@@ -430,7 +430,6 @@ mixin AppLocale {
   static const String menuUnderDevelopment = 'menuUnderDevelopment';
   static const String currentCafePrefix = 'currentCafePrefix';
   static const String notSpecified = 'notSpecified';
-  // Active Reservations
   static const String activeReservationsTitle = 'activeReservationsTitle';
   static const String noCafeIdProvided = 'noCafeIdProvided';
   static const String reservationsLoadError = 'reservationsLoadError';
@@ -517,7 +516,129 @@ mixin AppLocale {
   static const String faqQ4 = 'faqQ4';
   static const String faqA4 = 'faqA4';
   static const String whatsappNotInstalled = 'whatsappNotInstalled';
+  static const String maxCafesError = 'maxCafesError';
+  static const String minCafesError = 'minCafesError';
+  static const String selectCafesTitle = 'selectCafesTitle';
+  static const String noCafesAvailable = 'noCafesAvailable';
+  static const String selectCafesRangeHint = 'selectCafesRangeHint';
+  static const String selectedCafesCount = 'selectedCafesCount';
+  static const String selectedBadge = 'selectedBadge';
+  static const String finishSelectionBtn = 'finishSelectionBtn';
+  static const String enterGroupNameError = 'enterGroupNameError';
+  static const String enterInviteCodeError = 'enterInviteCodeError';
+  static const String planWithFriendsTitle = 'planWithFriendsTitle';
+  static const String planHeaderTitle = 'planHeaderTitle';
+  static const String planHeaderSubtitle = 'planHeaderSubtitle';
+  static const String groupNameLabel = 'groupNameLabel';
+  static const String groupNameHint = 'groupNameHint';
+  static const String createGroupBtn = 'createGroupBtn';
+  static const String orDivider = 'orDivider';
+  static const String inviteCodeLabel = 'inviteCodeLabel';
+  static const String inviteCodeHint = 'inviteCodeHint';
+  static const String joinGroupBtn = 'joinGroupBtn';
+  static const String howItWorksTitle = 'howItWorksTitle';
+  static const String step1Title = 'step1Title';
+  static const String step1Desc = 'step1Desc';
+  static const String step2Title = 'step2Title';
+  static const String step2Desc = 'step2Desc';
+  static const String step3Title = 'step3Title';
+  static const String step3Desc = 'step3Desc';
+  static const String groupRoomTitle = 'groupRoomTitle';
+  static const String tryAgainBtn = 'tryAgainBtn';
+  static const String groupNotFoundError = 'groupNotFoundError';
+  static const String groupRoomSubtitle = 'groupRoomSubtitle';
+  static const String groupMembersTitle = 'groupMembersTitle';
+  static const String youSuffix = 'youSuffix';
+  static const String readyStatus = 'readyStatus';
+  static const String choosingStatus = 'choosingStatus';
+  static const String winnerSelectedBanner = 'winnerSelectedBanner';
+  static const String everyoneReadyBanner = 'everyoneReadyBanner';
+  static const String waitingForOthersBanner = 'waitingForOthersBanner';
+  static const String chooseMyCafesBtn = 'chooseMyCafesBtn';
+  static const String spinTheWheelBtn = 'spinTheWheelBtn';
+  static const String everyoneIsReadySub = 'everyoneIsReadySub';
+  static const String waitingForCreatorSpin = 'waitingForCreatorSpin';
+  static const String onlyCreatorCanSpinError = 'onlyCreatorCanSpinError';
+  static const String noCafesAvailableSpinError = 'noCafesAvailableSpinError';
+  static const String errorPrefix = 'errorPrefix';
+  static const String chooseYourCafeTitle = 'chooseYourCafeTitle';
+  static const String noGroupDataError = 'noGroupDataError';
+  static const String winnerDataNotAvailable = 'winnerDataNotAvailable';
+  static const String noCafesSelectedYet = 'noCafesSelectedYet';
+  static const String theWinnerHeader = 'theWinnerHeader';
+  static const String groupGoingToText = 'groupGoingToText';
+  static const String backToGroupBtn = 'backToGroupBtn';
+  static const String pickedByTitle = 'pickedByTitle';
+  static const String groupMembersFallback = 'groupMembersFallback';
+  static const String spinningText = 'spinningText';
+  static const String spinTheWheelBtnText = 'spinTheWheelBtnText';
+  static const String whereAreWeGoingTitle = 'whereAreWeGoingTitle';
+  static const String letTheGroupDecideSubtitle = 'letTheGroupDecideSubtitle';
+  static const String cafesCompetingCount = 'cafesCompetingCount';
+  static const String weHaveAWinnerTitle = 'weHaveAWinnerTitle';
+  static const String letsGoBtn = 'letsGoBtn';
   static const Map<String, dynamic> AR = {
+    'weHaveAWinnerTitle': 'لقد فزنا بواحد!',
+    'letsGoBtn': 'يلا بينا! ☕',
+    'whereAreWeGoingTitle': 'رايحين فين؟ ☕',
+    'letTheGroupDecideSubtitle': 'خلي الجروب يقرر!',
+    'cafesCompetingCount': '{count} كافيهات منافسة',
+    'spinningText': 'جارٍ التدوير...',
+    'spinTheWheelBtnText': 'العب العجلة',
+    'pickedByTitle': '☕ اختاره',
+    'groupMembersFallback': 'أعضاء الجروب',
+    'theWinnerHeader': 'الفائز!',
+    'groupGoingToText': 'جروبكم رايح على...',
+    'backToGroupBtn': 'الرجوع إلى الجروب',
+    'onlyCreatorCanSpinError': 'منشئ الجروب فقط هو من يمكنه لف العجلة.',
+    'noCafesAvailableSpinError': 'لا توجد خيارات كافيهات متاحة.',
+    'errorPrefix': 'حدث خطأ ما:',
+    'chooseYourCafeTitle': 'اختر كافيهك 🎡',
+    'noGroupDataError': 'لا توجد بيانات للجروب متاحة.',
+    'winnerDataNotAvailable': 'بيانات الفائز غير متاحة.',
+    'noCafesSelectedYet': 'لم يتم اختيار أي كافيهات بعد.',
+    'groupRoomTitle': 'غرفة الجروب',
+    'tryAgainBtn': 'إعادة المحاولة',
+    'groupNotFoundError': 'الجروب غير موجود',
+    'groupRoomSubtitle': 'خططوا لخروجة القهوة القادمة معاً ☕',
+    'groupMembersTitle': 'أعضاء الجروب',
+    'youSuffix': '(أنت)',
+    'readyStatus': 'جاهز ✓',
+    'choosingStatus': 'جارٍ اختيار الكافيهات...',
+    'winnerSelectedBanner': 'تم اختيار الفائز! 🎉',
+    'everyoneReadyBanner': 'الجميع جاهز! 🎉',
+    'waitingForOthersBanner': 'في انتظار الانتهاء من الاختيار...',
+    'chooseMyCafesBtn': 'اختر كافيهاتي',
+    'spinTheWheelBtn': 'لف العجلة 🎡',
+    'everyoneIsReadySub': 'الجميع جاهز!',
+    'waitingForCreatorSpin': 'في انتظار أن يقوم منشئ الجروب بلف العجلة 🎡',
+    'enterGroupNameError': 'برجاء إدخال اسم الجروب',
+    'enterInviteCodeError': 'برجاء إدخال كود الدعوة',
+    'planWithFriendsTitle': 'التخطيط مع الأصدقاء',
+    'planHeaderTitle': 'خطط خروجة مع أصحابك 🎉',
+    'planHeaderSubtitle': 'اختاروا الكافيهات مع بعض وسيبوا القرار النهائي للعجلة 🎡',
+    'groupNameLabel': 'اسم الجروب',
+    'groupNameHint': 'Friday Coffee',
+    'createGroupBtn': 'اعمل جروب جديد',
+    'orDivider': 'أو',
+    'inviteCodeLabel': 'كود الدعوة',
+    'inviteCodeHint': 'ABC123',
+    'joinGroupBtn': 'انضم لجروب',
+    'howItWorksTitle': 'إزاي بتشتغل؟',
+    'step1Title': 'اعمل جروب',
+    'step1Desc': 'أنشئ جروب وشارك كود الدعوة مع أصحابك',
+    'step2Title': 'كل واحد يختار',
+    'step2Desc': 'كل شخص يختار من 2 لـ 3 كافيهات',
+    'step3Title': 'العجلة تقرر',
+    'step3Desc': 'لما الكل يخلص، العجلة تختار الكافيه الفائز 🎡',
+    'maxCafesError': 'ممكن تختاري لحد 3 كافيهات بس',
+    'minCafesError': 'اختاري كافيهين على الأقل',
+    'selectCafesTitle': 'اختار كافيهاتك',
+    'noCafesAvailable': 'مفيش كافيهات متاحة حاليًا',
+    'selectCafesRangeHint': 'اختاري من 2 لـ 3 كافيهات',
+    'selectedCafesCount': '{count}/3 تم اختيارهم',
+    'selectedBadge': 'تم الاختيار ✓',
+    'finishSelectionBtn': 'أنا خلصت اختياري',
     aboutCafeLabel: 'عن الكافيه',
     AppLocale.today: 'اليوم',
     AppLocale.bookingConfirmedTitle: 'تم تأكيد الحجز بنجاح!',
@@ -1065,6 +1186,67 @@ mixin AppLocale {
   };
 
   static const Map<String, dynamic> EN = {
+    'weHaveAWinnerTitle': 'We Have a Winner!',
+    'letsGoBtn': "Let's Go! ☕",
+    'whereAreWeGoingTitle': 'Where are we going? ☕',
+    'letTheGroupDecideSubtitle': 'Let the group decide!',
+    'cafesCompetingCount': '{count} cafes competing',
+    'spinningText': 'Spinning...',
+    'spinTheWheelBtnText': 'SPIN THE WHEEL',
+    'pickedByTitle': '☕ Picked by',
+    'groupMembersFallback': 'Group members',
+    'theWinnerHeader': 'The Winner!',
+    'groupGoingToText': 'Your group is going to...',
+    'backToGroupBtn': 'Back to Group',
+    'onlyCreatorCanSpinError': 'Only the group creator can spin the wheel.',
+    'noCafesAvailableSpinError': 'No cafe choices are available.',
+    'errorPrefix': 'Something went wrong:',
+    'chooseYourCafeTitle': 'Choose Your Cafe 🎡',
+    'noGroupDataError': 'No group data available.',
+    'winnerDataNotAvailable': 'Winner data is not available.',
+    'noCafesSelectedYet': 'No cafes have been selected yet.',
+    'groupRoomTitle': 'Group Room',
+    'tryAgainBtn': 'Try Again',
+    'groupNotFoundError': 'Group not found',
+    'groupRoomSubtitle': 'Plan your next coffee outing together ☕',
+    'groupMembersTitle': 'Group Members',
+    'youSuffix': '(You)',
+    'readyStatus': 'Ready ✓',
+    'choosingStatus': 'Choosing cafes...',
+    'winnerSelectedBanner': 'The winner has been selected! 🎉',
+    'everyoneReadyBanner': 'Everyone is ready! 🎉',
+    'waitingForOthersBanner': 'Waiting for everyone to finish choosing.',
+    'chooseMyCafesBtn': 'Choose My Cafes',
+    'spinTheWheelBtn': 'Spin The Wheel 🎡',
+    'everyoneIsReadySub': 'Everyone is ready!',
+    'waitingForCreatorSpin': 'Waiting for the creator to spin the wheel 🎡',
+    'enterGroupNameError': 'Please enter a group name',
+    'enterInviteCodeError': 'Please enter the invite code',
+    'planWithFriendsTitle': 'Plan With Friends',
+    'planHeaderTitle': 'Plan a hangout with your friends 🎉',
+    'planHeaderSubtitle': 'Choose cafes together and leave the final decision to the wheel 🎡',
+    'groupNameLabel': 'Group Name',
+    'groupNameHint': 'Friday Coffee',
+    'createGroupBtn': 'Create New Group',
+    'orDivider': 'OR',
+    'inviteCodeLabel': 'Invite Code',
+    'inviteCodeHint': 'ABC123',
+    'joinGroupBtn': 'Join Group',
+    'howItWorksTitle': 'How it works?',
+    'step1Title': 'Create a Group',
+    'step1Desc': 'Create a group and share the invite code with your friends',
+    'step2Title': 'Everyone Chooses',
+    'step2Desc': 'Each person picks 2 to 3 cafes',
+    'step3Title': 'The Wheel Decides',
+    'step3Desc': 'When everyone finishes, the wheel picks the winning cafe 🎡',
+    'maxCafesError': 'You can select up to 3 cafes only',
+    'minCafesError': 'Please select at least 2 cafes',
+    'selectCafesTitle': 'Choose Your Cafes',
+    'noCafesAvailable': 'No cafes available at the moment',
+    'selectCafesRangeHint': 'Choose from 2 to 3 cafes',
+    'selectedCafesCount': '{count}/3 selected',
+    'selectedBadge': 'Selected ✓',
+    'finishSelectionBtn': 'I have finished my selection',
     aboutCafeLabel: 'About Cafe',
     AppLocale.today: 'Today',
     AppLocale.bookingConfirmedTitle: 'Booking Confirmed Successfully!',

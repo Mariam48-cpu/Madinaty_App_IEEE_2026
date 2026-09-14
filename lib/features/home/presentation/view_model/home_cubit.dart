@@ -22,6 +22,8 @@ class HomeCubit extends Cubit<HomeState> {
 
   Timer? _searchDebounce;
 
+     int _homeRequestId = 0;
+
   HomeCubit({
     required this.getRecommendationsUseCase,
     required this.getUserPreferencesUseCase,
@@ -35,22 +37,28 @@ class HomeCubit extends Cubit<HomeState> {
   }) async {
     if (isClosed) return;
 
+    final int requestId = ++_homeRequestId;
+
     emit(const HomeLoading());
 
     try {
       final preferences = await getUserPreferencesUseCase(currentUserId);
 
-      if (isClosed) return;
+      if (isClosed || requestId != _homeRequestId) {
+        return;
+      }
 
       final interests =
           preferences?.interests ??
-              [AppLocale.specialtyCoffee, AppLocale.studyPlaces];
+          [AppLocale.specialtyCoffee, AppLocale.studyPlaces];
 
       final mood = preferences?.selectedMood;
       final occasion = preferences?.selectedOccasion;
 
       String location = '';
 
+      // تحويل الـ GPS الحالي إلى اسم منطقة لاستخدامه
+      // كمعلومة إضافية في نظام التوصيات.
       if (userLocation != null) {
         try {
           final placemarks = await placemarkFromCoordinates(
@@ -58,7 +66,9 @@ class HomeCubit extends Cubit<HomeState> {
             userLocation.longitude,
           );
 
-          if (isClosed) return;
+          if (isClosed || requestId != _homeRequestId) {
+            return;
+          }
 
           if (placemarks.isNotEmpty) {
             final place = placemarks.first;
@@ -86,14 +96,20 @@ class HomeCubit extends Cubit<HomeState> {
         location = 'current location';
       }
 
+      // أهم جزء:
+      // بنمرر الـ GPS نفسه للـ recommendation layer
+      // وليس اسم المنطقة فقط.
       final cafes = await getRecommendationsUseCase(
         interests: interests,
         mood: mood,
         occasion: occasion,
         location: location,
+        userLocation: userLocation,
       );
 
-      if (isClosed) return;
+      if (isClosed || requestId != _homeRequestId) {
+        return;
+      }
 
       if (cafes.isEmpty) {
         emit(const HomeEmpty());
@@ -104,7 +120,9 @@ class HomeCubit extends Cubit<HomeState> {
 
       final filtered = _filterCafes(cafes, selectedCategory);
 
-      if (isClosed) return;
+      if (isClosed || requestId != _homeRequestId) {
+        return;
+      }
 
       emit(
         HomeLoaded(
@@ -116,16 +134,18 @@ class HomeCubit extends Cubit<HomeState> {
         ),
       );
     } catch (e) {
-      if (isClosed) return;
+      if (isClosed || requestId != _homeRequestId) {
+        return;
+      }
 
       emit(HomeError(e.toString().replaceAll('Exception: ', '')));
     }
   }
 
   List<CafeRecommendationEntity> _filterCafes(
-      List<CafeRecommendationEntity> cafes,
-      String category,
-      ) {
+    List<CafeRecommendationEntity> cafes,
+    String category,
+  ) {
     if (category == AppLocale.all || category == 'الكل' || category == 'All') {
       return cafes;
     }
@@ -157,14 +177,14 @@ class HomeCubit extends Cubit<HomeState> {
           category == 'للعمل' ||
           category == 'Work / Study') {
         return containsAny(cafe.interests, [
-          'للعمل',
-          'أماكن للمذاكرة',
-          'مذاكرة',
-          'study',
-          'work',
-          'workspace',
-          'working',
-        ]) ||
+              'للعمل',
+              'أماكن للمذاكرة',
+              'مذاكرة',
+              'study',
+              'work',
+              'workspace',
+              'working',
+            ]) ||
             containsAny(cafe.moods, [
               'جلسة هادئة',
               'هادئ',
@@ -182,11 +202,11 @@ class HomeCubit extends Cubit<HomeState> {
           category == 'قهوة' ||
           category == 'Coffee') {
         return containsAny(cafe.interests, [
-          'قهوة',
-          'قهوة مختصة',
-          'coffee',
-          'specialty coffee',
-        ]) ||
+              'قهوة',
+              'قهوة مختصة',
+              'coffee',
+              'specialty coffee',
+            ]) ||
             containsAny(cafe.moods, ['قهوة', 'coffee']);
       }
 
@@ -313,6 +333,7 @@ class HomeCubit extends Cubit<HomeState> {
     if (isClosed) return;
 
     _searchDebounce?.cancel();
+
     _clearSearch();
   }
 

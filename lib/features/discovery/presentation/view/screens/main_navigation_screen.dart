@@ -44,7 +44,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     _discoveryCubit = sl<DiscoveryCubit>();
 
-    _homeCubit!.fetchHomeData();
+    // _homeCubit!.fetchHomeData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _discoveryCubit == null) {
@@ -87,7 +87,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-
     if (user == null || _homeCubit == null || _discoveryCubit == null) {
       return Scaffold(
         backgroundColor: AppColors.background,
@@ -107,7 +106,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       );
     }
-
 
     return MultiBlocProvider(
       providers: [

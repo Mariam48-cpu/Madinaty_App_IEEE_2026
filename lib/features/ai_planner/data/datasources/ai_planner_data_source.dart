@@ -25,9 +25,8 @@ abstract class AIPlannerDataSource {
 
 @LazySingleton(as: AIPlannerDataSource)
 class AIPlannerDataSourceImpl implements AIPlannerDataSource {
-
   static const String _apiKey =
-      'AQ.Ab8RN6IHKnKi2nFD1esyNQXWzSCF32ovBPXejnqUOOSFnv3RoA';
+      'AQ.Ab8RN6LQCBC9tgnSdiQxV6kD0DNEhq1IKrswegTYy5dPIO-rsQ';
 
   static const String _model = 'gemini-3.5-flash';
 
@@ -92,15 +91,11 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
       }
 
       if (response.statusCode == 401 || response.statusCode == 403) {
-        throw Exception(
-          AppLocale.aiAuthError,
-        );
+        throw Exception(AppLocale.aiAuthError);
       }
 
       if (response.statusCode == 429) {
-        throw Exception(
-          AppLocale.aiRateLimitError
-        );
+        throw Exception(AppLocale.aiRateLimitError);
       }
 
       String message = AppLocale.aiServerError;
@@ -117,8 +112,7 @@ class AIPlannerDataSourceImpl implements AIPlannerDataSource {
             message = apiMessage;
           }
         }
-      } catch (_) {
-      }
+      } catch (_) {}
 
       throw Exception(AppLocale.aiServerError);
     } on http.ClientException catch (_) {
@@ -225,7 +219,6 @@ Return ONLY valid JSON.
     return AIPlanIntentDTO.fromJson(_decodeObject(rawText));
   }
 
-
   @override
   Future<AIPlanFinalDTO> rankCandidates({
     required AIPlanIntentDTO intent,
@@ -327,7 +320,6 @@ Return ONLY valid JSON.
         .replaceAll('```JSON', '')
         .replaceAll('```', '')
         .trim();
-
 
     final first = clean.indexOf('{');
     final last = clean.lastIndexOf('}');

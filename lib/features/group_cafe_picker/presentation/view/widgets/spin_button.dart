@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class SpinButton extends StatelessWidget {
@@ -14,12 +16,7 @@ class SpinButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        8,
-        20,
-        22,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 22),
       child: GestureDetector(
         onTap: isSpinning ? null : onPressed,
         child: AnimatedContainer(
@@ -27,17 +24,13 @@ class SpinButton extends StatelessWidget {
           width: double.infinity,
           height: 58,
           decoration: BoxDecoration(
-            color: isSpinning
-                ? Colors.grey
-                : AppColors.primary,
+            color: isSpinning ? Colors.grey : AppColors.primary,
             borderRadius: BorderRadius.circular(18),
             boxShadow: isSpinning
                 ? []
                 : [
                     BoxShadow(
-                      color: AppColors.primary.withValues(
-                        alpha: 0.28,
-                      ),
+                      color: AppColors.primary.withValues(alpha: 0.28),
                       blurRadius: 14,
                       offset: const Offset(0, 7),
                     ),
@@ -58,8 +51,8 @@ class SpinButton extends StatelessWidget {
 
               Text(
                 isSpinning
-                    ? 'Spinning...'
-                    : 'SPIN THE WHEEL',
+                    ? AppLocale.spinningText.getString(context)
+                    : AppLocale.spinTheWheelBtnText.getString(context),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,

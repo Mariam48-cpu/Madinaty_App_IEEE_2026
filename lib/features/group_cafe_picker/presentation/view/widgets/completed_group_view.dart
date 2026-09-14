@@ -1,5 +1,7 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
 
@@ -28,16 +30,13 @@ class CompletedGroupView extends StatelessWidget {
             children: [
               const SizedBox(height: 25),
 
-              const Text(
-                '🎉',
-                style: TextStyle(fontSize: 55),
-              ),
+              const Text('🎉', style: TextStyle(fontSize: 55)),
 
               const SizedBox(height: 8),
 
-              const Text(
-                'The Winner!',
-                style: TextStyle(
+              Text(
+                AppLocale.theWinnerHeader.getString(context),
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                 ),
@@ -46,12 +45,11 @@ class CompletedGroupView extends StatelessWidget {
               const SizedBox(height: 8),
 
               Text(
-                'Your group is going to...',
+                AppLocale.groupGoingToText.getString(context),
                 style: TextStyle(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -66,10 +64,7 @@ class CompletedGroupView extends StatelessWidget {
 
               const SizedBox(height: 25),
 
-              PickedBySection(
-                names: pickedBy,
-                compact: false,
-              ),
+              PickedBySection(names: pickedBy, compact: false),
 
               const SizedBox(height: 25),
 
@@ -80,9 +75,9 @@ class CompletedGroupView extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    'Back to Group',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocale.backToGroupBtn.getString(context),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -96,8 +91,7 @@ class CompletedGroupView extends StatelessWidget {
           child: IgnorePointer(
             child: ConfettiWidget(
               confettiController: confettiController,
-              blastDirectionality:
-                  BlastDirectionality.explosive,
+              blastDirectionality: BlastDirectionality.explosive,
               emissionFrequency: 0.03,
               numberOfParticles: 7,
               maxBlastForce: 25,

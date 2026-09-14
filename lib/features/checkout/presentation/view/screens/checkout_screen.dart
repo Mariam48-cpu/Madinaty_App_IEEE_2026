@@ -43,12 +43,13 @@ class CheckoutScreen extends StatelessWidget {
       firestore: FirebaseFirestore.instance,
       auth: FirebaseAuth.instance,
     );
+
     final repo = PaymentRepoImpl(paymentDataSource: dataSource);
 
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => CheckoutCubit(
+          create: (_) => CheckoutCubit(
             confirmBookingUseCase: ConfirmBookingUseCase(repo),
             getPaymobUrlUseCase: GetPaymobUrlUseCase(repo),
             getPaymobWalletUrlUseCase: GetPaymobWalletUrlUseCase(repo),
@@ -59,8 +60,9 @@ class CheckoutScreen extends StatelessWidget {
           ),
         ),
         BlocProvider(
-          create: (context) =>
-          sl<CartCubit>()..initCartWatcher(cafeName: booking.cafeName ?? booking.cafeId),
+          create: (_) =>
+              sl<CartCubit>()
+                ..initCartWatcher(cafeName: booking.cafeName ?? booking.cafeId),
         ),
       ],
       child: _CheckoutView(originalBooking: booking),
@@ -95,19 +97,30 @@ class _CheckoutViewState extends State<_CheckoutView> {
   BookingEntity _resolveLiveBooking(BookingEntity base) {
     return BookingEntity(
       id: base.id.isNotEmpty ? base.id : widget.originalBooking.id,
-      userId: base.userId.isNotEmpty ? base.userId : widget.originalBooking.userId,
-      cafeId: widget.originalBooking.cafeId.isNotEmpty ? widget.originalBooking.cafeId : base.cafeId,
-      cafeName: (widget.originalBooking.cafeName != null && widget.originalBooking.cafeName!.isNotEmpty)
+      userId: base.userId.isNotEmpty
+          ? base.userId
+          : widget.originalBooking.userId,
+      cafeId: widget.originalBooking.cafeId.isNotEmpty
+          ? widget.originalBooking.cafeId
+          : base.cafeId,
+      cafeName:
+          widget.originalBooking.cafeName != null &&
+              widget.originalBooking.cafeName!.isNotEmpty
           ? widget.originalBooking.cafeName
           : base.cafeName,
-      cafeLocation: (widget.originalBooking.cafeLocation != null && widget.originalBooking.cafeLocation!.isNotEmpty)
+      cafeLocation:
+          widget.originalBooking.cafeLocation != null &&
+              widget.originalBooking.cafeLocation!.isNotEmpty
           ? widget.originalBooking.cafeLocation
           : base.cafeLocation,
       date: widget.originalBooking.date ?? base.date,
       time: widget.originalBooking.time ?? base.time,
-      guests: widget.originalBooking.guests > 0 ? widget.originalBooking.guests : base.guests,
+      guests: widget.originalBooking.guests > 0
+          ? widget.originalBooking.guests
+          : base.guests,
       occasion: widget.originalBooking.occasion ?? base.occasion,
-      seatingPreference: widget.originalBooking.seatingPreference ?? base.seatingPreference,
+      seatingPreference:
+          widget.originalBooking.seatingPreference ?? base.seatingPreference,
       status: base.status,
       createdAt: base.createdAt,
       totalAmount: base.totalAmount,
@@ -130,7 +143,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
           style: AppTypography.titleLarge,
         ),
         leading: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: CircleAvatar(
             backgroundColor: AppColors.surfaceVariant,
             child: IconButton(
@@ -166,16 +179,25 @@ class _CheckoutViewState extends State<_CheckoutView> {
               ),
             );
 
-            if (isSuccess == true && context.mounted) {
-              context.read<CheckoutCubit>().finalizePaymobSuccess(booking);
-              context.read<CheckoutCubit>().finalizePaymobSuccess(
+            if (!context.mounted) {
+              return;
+            }
+
+            /*
+             * مهم جدًا:
+             * finalize مرة واحدة فقط.
+             */
+            if (isSuccess == true) {
+              await context.read<CheckoutCubit>().finalizePaymobSuccess(
                 state.booking,
               );
-            } else if (isSuccess == false && context.mounted) {
+            } else {
               AppToast.showToast(
                 context: context,
                 title: AppLocale.toastError.getString(context),
-                description: 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى',
+                description:
+                    'لم يتم تأكيد عملية الدفع، '
+                    'ولم يتم إنشاء الحجز.',
                 type: ToastificationType.error,
               );
             }
@@ -193,39 +215,49 @@ class _CheckoutViewState extends State<_CheckoutView> {
 
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (_) => ReservationConfirmedScreen(
-                  booking: finalBooking,
-                ),
+                builder: (_) =>
+                    ReservationConfirmedScreen(booking: finalBooking),
               ),
             );
           }
         },
         builder: (context, state) {
           final checkoutCubit = context.read<CheckoutCubit>();
-          final isSubmitting = state is CheckoutLoadingState && state.isSubmitting;
+
+          final isSubmitting =
+              state is CheckoutLoadingState && state.isSubmitting;
+
           final selectedMethod = state is CheckoutLoadingState
               ? state.selectedPaymentMethod
               : const PaymentMethodEntity(
-            id: 'card',
-            title: 'بطاقة ائتمان / خصم مباشر',
-            type: PaymentType.card,
-            isSelected: true,
-          );
+                  id: 'card',
+                  title: 'بطاقة ائتمان / خصم مباشر',
+                  type: PaymentType.card,
+                  isSelected: true,
+                );
 
           return BlocBuilder<CartCubit, CartState>(
             builder: (context, cartState) {
               final cartCubit = context.read<CartCubit>();
-              final List<CartItemEntity> cartItems =
-              cartState is CartLoaded ? cartState.items : [];
-              final String orderNotes =
-              cartState is CartLoaded ? cartState.orderNotes : '';
-              final double preOrdersAmount =
-              cartState is CartLoaded ? cartState.subtotal : 0.0;
 
-              const double reservationFee = 50.0;
-              const double taxRate = 0.14;
-              final double taxableAmount = reservationFee + preOrdersAmount;
-              final double totalAmount = taxableAmount * (1 + taxRate);
+              final cartItems = cartState is CartLoaded
+                  ? cartState.items
+                  : <CartItemEntity>[];
+
+              final orderNotes = cartState is CartLoaded
+                  ? cartState.orderNotes
+                  : '';
+
+              final preOrdersAmount = cartState is CartLoaded
+                  ? cartState.subtotal
+                  : 0.0;
+
+              const reservationFee = 50.0;
+              const taxRate = 0.14;
+
+              final taxableAmount = reservationFee + preOrdersAmount;
+
+              final totalAmount = taxableAmount * (1 + taxRate);
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
@@ -282,29 +314,30 @@ class _CheckoutViewState extends State<_CheckoutView> {
                         onPressed: isSubmitting
                             ? null
                             : () {
-                          WalletPaymentDetails? walletDetails;
-                          if (selectedMethod.type == PaymentType.wallet ||
-                              selectedMethod.id == 'wallet') {
-                            walletDetails = WalletPaymentDetails(
-                              phoneNumber:
-                              _phoneWalletController.text.trim(),
-                            );
-                          }
+                                WalletPaymentDetails? walletDetails;
 
-                          final user = FirebaseAuth.instance.currentUser;
+                                if (selectedMethod.type == PaymentType.wallet ||
+                                    selectedMethod.id == 'wallet') {
+                                  walletDetails = WalletPaymentDetails(
+                                    phoneNumber: _phoneWalletController.text
+                                        .trim(),
+                                  );
+                                }
 
-                          checkoutCubit.confirmAndPay(
-                            walletDetails: walletDetails,
-                            totalAmount: totalAmount,
-                            userEmail:
-                            user?.email ?? 'customer@madinaty.com',
-                            userPhone:
-                            user?.phoneNumber ?? '+201000000000',
-                            userName: user?.displayName ?? 'عميل مدينتي',
-                            cartItems: cartItems,
-                            orderNotes: orderNotes,
-                          );
-                        },
+                                final user = FirebaseAuth.instance.currentUser;
+
+                                checkoutCubit.confirmAndPay(
+                                  walletDetails: walletDetails,
+                                  totalAmount: totalAmount,
+                                  userEmail:
+                                      user?.email ?? 'customer@madinaty.com',
+                                  userPhone:
+                                      user?.phoneNumber ?? '+201000000000',
+                                  userName: user?.displayName ?? 'عميل مدينتي',
+                                  cartItems: cartItems,
+                                  orderNotes: orderNotes,
+                                );
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.darkButton,
                           foregroundColor: AppColors.onDarkButton,
@@ -315,30 +348,30 @@ class _CheckoutViewState extends State<_CheckoutView> {
                         ),
                         child: isSubmitting
                             ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: AppColors.textWhite,
-                          ),
-                        )
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.textWhite,
+                                ),
+                              )
                             : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.lock_outline_rounded,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              AppLocale.confirmAndPay.getString(context),
-                              style: AppTypography.labelLarge.copyWith(
-                                color: AppColors.onDarkButton,
-                                fontWeight: FontWeight.bold,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.lock_outline_rounded,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    AppLocale.confirmAndPay.getString(context),
+                                    style: AppTypography.labelLarge.copyWith(
+                                      color: AppColors.onDarkButton,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                     const SizedBox(height: 12),

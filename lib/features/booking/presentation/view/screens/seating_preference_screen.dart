@@ -9,11 +9,11 @@ import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/domain/entities/booking_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/widgets/cafe_header_card.dart';
 import 'package:madinaty_app_ieee_2026/features/booking/presentation/view/widgets/legend_item.dart';
+import 'package:madinaty_app_ieee_2026/features/booking/presentation/view_model/cubit/booking_state.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../view_model/cubit/booking_cubit.dart';
-import '../../view_model/cubit/booking_state.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/seating_filter_chip.dart';
 import '../widgets/seating_map.dart';
@@ -30,7 +30,7 @@ class SeatingPreferenceScreen extends StatefulWidget {
 
 class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
   int _selectedFilterIndex = 0;
-  String? selectedTable = 'T3';
+  String? selectedTable;
 
   List<String> _getFilters(BuildContext context) => [
     AppLocale.filterAll.getString(context),
@@ -67,51 +67,9 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
           ),
         ),
       ),
-      body: BlocConsumer<BookingCubit, BookingState>(
-        listener: (context, state) {
-          if (state is BookingSuccess) {
-            final cubit = context.read<BookingCubit>();
-
-            final booking = BookingEntity(
-              id: state.bookingId,
-              userId: FirebaseAuth.instance.currentUser?.uid ?? 'guest_user',
-              cafeId: widget.cafe.id,
-              cafeName: widget.cafe.name,
-              cafeLocation: widget.cafe.address,
-              date: cubit.date ?? DateTime.now(),
-              time: cubit.time ?? '18:00',
-              guests: cubit.guests,
-              occasion: cubit.occasion ?? 'casual_coffee',
-              seatingPreference: selectedTable ?? 'T3',
-              status: BookingStatus.pending,
-              createdAt: DateTime.now(),
-            );
-
-            Navigator.pushNamed(
-              context,
-              AppRoutes.preOrder,
-              arguments: {
-                'booking': booking,
-                'cafeId': widget.cafe.id,
-                'cafeName': widget.cafe.name,
-                'cafeLocation': widget.cafe.address,
-                'cafe': widget.cafe,
-              },
-            );
-          }
-
-          if (state is BookingFailure) {
-            AppToast.showToast(
-              context: context,
-              title: AppLocale.toastError.getString(context),
-              description: state.message,
-              type: ToastificationType.error,
-            );
-          }
-        },
+      body: BlocBuilder<BookingCubit, BookingState>(
         builder: (context, state) {
           final cubit = context.read<BookingCubit>();
-          final isLoading = state is BookingLoading;
 
           return Column(
             children: [
@@ -129,6 +87,7 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                             : null,
                       ),
                       const SizedBox(height: 12),
+
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Row(
@@ -153,7 +112,9 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                           ],
                         ),
                       ),
+
                       const SizedBox(height: 18),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -173,14 +134,16 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                           ),
                         ],
                       ),
+
                       const SizedBox(height: 18),
+
                       SizedBox(
                         height: 38,
                         child: ListView.separated(
                           itemCount: filters.length,
                           scrollDirection: Axis.horizontal,
                           separatorBuilder: (context, index) =>
-                          const SizedBox(width: 7),
+                              const SizedBox(width: 7),
                           itemBuilder: (context, index) {
                             final filter = filters[index];
 
@@ -196,7 +159,9 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                           },
                         ),
                       ),
+
                       const SizedBox(height: 18),
+
                       SeatingMap(
                         filterCategory: selectedFilter,
                         selectedTable: selectedTable,
@@ -206,7 +171,9 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                           });
                         },
                       ),
+
                       const SizedBox(height: 18),
+
                       Text(
                         AppLocale.chooseSuitablePlaceHint.getString(context),
                         style: const TextStyle(
@@ -218,6 +185,7 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                   ),
                 ),
               ),
+
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                 decoration: BoxDecoration(
@@ -236,23 +204,21 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                 child: Column(
                   children: [
                     BookingSummaryCard(
-                      table: selectedTable ?? 'T3',
+                      table: selectedTable ?? '--',
                       time: cubit.time,
                       guests: cubit.guests,
                     ),
                     const SizedBox(height: 15),
+
                     SizedBox(
                       width: double.infinity,
                       height: 54,
                       child: ElevatedButton(
-                        onPressed: isLoading
-                            ? null
-                            : () {
+                        onPressed: () {
                           if (selectedTable == null) {
                             AppToast.showToast(
                               context: context,
-                              title: AppLocale.toastError
-                                  .getString(context),
+                              title: AppLocale.toastError.getString(context),
                               description: AppLocale.selectFirstTableError
                                   .getString(context),
                               type: ToastificationType.warning,
@@ -260,8 +226,51 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                             return;
                           }
 
+                          final user = FirebaseAuth.instance.currentUser;
+
+                          if (user == null) {
+                            AppToast.showToast(
+                              context: context,
+                              title: AppLocale.toastError.getString(context),
+                              description: AppLocale.loginRequiredBookingError
+                                  .getString(context),
+                              type: ToastificationType.error,
+                            );
+                            return;
+                          }
+
+                          // نحفظ اختيار الترابيزة داخل الـ Cubit فقط.
+                          // لا يوجد أي Firestore write هنا.
                           cubit.selectSeatingPreference(selectedTable!);
-                          cubit.createBooking();
+
+                          final booking = BookingEntity(
+                            id: '',
+                            userId: user.uid,
+                            cafeId: widget.cafe.id,
+                            cafeName: widget.cafe.name,
+                            cafeLocation: widget.cafe.address,
+                            date: cubit.date ?? DateTime.now(),
+                            time: cubit.time ?? '',
+                            guests: cubit.guests,
+                            occasion: cubit.occasion ?? 'casual_coffee',
+                            seatingPreference: selectedTable!,
+                            status: BookingStatus.pending,
+                            createdAt: DateTime.now(),
+                            totalAmount: 50,
+                            reservationFee: 50,
+                          );
+
+                          // مهم:
+                          // هنا لا نستدعي createBooking().
+                          // ولا CreateBookingUseCase.
+                          // ولا نكتب في Firebase.
+                          //
+                          // فقط نمرر بيانات الحجز إلى الـ Checkout.
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.checkout,
+                            arguments: booking,
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.darkButton,
@@ -272,26 +281,13 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: isLoading
-                            ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            color: AppColors.textWhite,
-                            strokeWidth: 2,
-                          ),
-                        )
-                            : Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.check_circle_outline,
-                              size: 20,
-                            ),
+                            const Icon(Icons.check_circle_outline, size: 20),
                             const SizedBox(width: 8),
                             Text(
-                              AppLocale.confirmBookingButton
-                                  .getString(context),
+                              AppLocale.confirmBookingButton.getString(context),
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,

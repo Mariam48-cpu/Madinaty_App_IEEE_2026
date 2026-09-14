@@ -67,12 +67,19 @@ class _CafeDetailsScreenState extends State<CafeDetailsScreen> {
     final ratingLabel = AppLocale.shareRating.getString(context);
     final addressLabel = AppLocale.shareAddress.getString(context);
     final footer = AppLocale.shareFooter.getString(context);
-    final subject = AppLocale.shareCafeSubject.getString(context).replaceAll('%a', cafe.name);
+    final subject = AppLocale.shareCafeSubject
+        .getString(context)
+        .replaceAll('%a', cafe.name);
 
-    final text = '''
+    final mapsLink =
+        'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent('${cafe.name} ${cafe.address}')}';
+
+    final text =
+        '''
 ☕ ${cafe.name}
 ⭐ $ratingLabel: ${cafe.rating.toStringAsFixed(1)} / 5
 📍 $addressLabel: ${cafe.address}
+🔗 $mapsLink
 
 $footer
 ''';
@@ -80,7 +87,12 @@ $footer
     Share.share(
       text,
       subject: subject,
-      sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, 100),
+      sharePositionOrigin: Rect.fromLTWH(
+        0,
+        0,
+        MediaQuery.of(context).size.width,
+        100,
+      ),
     );
   }
 
@@ -196,13 +208,13 @@ $footer
                                           child: CafeMainCard(
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.end,
+                                                  CrossAxisAlignment.end,
                                               children: [
                                                 CafeHeader(
                                                   name: cafe.name,
                                                   rating: cafe.rating,
                                                   reviewsCount:
-                                                  cafe.reviewsCount,
+                                                      cafe.reviewsCount,
                                                   onReviewsTap: () {
                                                     Navigator.push(
                                                       context,
@@ -211,7 +223,7 @@ $footer
                                                             ReviewsScreen(
                                                               cafeId: cafe.id,
                                                               cafeName:
-                                                              cafe.name,
+                                                                  cafe.name,
                                                             ),
                                                       ),
                                                     );
@@ -233,10 +245,11 @@ $footer
                                           ),
                                           child: Column(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.end,
+                                                CrossAxisAlignment.end,
                                             children: [
                                               Text(
-                                                AppLocale.aboutCafeLabel.getString(context),
+                                                AppLocale.aboutCafeLabel
+                                                    .getString(context),
                                                 style: const TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -308,7 +321,7 @@ $footer
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius:
-                                              BorderRadius.circular(16),
+                                                  BorderRadius.circular(16),
                                               border: Border.all(
                                                 color: const Color(0xFFF0E5DA),
                                               ),
@@ -331,7 +344,7 @@ $footer
                                                 const Spacer(),
                                                 Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
+                                                      CrossAxisAlignment.end,
                                                   children: [
                                                     Text(
                                                       AppLocale
@@ -340,7 +353,7 @@ $footer
                                                       style: const TextStyle(
                                                         fontSize: 15,
                                                         fontWeight:
-                                                        FontWeight.bold,
+                                                            FontWeight.bold,
                                                         color: Color(
                                                           0xFF2D2521,
                                                         ),
@@ -355,7 +368,7 @@ $footer
                                                           0xFF8A5A36,
                                                         ),
                                                         fontWeight:
-                                                        FontWeight.w600,
+                                                            FontWeight.w600,
                                                       ),
                                                     ),
                                                   ],
@@ -370,9 +383,9 @@ $footer
                                                       0xFFFFF3EB,
                                                     ),
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                      10,
-                                                    ),
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
                                                   ),
                                                   child: const Icon(
                                                     Icons.rate_review_outlined,
@@ -404,7 +417,9 @@ $footer
                       bookingCubit.setCafeDetails(
                         id: cafe.id,
                         name: cafe.name,
-                        location: cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
+                        location: cafe.address.isNotEmpty
+                            ? cafe.address
+                            : 'بنها، الفلل',
                       );
 
                       Navigator.push(
@@ -422,7 +437,9 @@ $footer
                       bookingCubit.setCafeDetails(
                         id: cafe.id,
                         name: cafe.name,
-                        location: cafe.address.isNotEmpty ? cafe.address : 'بنها، الفلل',
+                        location: cafe.address.isNotEmpty
+                            ? cafe.address
+                            : 'بنها، الفلل',
                       );
 
                       Navigator.push(

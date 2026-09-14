@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/screens/cafe_picker_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/screens/spin_wheel_screen.dart';
@@ -32,7 +36,10 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Group Room'), centerTitle: true),
+      appBar: AppBar(
+        title: Text(AppLocale.groupRoomTitle.getString(context)),
+        centerTitle: true,
+      ),
       body: BlocBuilder<GroupCafeCubit, GroupCafeState>(
         builder: (context, state) {
           if (state is GroupCafeLoading) {
@@ -60,7 +67,7 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                           widget.groupId,
                         );
                       },
-                      child: const Text('Try Again'),
+                      child: Text(AppLocale.tryAgainBtn.getString(context)),
                     ),
                   ],
                 ),
@@ -69,7 +76,9 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
           }
 
           if (state is! GroupCafeLoaded) {
-            return const Center(child: Text('Group not found'));
+            return Center(
+              child: Text(AppLocale.groupNotFoundError.getString(context)),
+            );
           }
 
           final group = state.group;
@@ -111,8 +120,8 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Plan your next coffee outing together ☕',
+                        Text(
+                          AppLocale.groupRoomSubtitle.getString(context),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -139,7 +148,7 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                           child: Column(
                             children: [
                               Text(
-                                'Invite Code',
+                                AppLocale.inviteCodeLabel.getString(context),
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Theme.of(context).colorScheme.onSurface
@@ -174,9 +183,9 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text(
-                        'Group Members',
-                        style: TextStyle(
+                      Text(
+                        AppLocale.groupMembersTitle.getString(context),
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -226,7 +235,7 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                               children: [
                                 Text(
                                   isCurrentUser
-                                      ? '${member.name} (You)'
+                                      ? '${member.name} ${AppLocale.youSuffix.getString(context)}'
                                       : member.name,
                                   style: const TextStyle(
                                     fontSize: 15,
@@ -236,8 +245,10 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   member.isReady
-                                      ? 'Ready ✓'
-                                      : 'Choosing cafes...',
+                                      ? AppLocale.readyStatus.getString(context)
+                                      : AppLocale.choosingStatus.getString(
+                                          context,
+                                        ),
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: member.isReady
@@ -281,18 +292,18 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                         borderRadius: BorderRadius.circular(18),
                         color: Colors.green.withValues(alpha: 0.10),
                       ),
-                      child: const Column(
+                      child: Column(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.celebration_rounded,
                             color: Colors.green,
                             size: 38,
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
-                            'The winner has been selected! 🎉',
+                            AppLocale.winnerSelectedBanner.getString(context),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -325,8 +336,12 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                           Expanded(
                             child: Text(
                               everyoneReady
-                                  ? 'Everyone is ready! 🎉'
-                                  : 'Waiting for everyone to finish choosing.',
+                                  ? AppLocale.everyoneReadyBanner.getString(
+                                      context,
+                                    )
+                                  : AppLocale.waitingForOthersBanner.getString(
+                                      context,
+                                    ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -356,9 +371,9 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                             );
                           },
                           icon: const Icon(Icons.local_cafe_rounded),
-                          label: const Text(
-                            'Choose My Cafes',
-                            style: TextStyle(
+                          label: Text(
+                            AppLocale.chooseMyCafesBtn.getString(context),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -382,9 +397,9 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                             );
                           },
                           icon: const Icon(Icons.casino_rounded),
-                          label: const Text(
-                            'Spin The Wheel 🎡',
-                            style: TextStyle(
+                          label: Text(
+                            AppLocale.spinTheWheelBtn.getString(context),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -403,17 +418,21 @@ class _GroupRoomScreenState extends State<GroupRoomScreen> {
                             ).colorScheme.outline.withValues(alpha: 0.25),
                           ),
                         ),
-                        child: const Column(
+                        child: Column(
                           children: [
-                            Icon(Icons.hourglass_top_rounded, size: 30),
-                            SizedBox(height: 8),
+                            const Icon(Icons.hourglass_top_rounded, size: 30),
+                            const SizedBox(height: 8),
                             Text(
-                              'Everyone is ready!',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              AppLocale.everyoneIsReadySub.getString(context),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
-                              'Waiting for the creator to spin the wheel 🎡',
+                              AppLocale.waitingForCreatorSpin.getString(
+                                context,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ],

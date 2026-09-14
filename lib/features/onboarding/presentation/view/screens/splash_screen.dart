@@ -2,11 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localization/flutter_localization.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:madinaty_app_ieee_2026/core/di/injection_container.dart';
-import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
@@ -30,6 +28,8 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _logoAnimation;
   late Animation<double> _textAnimation;
 
+  bool _isNavigating = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,11 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _textAnimation = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(
-        0.35,
-        1.0,
-        curve: Curves.easeIn,
-      ),
+      curve: const Interval(0.35, 1.0, curve: Curves.easeIn),
     );
 
     _controller.forward();
@@ -58,62 +54,50 @@ class _SplashScreenState extends State<SplashScreen>
     _handleNavigation();
   }
 
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+
   Future<void> _handleNavigation() async {
-    print('========== SPLASH START ==========');
+    if (_isNavigating) return;
 
     await Future.delayed(const Duration(seconds: 2));
 
-    print('1 - Delay finished');
-
-    if (!mounted) return;
-
-    print('2 - Getting onboarding status');
+    if (!mounted || _isNavigating) return;
 
     final isOnboardingSeen = await GetIt.I<IsOnboardingSeen>().call();
 
-    print('3 - Onboarding seen: $isOnboardingSeen');
+    if (!mounted || _isNavigating) return;
 
-    if (!mounted) return;
+    // ============================================================
+    // FIRST LAUNCH
+    // ============================================================
 
-    // First launch -> Onboarding
     if (!isOnboardingSeen) {
-      print('4 - Going to Onboarding');
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const OnboardingScreen(),
-        ),
-      );
-
+      _navigateToOnboarding();
       return;
     }
 
-    print('5 - Checking Firebase user');
+    // ============================================================
+    // FIREBASE USER
+    // ============================================================
 
     final currentUser = FirebaseAuth.instance.currentUser;
 
-    print('6 - Current user: $currentUser');
+    if (!mounted || _isNavigating) return;
 
-    if (!mounted) return;
+    // ============================================================
+    // NOT LOGGED IN
+    // ============================================================
 
-    // User is not logged in
     if (currentUser == null) {
-      print('7 - User NOT logged in');
-      print('8 - Going to Auth');
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const AuthScreen(),
-        ),
-      );
-
+      _navigateToAuth();
       return;
     }
 
-    // User is logged in
-    print('7 - User logged in');
+    // ============================================================
+    // GET USER DATA
+    // ============================================================
 
     try {
       final userDoc = await FirebaseFirestore.instance
@@ -121,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
           .doc(currentUser.uid)
           .get();
 
-      if (!mounted) return;
+      if (!mounted || _isNavigating) return;
 
       if (userDoc.exists && userDoc.data() != null) {
         final data = userDoc.data()!;
@@ -132,64 +116,131 @@ class _SplashScreenState extends State<SplashScreen>
 
         final interests = data['interests'] as List<dynamic>?;
 
-        // Cafe owner
-        if (role == 'cafe_owner' || role == 'cafeowner') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => OwnerDashboardScreen(
-                cafeId: cafeId ?? '',
-              ),
-            ),
-          );
+        // ========================================================
+        // CAFE OWNER
+        // ========================================================
 
+        if (role == 'cafe_owner' || role == 'cafeowner') {
+          _navigateToOwnerDashboard(cafeId ?? '');
           return;
         }
 
-        // Existing customer with interests
-        if (interests != null && interests.isNotEmpty) {
-          Navigator.pushReplacementNamed(
-            context,
-            AppRoutes.home,
-          );
+        // ========================================================
+        // EXISTING CUSTOMER
+        //
+        // مهم:
+        // لو عنده interests محفوظة، مش هنروح Home مباشرة.
+        //
+        // هنفتح Personalization على STEP 1:
+        // "ليه خارج النهارده؟"
+        // ========================================================
 
+        if (interests != null && interests.isNotEmpty) {
+          _navigateToPersonalization(initialStep: 1);
           return;
         }
       }
 
-      // Logged-in user without personalization data
-      print('8 - Getting DiscoveryCubit');
+      // ==========================================================
+      // NEW CUSTOMER
+      //
+      // مفيش interests محفوظة
+      // نبدأ من STEP 0:
+      // "إيه اللي بتحبه؟"
+      // ==========================================================
 
-      final discoveryCubit = sl<DiscoveryCubit>();
+      _navigateToPersonalization(initialStep: 0);
+    } catch (_) {
+      if (!mounted || _isNavigating) return;
 
-      print('9 - DiscoveryCubit created');
-      print(
-        '10 - Current location: ${discoveryCubit.currentLocation}',
-      );
+      // لو حصل خطأ في قراءة Firestore
+      // نرجع للـ Home بدل ما التطبيق يعلق.
+      _navigateToHome();
+    }
+  }
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BlocProvider<DiscoveryCubit>.value(
-            value: discoveryCubit,
-            child: PersonalizationScreen(
-              userLocation: discoveryCubit.currentLocation,
-            ),
+  // ============================================================
+  // GO TO ONBOARDING
+  // ============================================================
+
+  void _navigateToOnboarding() {
+    if (_isNavigating || !mounted) return;
+
+    _isNavigating = true;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+      (route) => false,
+    );
+  }
+
+  // ============================================================
+  // GO TO AUTH
+  // ============================================================
+
+  void _navigateToAuth() {
+    if (_isNavigating || !mounted) return;
+
+    _isNavigating = true;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const AuthScreen()),
+      (route) => false,
+    );
+  }
+
+  // ============================================================
+  // GO TO OWNER DASHBOARD
+  // ============================================================
+
+  void _navigateToOwnerDashboard(String cafeId) {
+    if (_isNavigating || !mounted) return;
+
+    _isNavigating = true;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => OwnerDashboardScreen(cafeId: cafeId)),
+      (route) => false,
+    );
+  }
+
+  // ============================================================
+  // GO TO PERSONALIZATION
+  // ============================================================
+
+  void _navigateToPersonalization({required int initialStep}) {
+    if (_isNavigating || !mounted) return;
+
+    final discoveryCubit = sl<DiscoveryCubit>();
+
+    _isNavigating = true;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider<DiscoveryCubit>.value(
+          value: discoveryCubit,
+          child: PersonalizationScreen(
+            initialStep: initialStep,
+            userLocation: discoveryCubit.currentLocation,
           ),
         ),
-      );
+      ),
+      (route) => false,
+    );
+  }
 
-      print('11 - Navigation to Personalization done');
-    } catch (e) {
-      print('Splash navigation error: $e');
+  // ============================================================
+  // GO TO HOME
+  // ============================================================
 
-      if (!mounted) return;
+  void _navigateToHome() {
+    if (_isNavigating || !mounted) return;
 
-      Navigator.pushReplacementNamed(
-        context,
-        AppRoutes.home,
-      );
-    }
+    _isNavigating = true;
+
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
   }
 
   @override
@@ -197,6 +248,10 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.dispose();
     super.dispose();
   }
+
+  // ============================================================
+  // UI
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -218,20 +273,24 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
             ),
+
             const SizedBox(height: 28),
+
             FadeTransition(
               opacity: _textAnimation,
               child: Column(
                 children: [
-                  Text(
-                    AppLocale.appTitle.getString(context),
-                    style: const TextStyle(
+                  const Text(
+                    'Madinaty',
+                    style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
+
                   const SizedBox(height: 4),
+
                   const Text(
                     'MADINATY',
                     style: TextStyle(

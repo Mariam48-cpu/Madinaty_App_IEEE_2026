@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class SpinWheelHeader extends StatelessWidget {
   final int cafeCount;
 
-  const SpinWheelHeader({
-    super.key,
-    required this.cafeCount,
-  });
+  const SpinWheelHeader({super.key, required this.cafeCount});
 
   @override
   Widget build(BuildContext context) {
@@ -15,41 +14,36 @@ class SpinWheelHeader extends StatelessWidget {
       children: [
         const SizedBox(height: 12),
 
-        const Text(
-          'Where are we going? ☕',
+        Text(
+          AppLocale.whereAreWeGoingTitle.getString(context),
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-          ),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
         ),
 
         const SizedBox(height: 5),
 
         Text(
-          'Let the group decide!',
+          AppLocale.letTheGroupDecideSubtitle.getString(context),
           style: TextStyle(
             fontSize: 14,
-            color: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withValues(alpha: 0.55),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.55),
           ),
         ),
 
         const SizedBox(height: 15),
 
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            '$cafeCount cafes competing',
+            AppLocale.cafesCompetingCount
+                .getString(context)
+                .replaceAll('{count}', '$cafeCount'),
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:madinaty_app_ieee_2026/features/cart/domain/entities/cart_item_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cart/domain/use_cases/clear_cart_use_case.dart';
 import 'package:madinaty_app_ieee_2026/features/checkout/presentation/view_model/checkout_state.dart';
@@ -27,6 +28,13 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
   String _pendingOrderNotes = '';
 
+  bool _isFinalizing = false;
+
+  /*
+   * يمنع تأكيد نفس عملية Paymob أكثر من مرة.
+   */
+  bool _paymobAlreadyConfirmed = false;
+
   PaymentMethodEntity _selectedMethod = const PaymentMethodEntity(
     id: 'card',
     title: 'بطاقة ائتمان / خصم مباشر',
@@ -43,26 +51,30 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     required CreateNotificationUseCase createNotificationUseCase,
     required BookingEntity initialBooking,
   }) : _confirmBookingUseCase = confirmBookingUseCase,
-        _getPaymobUrlUseCase = getPaymobUrlUseCase,
-        _getPaymobWalletUrlUseCase = getPaymobWalletUrlUseCase,
-        _createPreOrderUseCase = createPreOrderUseCase,
-        _clearCartUseCase = clearCartUseCase,
-        _createNotificationUseCase = createNotificationUseCase,
-        super(
-        CheckoutLoadingState(
-          booking: initialBooking,
-          selectedPaymentMethod: const PaymentMethodEntity(
-            id: 'card',
-            title: 'بطاقة ائتمان / خصم مباشر',
-            type: PaymentType.card,
-            isSelected: true,
-          ),
-        ),
-      ) {
+       _getPaymobUrlUseCase = getPaymobUrlUseCase,
+       _getPaymobWalletUrlUseCase = getPaymobWalletUrlUseCase,
+       _createPreOrderUseCase = createPreOrderUseCase,
+       _clearCartUseCase = clearCartUseCase,
+       _createNotificationUseCase = createNotificationUseCase,
+       super(
+         CheckoutLoadingState(
+           booking: initialBooking,
+           selectedPaymentMethod: const PaymentMethodEntity(
+             id: 'card',
+             title: 'بطاقة ائتمان / خصم مباشر',
+             type: PaymentType.card,
+             isSelected: true,
+           ),
+         ),
+       ) {
     _currentBooking = initialBooking;
   }
 
   void selectPaymentMethod(PaymentMethodEntity method) {
+    if (_isFinalizing) {
+      return;
+    }
+
     _selectedMethod = method;
 
     emit(
@@ -83,24 +95,40 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     List<CartItemEntity> cartItems = const [],
     String orderNotes = '',
   }) async {
+    /*
+     * منع الضغط المتكرر.
+     */
+    if (_isFinalizing) {
+      return;
+    }
+
+    /*
+     * منع بدء عملية جديدة لو Paymob
+     * تم تأكيدها بالفعل.
+     */
+    if (_paymobAlreadyConfirmed) {
+      return;
+    }
+
     _pendingCartItems = cartItems;
     _pendingOrderNotes = orderNotes;
 
     final isCard =
         _selectedMethod.type == PaymentType.card ||
-            _selectedMethod.id == 'card';
+        _selectedMethod.id == 'card';
 
     final isWallet =
         _selectedMethod.type == PaymentType.wallet ||
-            _selectedMethod.id == 'wallet';
+        _selectedMethod.id == 'wallet';
 
     if (isWallet) {
-      if (walletDetails == null ||
-          walletDetails.phoneNumber.trim().length != 11 ||
-          !walletDetails.phoneNumber.trim().startsWith('01')) {
+      final phone = walletDetails?.phoneNumber.trim() ?? '';
+
+      if (phone.length != 11 || !phone.startsWith('01')) {
         emit(
           const CheckoutErrorState(
-            'يرجى إدخال رقم محفظة إلكترونية صحيح (11 رقماً يبدأ بـ 01)',
+            'يرجى إدخال رقم محفظة إلكترونية صحيح '
+            '(11 رقماً يبدأ بـ 01)',
           ),
         );
         return;
@@ -116,6 +144,15 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     );
 
     try {
+      /*
+       * ========================================================
+       * CARD
+       * ========================================================
+       *
+       * هنا لا يوجد أي Firebase Booking.
+       *
+       * فقط نطلب رابط Paymob.
+       */
       if (isCard) {
         final paymentUrl = await _getPaymobUrlUseCase(
           amount: totalAmount > 0 ? totalAmount : 50.0,
@@ -134,6 +171,13 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         return;
       }
 
+      /*
+       * ========================================================
+       * WALLET
+       * ========================================================
+       *
+       * برضه لا يوجد أي Firebase Booking هنا.
+       */
       if (isWallet) {
         final walletNumber = walletDetails?.phoneNumber.trim() ?? '';
 
@@ -155,19 +199,52 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         return;
       }
 
+      /*
+       * ========================================================
+       * CASH
+       * ========================================================
+       *
+       * الدفع النقدي هو الحالة الوحيدة التي نؤكد فيها
+       * الحجز مباشرة بدون Paymob.
+       */
       final bookingModel = BookingModel.fromEntity(_currentBooking);
 
       final confirmedBooking = await _confirmBookingUseCase(bookingModel);
+
       await _processPreOrderAndCart(confirmedBooking);
+
       await _createBookingNotification(confirmedBooking);
+
+      _currentBooking = confirmedBooking;
 
       emit(CheckoutSuccessState(confirmedBooking));
     } catch (e) {
-      emit(CheckoutErrorState(e.toString().replaceAll('Exception: ', '')));
+      emit(CheckoutErrorState(_cleanError(e)));
     }
   }
 
   Future<void> finalizePaymobSuccess(BookingEntity booking) async {
+    /*
+     * لو فيه finalize شغال بالفعل:
+     * لا ننفذ مرة ثانية.
+     */
+    if (_isFinalizing) {
+      return;
+    }
+
+    /*
+     * لو العملية اتأكدت بالفعل:
+     * لا ننشئ Booking ثاني.
+     */
+    if (_paymobAlreadyConfirmed) {
+      return;
+    }
+
+    /*
+     * هنا فقط نبدأ إنشاء الحجز بعد Paymob success.
+     */
+    _isFinalizing = true;
+
     emit(
       CheckoutLoadingState(
         booking: booking,
@@ -177,21 +254,57 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     );
 
     try {
-      final bookingModel = BookingModel.fromEntity(booking);
+      /*
+       * نستخدم بيانات الحجز الأصلية.
+       */
+      _currentBooking = booking;
 
+      final bookingModel = BookingModel.fromEntity(_currentBooking);
+
+      /*
+       * هنا فقط:
+       *
+       * Firebase Booking creation
+       *
+       * وقبل هذه اللحظة لا يوجد Booking.
+       */
       final confirmedBooking = await _confirmBookingUseCase(bookingModel);
+
+      /*
+       * نعتبر العملية confirmed
+       * فقط بعد نجاح إنشاء Booking.
+       */
+      _paymobAlreadyConfirmed = true;
+
+      /*
+       * Pre-order بعد نجاح الحجز فقط.
+       */
       await _processPreOrderAndCart(confirmedBooking);
 
+      /*
+       * Notification بعد نجاح الحجز فقط.
+       */
       await _createBookingNotification(confirmedBooking);
+
+      _currentBooking = confirmedBooking;
 
       emit(CheckoutSuccessState(confirmedBooking));
     } catch (e) {
-      emit(CheckoutErrorState(e.toString().replaceAll('Exception: ', '')));
+      /*
+       * مهم:
+       * لو إنشاء الحجز فشل، لا نعتبر Paymob
+       * confirmed داخل الـ Cubit.
+       */
+      _paymobAlreadyConfirmed = false;
+
+      emit(CheckoutErrorState(_cleanError(e)));
+    } finally {
+      _isFinalizing = false;
     }
   }
 
   Future<void> _createBookingNotification(BookingEntity booking) async {
-    if (booking.userId.isEmpty) {
+    if (booking.userId.isEmpty || booking.id.isEmpty) {
       return;
     }
 
@@ -204,14 +317,8 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         bookingId: booking.id,
       );
 
-      result.fold(
-            (failure) {
-        },
-            (_) {
-        },
-      );
-    } catch (_) {
-    }
+      result.fold((_) {}, (_) {});
+    } catch (_) {}
   }
 
   Future<void> _processPreOrderAndCart(BookingEntity confirmedBooking) async {
@@ -230,6 +337,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
       if (parts.length >= 2) {
         final hour = int.tryParse(parts[0]);
+
         final minute = int.tryParse(parts[1]);
 
         if (hour != null && minute != null) {
@@ -262,5 +370,9 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     await _createPreOrderUseCase(preOrder);
 
     await _clearCartUseCase();
+  }
+
+  String _cleanError(Object error) {
+    return error.toString().replaceFirst('Exception: ', '').trim();
   }
 }

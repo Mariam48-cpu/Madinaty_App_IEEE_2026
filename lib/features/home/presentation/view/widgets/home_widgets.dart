@@ -9,6 +9,7 @@ import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/skeleton_primitive
 
 import 'package:madinaty_app_ieee_2026/features/cafe/presentation/view/screens/cafe_details_screen.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
+import 'package:madinaty_app_ieee_2026/features/discovery/presentation/view_model/cubit/discovery_cubit.dart';
 import 'package:madinaty_app_ieee_2026/features/home/domain/entities/cafe_recommendation_entity.dart';
 
 import '../../view_model/home_cubit.dart';
@@ -673,8 +674,11 @@ class ErrorStateWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () {
-                context.read<HomeCubit>().fetchHomeData();
+              onPressed: () async {
+                final discoveryCubit = context.read<DiscoveryCubit>();
+                await context.read<HomeCubit>().fetchHomeData(
+                  userLocation: discoveryCubit.currentLocation,
+                );
               },
               child: Text(AppLocale.retry.getString(context)),
             ),
@@ -717,8 +721,11 @@ class EmptyStateWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            onPressed: () {
-              context.read<HomeCubit>().fetchHomeData();
+            onPressed: () async {
+              final discoveryCubit = context.read<DiscoveryCubit>();
+              await context.read<HomeCubit>().fetchHomeData(
+                userLocation: discoveryCubit.currentLocation,
+              );
             },
             child: Text(AppLocale.retry.getString(context)),
           ),

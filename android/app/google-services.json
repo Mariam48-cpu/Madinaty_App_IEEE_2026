@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "514367928999-mipc3vc4dg2ivmh95t52jjpuksij74df.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.madinaty_app_ieee_2026",
+            "certificate_hash": "69d19ce6481b9239128d16d9ae590fad21de1308"
+          }
+        },
+        {
           "client_id": "514367928999-jev2bi7ta5h8id93eekrv6qtrsci0k0b.apps.googleusercontent.com",
           "client_type": 3
         }

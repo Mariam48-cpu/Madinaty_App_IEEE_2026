@@ -49,11 +49,7 @@ class BookingCubit extends Cubit<BookingState> {
     emit(BookingInitial());
   }
 
-  void setCafeDetails({
-    required String id,
-    String? name,
-    String? location,
-  }) {
+  void setCafeDetails({required String id, String? name, String? location}) {
     cafeId = id;
     cafeName = name;
     cafeLocation = location;
@@ -69,11 +65,7 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   void selectDate(DateTime selectedDate) {
-    date = DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-    );
+    date = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
 
     emit(BookingInitial());
   }
@@ -130,8 +122,15 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   Future<void> createBooking() async {
+    // منع الضغط على زر الحجز أكثر من مرة
+    // أثناء تنفيذ أول request.
+    if (state is BookingLoading) {
+      return;
+    }
+
     if (!validateBooking()) {
       emit(BookingFailure('complete_booking_data_error'));
+
       return;
     }
 
@@ -139,6 +138,7 @@ class BookingCubit extends Cubit<BookingState> {
 
     if (user == null) {
       emit(BookingFailure('login_required_booking_error'));
+
       return;
     }
 
@@ -164,11 +164,7 @@ class BookingCubit extends Cubit<BookingState> {
 
       emit(BookingSuccess(bookingId!));
     } catch (e) {
-      emit(
-        BookingFailure(
-          e.toString().replaceFirst('Exception: ', ''),
-        ),
-      );
+      emit(BookingFailure(e.toString().replaceFirst('Exception: ', '')));
     }
   }
 
@@ -176,11 +172,7 @@ class BookingCubit extends Cubit<BookingState> {
     try {
       return await getBookingUseCase(id);
     } catch (e) {
-      emit(
-        BookingFailure(
-          e.toString().replaceFirst('Exception: ', ''),
-        ),
-      );
+      emit(BookingFailure(e.toString().replaceFirst('Exception: ', '')));
 
       return null;
     }
@@ -193,10 +185,7 @@ class BookingCubit extends Cubit<BookingState> {
     emit(BookingLoading());
 
     try {
-      await updateBookingStatusUseCase(
-        bookingId: id,
-        status: status,
-      );
+      await updateBookingStatusUseCase(bookingId: id, status: status);
 
       if (status == BookingStatus.completed) {
         final booking = await getBookingUseCase(id);
@@ -210,20 +199,13 @@ class BookingCubit extends Cubit<BookingState> {
             bookingId: id,
           );
 
-          notificationResult.fold(
-            (failure) {},
-            (_) {},
-          );
+          notificationResult.fold((failure) {}, (_) {});
         }
       }
 
       emit(BookingSuccess(id));
     } catch (e) {
-      emit(
-        BookingFailure(
-          e.toString().replaceFirst('Exception: ', ''),
-        ),
-      );
+      emit(BookingFailure(e.toString().replaceFirst('Exception: ', '')));
     }
   }
 }

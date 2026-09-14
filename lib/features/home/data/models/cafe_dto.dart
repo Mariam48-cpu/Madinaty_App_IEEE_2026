@@ -5,6 +5,8 @@ class CafeDto {
   final int? userRatingCount;
   final String? formattedAddress;
   final List<dynamic>? photos;
+  final double? latitude;
+  final double? longitude;
 
   const CafeDto({
     this.id,
@@ -13,30 +15,38 @@ class CafeDto {
     this.userRatingCount,
     this.formattedAddress,
     this.photos,
+    this.latitude,
+    this.longitude,
   });
 
   factory CafeDto.fromJson(Map<String, dynamic> json) {
+    final location = json['location'];
+
     return CafeDto(
       id: json['id']?.toString(),
 
-      displayName:
-          json['displayName']?['text']?.toString(),
+      displayName: json['displayName']?['text']?.toString(),
 
-      rating:
-          (json['rating'] as num?)?.toDouble(),
+      rating: (json['rating'] as num?)?.toDouble(),
 
-      userRatingCount:
-          (json['userRatingCount'] as num?)?.toInt(),
+      userRatingCount: (json['userRatingCount'] as num?)?.toInt(),
 
-      formattedAddress:
-          json['formattedAddress']?.toString(),
+      formattedAddress: json['formattedAddress']?.toString(),
 
-      photos:
-          json['photos'] is List
-              ? List<dynamic>.from(json['photos'])
-              : null,
+      photos: json['photos'] is List
+          ? List<dynamic>.from(json['photos'])
+          : null,
+
+      latitude: location is Map<String, dynamic>
+          ? (location['latitude'] as num?)?.toDouble()
+          : null,
+
+      longitude: location is Map<String, dynamic>
+          ? (location['longitude'] as num?)?.toDouble()
+          : null,
     );
   }
+
   String? get firstPhotoName {
     if (photos == null || photos!.isEmpty) {
       return null;
@@ -49,5 +59,9 @@ class CafeDto {
     }
 
     return null;
+  }
+
+  bool get hasLocation {
+    return latitude != null && longitude != null;
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/cafe_card.dart';
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
@@ -47,7 +49,7 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
 
       if (selectedCafes.length >= 3) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ممكن تختاري لحد 3 كافيهات بس')),
+          SnackBar(content: Text(AppLocale.maxCafesError.getString(context))),
         );
 
         return;
@@ -59,9 +61,9 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
 
   Future<void> submit() async {
     if (selectedCafes.length < 2) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('اختاري كافيهين على الأقل')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocale.minCafesError.getString(context))),
+      );
 
       return;
     }
@@ -95,9 +97,9 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        title: const Text(
-          'اختار كافيهاتك',
-          style: TextStyle(
+        title: Text(
+          AppLocale.selectCafesTitle.getString(context),
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
           ),
@@ -121,7 +123,9 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
           }
 
           if (state is! DiscoverySuccess) {
-            return const Center(child: Text('مفيش كافيهات متاحة حاليًا'));
+            return Center(
+              child: Text(AppLocale.noCafesAvailable.getString(context)),
+            );
           }
 
           final cafes = state.cafes;
@@ -156,10 +160,10 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
-                            'اختاري من 2 لـ 3 كافيهات',
+                          Text(
+                            AppLocale.selectCafesRangeHint.getString(context),
                             textAlign: TextAlign.right,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
@@ -169,7 +173,12 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
                           const SizedBox(height: 3),
 
                           Text(
-                            '${selectedCafes.length}/3 تم اختيارهم',
+                            AppLocale.selectedCafesCount
+                                .getString(context)
+                                .replaceAll(
+                                  '{count}',
+                                  '${selectedCafes.length}',
+                                ),
                             textAlign: TextAlign.right,
                             style: const TextStyle(
                               fontSize: 11,
@@ -205,7 +214,9 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
                                 : null,
                             rating: cafe.rating,
                             reviewCount: cafe.reviewsCount,
-                            tagText: isSelected ? 'تم الاختيار ✓' : null,
+                            tagText: isSelected
+                                ? AppLocale.selectedBadge.getString(context)
+                                : null,
                             onTap: () {
                               toggleCafe(cafe);
                             },
@@ -271,9 +282,9 @@ class _CafePickerScreenState extends State<CafePickerScreen> {
                   child: ElevatedButton.icon(
                     onPressed: selectedCafes.length >= 2 ? submit : null,
                     icon: const Icon(Icons.check_rounded),
-                    label: const Text(
-                      'أنا خلصت اختياري',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    label: Text(
+                      AppLocale.finishSelectionBtn.getString(context),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

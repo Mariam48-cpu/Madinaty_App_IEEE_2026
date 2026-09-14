@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view_model/group_cafe_picker_cubit.dart';
@@ -113,7 +115,9 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
 
     if (groupName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a group name')),
+        SnackBar(
+          content: Text(AppLocale.enterGroupNameError.getString(context)),
+        ),
       );
 
       return;
@@ -152,7 +156,9 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
 
     if (inviteCode.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter the invite code')),
+        SnackBar(
+          content: Text(AppLocale.enterInviteCodeError.getString(context)),
+        ),
       );
 
       return;
@@ -202,9 +208,9 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.background,
           elevation: 0,
-          title: const Text(
-            'Plan With Friends',
-            style: TextStyle(
+          title: Text(
+            AppLocale.planWithFriendsTitle.getString(context),
+            style: const TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.bold,
             ),
@@ -237,10 +243,10 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
 
                     const SizedBox(height: 20),
 
-                    const Text(
-                      'خطط خروجة مع أصحابك 🎉',
+                    Text(
+                      AppLocale.planHeaderTitle.getString(context),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -249,10 +255,10 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
 
                     const SizedBox(height: 8),
 
-                    const Text(
-                      'اختاروا الكافيهات مع بعض وسيبوا القرار النهائي للعجلة 🎡',
+                    Text(
+                      AppLocale.planHeaderSubtitle.getString(context),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
                         height: 1.5,
                         color: AppColors.textSecondary,
@@ -264,8 +270,8 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
                     TextField(
                       controller: _groupNameController,
                       decoration: InputDecoration(
-                        labelText: 'اسم الجروب',
-                        hintText: 'Friday Coffee',
+                        labelText: AppLocale.groupNameLabel.getString(context),
+                        hintText: AppLocale.groupNameHint.getString(context),
                         prefixIcon: const Icon(Icons.groups_outlined),
                         filled: true,
                         fillColor: AppColors.surface,
@@ -283,26 +289,28 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _createGroup,
                         icon: const Icon(Icons.add_rounded),
-                        label: const Text(
-                          'اعمل جروب جديد',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        label: Text(
+                          AppLocale.createGroupBtn.getString(context),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
 
                     const SizedBox(height: 28),
 
-                    const Row(
+                    Row(
                       children: [
-                        Expanded(child: Divider()),
+                        const Expanded(child: Divider()),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
-                            'أو',
-                            style: TextStyle(color: AppColors.textSecondary),
+                            AppLocale.orDivider.getString(context),
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
-                        Expanded(child: Divider()),
+                        const Expanded(child: Divider()),
                       ],
                     ),
 
@@ -312,8 +320,8 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
                       controller: _inviteCodeController,
                       textCapitalization: TextCapitalization.characters,
                       decoration: InputDecoration(
-                        labelText: 'كود الدعوة',
-                        hintText: 'ABC123',
+                        labelText: AppLocale.inviteCodeLabel.getString(context),
+                        hintText: AppLocale.inviteCodeHint.getString(context),
                         prefixIcon: const Icon(Icons.vpn_key_outlined),
                         filled: true,
                         fillColor: AppColors.surface,
@@ -331,9 +339,9 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
                       child: OutlinedButton.icon(
                         onPressed: _joinGroup,
                         icon: const Icon(Icons.login_rounded),
-                        label: const Text(
-                          'انضم لجروب',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        label: Text(
+                          AppLocale.joinGroupBtn.getString(context),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -347,38 +355,37 @@ class _GroupCafeHomeScreenState extends State<GroupCafeHomeScreen> {
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'إزاي بتشتغل؟',
+                            AppLocale.howItWorksTitle.getString(context),
                             textAlign: TextAlign.right,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
                             ),
                           ),
 
-                          SizedBox(height: 18),
+                          const SizedBox(height: 18),
 
                           _Step(
                             number: '1',
-                            title: 'اعمل جروب',
-                            description: 'أنشئ جروب وشارك كود الدعوة مع أصحابك',
+                            title: AppLocale.step1Title.getString(context),
+                            description: AppLocale.step1Desc.getString(context),
                           ),
 
                           _Step(
                             number: '2',
-                            title: 'كل واحد يختار',
-                            description: 'كل شخص يختار من 2 لـ 3 كافيهات',
+                            title: AppLocale.step2Title.getString(context),
+                            description: AppLocale.step2Desc.getString(context),
                           ),
 
                           _Step(
                             number: '3',
-                            title: 'العجلة تقرر',
-                            description:
-                                'لما الكل يخلص، العجلة تختار الكافيه الفائز 🎡',
+                            title: AppLocale.step3Title.getString(context),
+                            description: AppLocale.step3Desc.getString(context),
                           ),
                         ],
                       ),

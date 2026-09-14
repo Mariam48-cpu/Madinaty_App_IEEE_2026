@@ -10,7 +10,7 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
   final FirebaseFirestore firestore;
 
   BookingRepositoryImpl({FirebaseFirestore? firestore})
-      : firestore = firestore ?? FirebaseFirestore.instance;
+    : firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> bookings() {
     return firestore.collection('bookings');
@@ -22,15 +22,15 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       throw Exception(AppLocale.selectDateError);
     }
 
-    if (booking.time == null || booking.time!.isEmpty) {
+    if (booking.time == null || booking.time!.trim().isEmpty) {
       throw Exception(AppLocale.selectTimeError);
     }
 
-    if (booking.cafeId.isEmpty) {
+    if (booking.cafeId.trim().isEmpty) {
       throw Exception(AppLocale.cafeDataNotFoundError);
     }
 
-    if (booking.userId.isEmpty) {
+    if (booking.userId.trim().isEmpty) {
       throw Exception(AppLocale.userNotLoggedInError);
     }
 
@@ -39,34 +39,24 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
         '${booking.date!.month.toString().padLeft(2, '0')}-'
         '${booking.date!.day.toString().padLeft(2, '0')}';
 
-    final timeKey = booking.time!.replaceAll(' ', '_').replaceAll(':', '-');
+    final timeKey = _normalizeKeyPart(booking.time!);
 
-    final seatingKey = (booking.seatingPreference ?? 'any').replaceAll(
-      ' ',
-      '_',
-    );
+    final seatingKey = _normalizeKeyPart(booking.seatingPreference ?? 'any');
 
-    final bookingId = '${booking.cafeId}_${dateKey}_${timeKey}_$seatingKey';
+    final bookingId =
+        '${booking.cafeId.trim()}_'
+        '${dateKey}_'
+        '${timeKey}_'
+        '${seatingKey}';
 
     final bookingRef = bookings().doc(bookingId);
 
-    final existingBooking = await bookingRef.get();
-
-    if (existingBooking.exists) {
-      final data = existingBooking.data();
-      final status = data?['status'];
-
-      if (status == 'pending' || status == 'approved') {
-        throw Exception(AppLocale.tableAlreadyBookedError);
-      }
-    }
-
     final bookingModel = BookingModel(
-      cafeName: booking.cafeName,
-      cafeLocation: booking.cafeLocation,
       id: bookingId,
       userId: booking.userId,
       cafeId: booking.cafeId,
+      cafeName: booking.cafeName,
+      cafeLocation: booking.cafeLocation,
       date: booking.date,
       time: booking.time,
       guests: booking.guests,
@@ -78,8 +68,26 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       reservationFee: booking.reservationFee,
     );
 
-    await bookingRef.set(bookingModel.toFirestore());
+    await firestore.runTransaction((transaction) async {
+      final existing = await transaction.get(bookingRef);
 
+      if (existing.exists) {
+        final data = existing.data();
+
+        final status = data?['status']?.toString();
+
+        if (status == BookingStatus.pending.name ||
+            status == BookingStatus.approved.name) {
+          throw Exception(AppLocale.tableAlreadyBookedError);
+        }
+      }
+
+      transaction.set(bookingRef, bookingModel.toFirestore());
+    });
+
+    /*
+     * النقاط بعد نجاح الحجز فقط.
+     */
     try {
       await firestore.collection('users').doc(booking.userId).set({
         'points': FieldValue.increment(50),
@@ -90,6 +98,16 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
     return bookingId;
   }
 
+  String _normalizeKeyPart(String value) {
+    return value
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'\s+'), '_')
+        .replaceAll(':', '-')
+        .replaceAll('/', '-')
+        .replaceAll('\\', '-');
+  }
+
   @override
   Future<BookingEntity?> getBooking(String bookingId) async {
     final doc = await bookings().doc(bookingId).get();
@@ -98,14 +116,15 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
       return null;
     }
 
-    final bookingModel = BookingModel.fromFirestore(doc);
-
-    return bookingModel.toEntity();
+    return BookingModel.fromFirestore(doc).toEntity();
   }
 
   @override
   Future<List<BookingEntity>> getUserBookings(String userId) async {
-    if (userId.isEmpty) return [];
+    if (userId.isEmpty) {
+      return [];
+    }
+
     try {
       final snapshot = await bookings()
           .where('userId', isEqualTo: userId)
@@ -117,9 +136,12 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
 
       list.sort((a, b) {
         final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+
         final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+
         return bDate.compareTo(aDate);
       });
+
       return list;
     } catch (_) {
       return [];
@@ -128,22 +150,32 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
 
   @override
   Stream<List<BookingEntity>> watchUserBookings(String userId) {
-    if (userId.isEmpty) return Stream.value([]);
+    if (userId.isEmpty) {
+      return Stream.value([]);
+    }
+
     try {
       return bookings()
           .where('userId', isEqualTo: userId)
           .snapshots()
           .map((snapshot) {
-        final list = snapshot.docs
-            .map((doc) => BookingModel.fromFirestore(doc).toEntity())
-            .toList();
-        list.sort((a, b) {
-          final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          return bDate.compareTo(aDate);
-        });
-        return list;
-      }).handleError((_) => <BookingEntity>[]);
+            final list = snapshot.docs
+                .map((doc) => BookingModel.fromFirestore(doc).toEntity())
+                .toList();
+
+            list.sort((a, b) {
+              final aDate =
+                  a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+
+              final bDate =
+                  b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+
+              return bDate.compareTo(aDate);
+            });
+
+            return list;
+          })
+          .handleError((_) => <BookingEntity>[]);
     } catch (_) {
       return Stream.value([]);
     }

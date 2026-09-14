@@ -2,16 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:toastification/toastification.dart';
 
 import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/core/utils/app_toast.dart';
-import 'package:madinaty_app_ieee_2026/core/services/location_service.dart';
 
 import '../../../../../core/di/injection.dart';
-
 import '../../../../cafe/data/data_sources/cafe_firestore_data_source.dart';
 import '../../../../discovery/data/data_sources/google_places_datasource.dart';
 import '../../../../discovery/data/repositories/cafe_repository_impl.dart';
@@ -86,6 +85,19 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
     super.dispose();
   }
 
+  void _toggleLanguage() {
+    final localization = FlutterLocalization.instance;
+    final currentLanguage = localization.currentLocale?.languageCode ?? 'ar';
+
+    if (currentLanguage == 'ar') {
+      localization.translate('en');
+    } else {
+      localization.translate('ar');
+    }
+
+    setState(() {});
+  }
+
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -151,7 +163,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
               ),
               const SizedBox(height: 18),
 
-              // Customer
               ListTile(
                 tileColor: const Color(0xFFF5F1EC),
                 shape: RoundedRectangleBorder(
@@ -187,7 +198,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
               const SizedBox(height: 10),
 
-              // Cafe Owner
               ListTile(
                 tileColor: const Color(0xFFF5F1EC),
                 shape: RoundedRectangleBorder(
@@ -246,34 +256,272 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
     final authCubit = context.read<AuthCubit>();
     final searchController = TextEditingController();
 
+    Future<Position?> getCurrentLocation() async {
+      try {
+        // 1. Check if GPS / Location Service is enabled
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+        if (!serviceEnabled) {
+          if (!mounted) return null;
+
+          final shouldOpenSettings = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (dialogContext) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                title: const Text(
+                  'الموقع غير مفعل',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                content: const Text(
+                  'لازم تفعّل خدمة الموقع على جهازك علشان نقدر نجيب الكافيهات القريبة منك.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                actionsAlignment: MainAxisAlignment.center,
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext, false);
+                    },
+                    child: const Text('إلغاء'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext, true);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    child: const Text(
+                      'تفعيل الموقع',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (shouldOpenSettings == true) {
+            await Geolocator.openLocationSettings();
+
+            // بعد ما يرجع من Settings، نتأكد إن الـ GPS اتفتح
+            final enabledAgain = await Geolocator.isLocationServiceEnabled();
+
+            if (!enabledAgain) {
+              return null;
+            }
+          } else {
+            return null;
+          }
+        }
+
+        // 2. Check location permission
+        LocationPermission permission = await Geolocator.checkPermission();
+
+        // 3. Request permission if it hasn't been granted
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+
+          if (permission == LocationPermission.denied) {
+            if (!mounted) return null;
+
+            await showDialog(
+              context: context,
+              builder: (dialogContext) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  title: const Text(
+                    'صلاحية الموقع مطلوبة',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  content: const Text(
+                    'لازم تسمح للتطبيق بالوصول إلى موقعك علشان نعرض الكافيهات القريبة منك.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  actionsAlignment: MainAxisAlignment.center,
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                      },
+                      child: const Text('حسنًا'),
+                    ),
+                  ],
+                );
+              },
+            );
+
+            return null;
+          }
+        }
+
+        // 4. Permission was permanently denied
+        if (permission == LocationPermission.deniedForever) {
+          if (!mounted) return null;
+
+          final shouldOpenSettings = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (dialogContext) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                title: const Text(
+                  'صلاحية الموقع مرفوضة',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                content: const Text(
+                  'صلاحية الموقع تم رفضها نهائيًا. افتح إعدادات التطبيق واسمح بالوصول إلى الموقع.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                actionsAlignment: MainAxisAlignment.center,
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext, false);
+                    },
+                    child: const Text('إلغاء'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext, true);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    child: const Text(
+                      'فتح الإعدادات',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (shouldOpenSettings == true) {
+            await Geolocator.openAppSettings();
+
+            // بعد الرجوع من Settings، نتحقق مرة أخرى
+            permission = await Geolocator.checkPermission();
+
+            if (permission == LocationPermission.denied ||
+                permission == LocationPermission.deniedForever) {
+              return null;
+            }
+          } else {
+            return null;
+          }
+        }
+
+        // 5. Get the REAL current location
+        final position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+          ),
+        );
+
+        return position;
+      } catch (e) {
+        if (!mounted) return null;
+
+        await showDialog(
+          context: context,
+          builder: (dialogContext) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                'حدث خطأ',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              content: Text(
+                'لم نتمكن من الحصول على موقعك الحالي.\n\n$e',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('حسنًا'),
+                ),
+              ],
+            );
+          },
+        );
+
+        return null;
+      }
+    }
+
     Future.microtask(() async {
       if (!mounted) return;
 
-      // ============================================================
-      // GET CURRENT DEVICE LOCATION
-      // ============================================================
+      // ---------------------------------------------------------
+      // Get current location BEFORE opening the cafe selection
+      // ---------------------------------------------------------
 
-      final locationService = LocationService();
-
-      final position = await locationService.getCurrentLocation();
+      final position = await getCurrentLocation();
 
       if (!mounted) return;
 
       if (position == null) {
-        AppToast.showToast(
-          context: context,
-          title: AppLocale.toastError.getString(context),
-          description:
-              'تعذر تحديد موقعك الحالي. تأكد من تشغيل الموقع والسماح للتطبيق باستخدامه.',
-          type: ToastificationType.error,
-        );
-
         return;
       }
 
-      // ============================================================
-      // SHOW CAFE SELECTION DIALOG
-      // ============================================================
+      final currentLatitude = position.latitude;
+      final currentLongitude = position.longitude;
+
+      debugPrint(
+        'Owner Current Location: '
+        '$currentLatitude, $currentLongitude',
+      );
 
       showDialog(
         context: context,
@@ -299,10 +547,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                   height: MediaQuery.of(context).size.height * 0.55,
                   child: Column(
                     children: [
-                      // ==================================================
-                      // SEARCH
-                      // ==================================================
-
                       TextField(
                         controller: searchController,
                         decoration: InputDecoration(
@@ -327,19 +571,14 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                       const SizedBox(height: 10),
 
-                      // ==================================================
-                      // CAFES
-                      // ==================================================
                       Expanded(
                         child: FutureBuilder<List<CafeEntity>>(
                           future: getNearbyCafesUseCase(
-                            // IMPORTANT:
-                            // Use CURRENT DEVICE LOCATION
-                            // instead of fixed coordinates.
-                            latitude: position.latitude,
-                            longitude: position.longitude,
+                            latitude: currentLatitude,
+                            longitude: currentLongitude,
                           ),
                           builder: (context, snapshot) {
+                            // Loading
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const Center(
@@ -349,28 +588,51 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               );
                             }
 
+                            // Error
                             if (snapshot.hasError) {
                               return Center(
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Text(
-                                    snapshot.error.toString(),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.red,
-                                    ),
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.location_off,
+                                        color: Colors.red,
+                                        size: 35,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        'حدث خطأ أثناء جلب الكافيهات القريبة.',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        snapshot.error.toString(),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );
                             }
 
+                            // No cafes
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
                               return Center(
                                 child: Text(
                                   AppLocale.noReservationsFound.getString(
                                     context,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               );
                             }
@@ -392,9 +654,10 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                       .toList();
 
                             if (cafes.isEmpty) {
-                              return Center(
+                              return const Center(
                                 child: Text(
-                                  AppLocale.noResultsFound.getString(context),
+                                  'لا يوجد كافيه بهذا الاسم.',
+                                  textAlign: TextAlign.center,
                                 ),
                               );
                             }
@@ -413,7 +676,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-
                                     leading: const CircleAvatar(
                                       backgroundColor: Color(0xFFEBE3D8),
                                       child: Icon(
@@ -421,7 +683,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-
                                     title: Text(
                                       cafe.name,
                                       style: const TextStyle(
@@ -430,7 +691,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-
                                     subtitle: Text(
                                       cafe.address.isNotEmpty
                                           ? cafe.address
@@ -442,14 +702,11 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
-
                                     onTap: () async {
+                                      // Close cafe selection dialog
                                       Navigator.of(dialogContext).pop();
 
-                                      // ==========================================
-                                      // SAVE SELECTED CAFE
-                                      // ==========================================
-
+                                      // Save/update cafe in Firestore
                                       await FirebaseFirestore.instance
                                           .collection('cafes')
                                           .doc(cafe.id)
@@ -464,10 +721,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                                 FieldValue.serverTimestamp(),
                                           }, SetOptions(merge: true));
 
-                                      // ==========================================
-                                      // AUTHENTICATION
-                                      // ==========================================
-
+                                      // Continue authentication flow
                                       if (isGoogle) {
                                         authCubit.processIntent(
                                           GoogleSignInIntent(
@@ -535,10 +789,8 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                   color: AppColors.textSecondary,
                 ),
               ),
-
               const SizedBox(height: 18),
 
-              // Customer
               ListTile(
                 tileColor: const Color(0xFFF5F1EC),
                 shape: RoundedRectangleBorder(
@@ -569,7 +821,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
               const SizedBox(height: 10),
 
-              // Cafe Owner
               ListTile(
                 tileColor: const Color(0xFFF5F1EC),
                 shape: RoundedRectangleBorder(
@@ -618,7 +869,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
             description: state.errorMessage,
             type: ToastificationType.error,
           );
-        } else if (state is AuthSuccessState) {
+        }
+
+        if (state is AuthSuccessState) {
           final userName = state.user.name ?? '';
 
           AppToast.showToast(
@@ -629,41 +882,32 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
             type: ToastificationType.success,
           );
 
-          // ============================================================
-          // NAVIGATION AFTER AUTH
-          // ============================================================
-
+          // Cafe owner
           if (state.user.isCafeOwner) {
-            // Cafe Owner -> Owner Dashboard
             Navigator.pushReplacementNamed(
               context,
               AppRoutes.ownerDashboard,
               arguments: state.user.cafeId,
             );
-          } else {
-            // Customer
-            Navigator.pushReplacementNamed(
-              context,
-              isLogin ? AppRoutes.home : AppRoutes.personalization,
-            );
+            return;
           }
 
-          // IMPORTANT:
-          // Removed the old unconditional navigation to Personalization.
-          //
-          // The old code was doing:
-          //
-          // Navigator.pushReplacementNamed(
-          //   context,
-          //   AppRoutes.personalization,
-          // );
-          //
-          // after already navigating the Cafe Owner to OwnerDashboard.
-          // That could override the Owner Dashboard navigation.
+          // Customer:
+          // Register -> Personalization
+          // Login -> Home
+          if (isLogin) {
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
+          } else {
+            Navigator.pushReplacementNamed(context, AppRoutes.personalization);
+          }
         }
       },
       builder: (context, state) {
         final isLoading = state is AuthLoadingState;
+
+        final localization = FlutterLocalization.instance;
+
+        final isArabic = localization.currentLocale?.languageCode == 'ar';
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -678,10 +922,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // ======================================================
-                      // LANGUAGE
-                      // ======================================================
-
                       Align(
                         alignment: AlignmentDirectional.topEnd,
                         child: TextButton.icon(
@@ -701,41 +941,19 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                             color: AppColors.textPrimary,
                           ),
                           label: Text(
-                            FlutterLocalization
-                                        .instance
-                                        .currentLocale
-                                        ?.languageCode ==
-                                    'ar'
-                                ? 'English'
-                                : 'العربية',
+                            isArabic ? 'English' : 'العربية',
                             style: const TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          onPressed: () {
-                            final localization = FlutterLocalization.instance;
-
-                            final currentLanguage =
-                                localization.currentLocale?.languageCode;
-
-                            if (currentLanguage == 'ar') {
-                              localization.translate('en');
-                            } else {
-                              localization.translate('ar');
-                            }
-
-                            setState(() {});
-                          },
+                          onPressed: _toggleLanguage,
                         ),
                       ),
 
                       const SizedBox(height: 10),
 
-                      // ======================================================
-                      // ICON
-                      // ======================================================
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: const BoxDecoration(
@@ -751,9 +969,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                       const SizedBox(height: 16),
 
-                      // ======================================================
-                      // TITLE
-                      // ======================================================
                       Text(
                         isLogin
                             ? AppLocale.welcome.getString(context)
@@ -778,9 +993,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                       const SizedBox(height: 20),
 
-                      // ======================================================
-                      // AUTH CARD
-                      // ======================================================
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -789,10 +1001,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                         ),
                         child: Column(
                           children: [
-                            // ==================================================
-                            // LOGIN / REGISTER TABS
-                            // ==================================================
-
                             Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
@@ -872,9 +1080,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                             const SizedBox(height: 20),
 
-                            // ==================================================
-                            // NAME
-                            // ==================================================
                             if (!isLogin) ...[
                               CustomTextField(
                                 controller: _nameController,
@@ -888,13 +1093,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                       )
                                     : null,
                               ),
-
                               const SizedBox(height: 14),
                             ],
 
-                            // ==================================================
-                            // EMAIL / PHONE
-                            // ==================================================
                             CustomTextField(
                               controller: _emailOrPhoneController,
                               label: AppLocale.emailOrPhone.getString(context),
@@ -910,9 +1111,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                             const SizedBox(height: 14),
 
-                            // ==================================================
-                            // PASSWORD
-                            // ==================================================
                             CustomTextField(
                               controller: _passwordController,
                               label: AppLocale.password.getString(context),
@@ -925,9 +1123,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                   : null,
                             ),
 
-                            // ==================================================
-                            // CONFIRM PASSWORD
-                            // ==================================================
                             if (!isLogin) ...[
                               const SizedBox(height: 14),
 
@@ -947,9 +1142,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                               ),
                             ],
 
-                            // ==================================================
-                            // FORGOT PASSWORD
-                            // ==================================================
                             if (isLogin)
                               Align(
                                 alignment: AlignmentDirectional.centerStart,
@@ -977,9 +1169,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                             const SizedBox(height: 16),
 
-                            // ==================================================
-                            // SUBMIT
-                            // ==================================================
                             CustomAuthButton(
                               text: isLogin
                                   ? AppLocale.login.getString(context)
@@ -990,9 +1179,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                             const SizedBox(height: 16),
 
-                            // ==================================================
-                            // OR
-                            // ==================================================
                             Row(
                               children: [
                                 const Expanded(child: Divider()),
@@ -1014,9 +1200,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                             const SizedBox(height: 16),
 
-                            // ==================================================
-                            // GOOGLE
-                            // ==================================================
                             OutlinedButton(
                               onPressed: isLoading
                                   ? null
@@ -1059,9 +1242,6 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
 
                             const SizedBox(height: 12),
 
-                            // ==================================================
-                            // SWITCH LOGIN / REGISTER
-                            // ==================================================
                             TextButton(
                               onPressed: () {
                                 setState(() {

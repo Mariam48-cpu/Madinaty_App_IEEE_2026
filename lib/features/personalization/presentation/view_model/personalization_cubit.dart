@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:madinaty_app_ieee_2026/features/personalization/domain/use_cases/get_user_preferences_usecase.dart';
+import 'package:madinaty_app_ieee_2026/features/personalization/domain/use_cases/save_user_preferences_usecase.dart';
 
 import '../../../../core/localization/app_locale.dart';
 import '../../domain/entities/personalization_entity.dart';
-import '../../domain/use_cases/get_user_preferences_usecase.dart';
-import '../../domain/use_cases/save_user_preferences_usecase.dart';
 import 'personalization_state.dart';
 
 class PersonalizationCubit extends Cubit<PersonalizationState> {
@@ -11,6 +11,9 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
   final SaveUserPreferencesUseCase _saveUserPreferencesUseCase;
 
   final String currentUserId;
+
+  /// 0 = What do you like?
+  /// 1 = Why are you going out?
   final int initialStep;
 
   PersonalizationCubit({
@@ -18,44 +21,49 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
     required SaveUserPreferencesUseCase saveUserPreferencesUseCase,
     required this.currentUserId,
     this.initialStep = 0,
-  })  : _getUserPreferencesUseCase = getUserPreferencesUseCase,
-        _saveUserPreferencesUseCase = saveUserPreferencesUseCase,
-        super(const PersonalizationInitialState());
+  }) : _getUserPreferencesUseCase = getUserPreferencesUseCase,
+       _saveUserPreferencesUseCase = saveUserPreferencesUseCase,
+       super(const PersonalizationInitialState());
 
-  // =========================================================
+  // ============================================================
   // LOAD PREFERENCES
-  // =========================================================
+  // ============================================================
 
-  Future<void> loadPreferences({DateTime? currentDate}) async {
+  Future<void> loadPreferences() async {
     if (isClosed) return;
 
     emit(const PersonalizationLoadingState());
 
     try {
-      final now = currentDate ?? DateTime.now();
+      final preferences = await _getUserPreferencesUseCase(currentUserId);
 
-      final preferences =
-          await _getUserPreferencesUseCase(currentUserId);
-
-      // Cubit may have been closed while waiting for Firestore.
       if (isClosed) return;
 
-      if (preferences != null &&
-          preferences.interests.isNotEmpty) {
-        final isSameDay =
-            preferences.updatedAt != null &&
-            _isSameDay(
-              preferences.updatedAt,
-              now,
-            );
+      // ----------------------------------------------------------
+      // USER ALREADY HAS SAVED INTERESTS
+      // ----------------------------------------------------------
 
-        if (isSameDay) {
+      if (preferences != null && preferences.interests.isNotEmpty) {
+        /*
+         * initialStep determines what we want to show:
+         *
+         * initialStep == 0
+         * ----------------
+         * Show "What do you like?"
+         *
+         * initialStep == 1
+         * ----------------
+         * Skip interests and show
+         * "Why are you going out?"
+         */
+
+        if (initialStep == 0) {
           emit(
             PersonalizationLoadedState(
               selectedInterests: preferences.interests,
               selectedMood: preferences.selectedMood,
               selectedOccasion: preferences.selectedOccasion,
-              currentStep: 1,
+              currentStep: 0,
             ),
           );
         } else {
@@ -68,178 +76,134 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
             ),
           );
         }
-      } else {
-        emit(
-          PersonalizationLoadedState(
-            selectedInterests:
-                preferences?.interests ?? const [],
-            selectedMood: null,
-            selectedOccasion: null,
-            currentStep: initialStep,
-          ),
-        );
+
+        return;
       }
+
+      // ----------------------------------------------------------
+      // USER HAS NO SAVED PREFERENCES
+      // ----------------------------------------------------------
+
+      emit(
+        PersonalizationLoadedState(
+          selectedInterests: preferences?.interests ?? const [],
+          selectedMood: null,
+          selectedOccasion: null,
+          currentStep: initialStep,
+        ),
+      );
     } catch (e) {
       if (isClosed) return;
 
       emit(
-        PersonalizationErrorState(
-          e.toString().replaceAll('Exception: ', ''),
-        ),
+        PersonalizationErrorState(e.toString().replaceAll('Exception: ', '')),
       );
     }
   }
 
-  // =========================================================
-  // DATE CHECK
-  // =========================================================
-
-  bool _isSameDay(
-    DateTime? date1,
-    DateTime? date2,
-  ) {
-    if (date1 == null || date2 == null) {
-      return false;
-    }
-
-    final local1 = date1.toLocal();
-    final local2 = date2.toLocal();
-
-    return local1.year == local2.year &&
-        local1.month == local2.month &&
-        local1.day == local2.day;
-  }
-
-  // =========================================================
+  // ============================================================
   // INTERESTS
-  // =========================================================
+  // ============================================================
 
   void toggleInterest(String interest) {
     if (isClosed) return;
 
-    if (state is! PersonalizationLoadedState) {
-      return;
-    }
+    if (state is! PersonalizationLoadedState) return;
 
-    final currentState =
-        state as PersonalizationLoadedState;
+    final currentState = state as PersonalizationLoadedState;
 
-    final updatedList =
-        List<String>.from(
-      currentState.selectedInterests,
-    );
+    final interests = List<String>.from(currentState.selectedInterests);
 
-    if (updatedList.contains(interest)) {
-      updatedList.remove(interest);
+    if (interests.contains(interest)) {
+      interests.remove(interest);
     } else {
-      updatedList.add(interest);
+      interests.add(interest);
     }
 
     emit(
       currentState.copyWith(
-        selectedInterests: updatedList,
+        selectedInterests: interests,
         clearErrorMessage: true,
       ),
     );
   }
 
-  // =========================================================
+  // ============================================================
   // MOOD
-  // =========================================================
+  // ============================================================
 
   void selectMood(String mood) {
     if (isClosed) return;
 
-    if (state is! PersonalizationLoadedState) {
-      return;
-    }
+    if (state is! PersonalizationLoadedState) return;
 
-    final currentState =
-        state as PersonalizationLoadedState;
+    final currentState = state as PersonalizationLoadedState;
 
-    final isSelected =
-        currentState.selectedMood == mood;
+    final isAlreadySelected = currentState.selectedMood == mood;
 
     emit(
       currentState.copyWith(
-        selectedMood:
-            isSelected ? null : mood,
-        clearMood: isSelected,
+        selectedMood: isAlreadySelected ? null : mood,
+        clearMood: isAlreadySelected,
         clearOccasion: true,
         clearErrorMessage: true,
       ),
     );
   }
 
-  // =========================================================
+  // ============================================================
   // OCCASION
-  // =========================================================
+  // ============================================================
 
   void selectOccasion(String occasion) {
     if (isClosed) return;
 
-    if (state is! PersonalizationLoadedState) {
-      return;
-    }
+    if (state is! PersonalizationLoadedState) return;
 
-    final currentState =
-        state as PersonalizationLoadedState;
+    final currentState = state as PersonalizationLoadedState;
 
-    final isSelected =
-        currentState.selectedOccasion == occasion;
+    final isAlreadySelected = currentState.selectedOccasion == occasion;
 
     emit(
       currentState.copyWith(
-        selectedOccasion:
-            isSelected ? null : occasion,
-        clearOccasion: isSelected,
+        selectedOccasion: isAlreadySelected ? null : occasion,
+        clearOccasion: isAlreadySelected,
         clearMood: true,
         clearErrorMessage: true,
       ),
     );
   }
 
-  // =========================================================
+  // ============================================================
   // SELECT OPTION
-  // =========================================================
+  // ============================================================
 
   void selectOption(String optionId) {
     if (isClosed) return;
 
-    if (state is! PersonalizationLoadedState) {
-      return;
-    }
+    if (state is! PersonalizationLoadedState) return;
 
-    final currentState =
-        state as PersonalizationLoadedState;
+    final currentState = state as PersonalizationLoadedState;
 
-    const occasions = {
-      'birthday',
-      'date',
-      'friends_outing',
-    };
+    const occasions = <String>{'birthday', 'date', 'friends_outing'};
 
     if (occasions.contains(optionId)) {
-      final isSelected =
-          currentState.selectedOccasion == optionId;
+      final isSelected = currentState.selectedOccasion == optionId;
 
       emit(
         currentState.copyWith(
-          selectedOccasion:
-              isSelected ? null : optionId,
+          selectedOccasion: isSelected ? null : optionId,
           clearOccasion: isSelected,
           clearMood: true,
           clearErrorMessage: true,
         ),
       );
     } else {
-      final isSelected =
-          currentState.selectedMood == optionId;
+      final isSelected = currentState.selectedMood == optionId;
 
       emit(
         currentState.copyWith(
-          selectedMood:
-              isSelected ? null : optionId,
+          selectedMood: isSelected ? null : optionId,
           clearMood: isSelected,
           clearOccasion: true,
           clearErrorMessage: true,
@@ -248,26 +212,21 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
     }
   }
 
-  // =========================================================
-  // NEXT STEP
-  // =========================================================
+  // ============================================================
+  // GO TO STEP 2
+  // ============================================================
 
   Future<void> goToNextStep() async {
     if (isClosed) return;
 
-    if (state is! PersonalizationLoadedState) {
-      return;
-    }
+    if (state is! PersonalizationLoadedState) return;
 
-    final currentState =
-        state as PersonalizationLoadedState;
+    final currentState = state as PersonalizationLoadedState;
 
+    // User must select at least one interest.
     if (currentState.selectedInterests.isEmpty) {
       emit(
-        currentState.copyWith(
-          errorMessage:
-              AppLocale.selectAtLeastOneInterest,
-        ),
+        currentState.copyWith(errorMessage: AppLocale.selectAtLeastOneInterest),
       );
 
       return;
@@ -276,80 +235,75 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
     try {
       final entity = PersonalizationEntity(
         userId: currentUserId,
-        interests:
-            currentState.selectedInterests,
-        selectedMood:
-            currentState.selectedMood,
-        selectedOccasion:
-            currentState.selectedOccasion,
+        interests: currentState.selectedInterests,
+        selectedMood: currentState.selectedMood,
+        selectedOccasion: currentState.selectedOccasion,
         updatedAt: DateTime.now(),
       );
 
       await _saveUserPreferencesUseCase(entity);
 
       if (isClosed) return;
-    } catch (_) {
-      // Continue even if saving fails.
+    } catch (e) {
       if (isClosed) return;
+
+      emit(
+        currentState.copyWith(
+          errorMessage: e.toString().replaceAll('Exception: ', ''),
+        ),
+      );
+
+      return;
     }
 
     if (isClosed) return;
 
-    emit(
-      currentState.copyWith(
-        currentStep: 1,
-        errorMessage: null,
-      ),
-    );
+    emit(currentState.copyWith(currentStep: 1, errorMessage: null));
   }
 
-  // =========================================================
-  // PREVIOUS STEP
-  // =========================================================
+  // ============================================================
+  // GO BACK TO STEP 1
+  // ============================================================
 
   void goToPreviousStep() {
     if (isClosed) return;
 
-    if (state is! PersonalizationLoadedState) {
-      return;
-    }
+    if (state is! PersonalizationLoadedState) return;
 
-    final currentState =
-        state as PersonalizationLoadedState;
+    final currentState = state as PersonalizationLoadedState;
 
-    emit(
-      currentState.copyWith(
-        currentStep: 0,
-        errorMessage: null,
-      ),
-    );
+    emit(currentState.copyWith(currentStep: 0, clearErrorMessage: true));
   }
 
-  // =========================================================
-  // SAVE PREFERENCES
-  // =========================================================
+  // ============================================================
+  // SAVE FINAL PREFERENCES
+  // ============================================================
 
   Future<void> savePreferences() async {
     if (isClosed) return;
 
-    if (state is! PersonalizationLoadedState) {
-      return;
-    }
+    if (state is! PersonalizationLoadedState) return;
 
-    final currentState =
-        state as PersonalizationLoadedState;
+    final currentState = state as PersonalizationLoadedState;
+
+    // ----------------------------------------------------------
+    // INTEREST VALIDATION
+    // ----------------------------------------------------------
 
     if (currentState.selectedInterests.isEmpty) {
       emit(
         currentState.copyWith(
-          errorMessage:
-              AppLocale.selectFavoriteInterests,
+          errorMessage: AppLocale.selectFavoriteInterests,
           currentStep: 0,
         ),
       );
 
       return;
     }
+
+    // ----------------------------------------------------------
+    // MOOD / OCCASION VALIDATION
+    // ----------------------------------------------------------
 
     final hasMood =
         currentState.selectedMood != null &&
@@ -360,32 +314,23 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
         currentState.selectedOccasion!.isNotEmpty;
 
     if (!hasMood && !hasOccasion) {
-      emit(
-        currentState.copyWith(
-          errorMessage:
-              AppLocale.selectGoingOutReason,
-        ),
-      );
+      emit(currentState.copyWith(errorMessage: AppLocale.selectGoingOutReason));
 
       return;
     }
 
-    emit(
-      currentState.copyWith(
-        isSaving: true,
-        errorMessage: null,
-      ),
-    );
+    // ----------------------------------------------------------
+    // START SAVING
+    // ----------------------------------------------------------
+
+    emit(currentState.copyWith(isSaving: true, clearErrorMessage: true));
 
     try {
       final entity = PersonalizationEntity(
         userId: currentUserId,
-        interests:
-            currentState.selectedInterests,
-        selectedMood:
-            currentState.selectedMood,
-        selectedOccasion:
-            currentState.selectedOccasion,
+        interests: currentState.selectedInterests,
+        selectedMood: currentState.selectedMood,
+        selectedOccasion: currentState.selectedOccasion,
         updatedAt: DateTime.now(),
       );
 
@@ -393,20 +338,14 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
 
       if (isClosed) return;
 
-      emit(
-        PersonalizationSuccessState(entity),
-      );
+      emit(PersonalizationSuccessState(entity));
     } catch (e) {
       if (isClosed) return;
 
       emit(
         currentState.copyWith(
           isSaving: false,
-          errorMessage:
-              e.toString().replaceAll(
-                    'Exception: ',
-                    '',
-                  ),
+          errorMessage: e.toString().replaceAll('Exception: ', ''),
         ),
       );
     }

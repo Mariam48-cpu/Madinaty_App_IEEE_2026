@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../../core/localization/app_locale.dart';
@@ -17,10 +16,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
     GoogleSignIn? googleSignIn,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
-
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance,
+       _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
   @override
   User? get currentUser => _firebaseAuth.currentUser;
 
@@ -54,12 +52,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
       createdAt: DateTime.now(),
     );
 
-    debugPrint('>>> REGISTERING: ${user.uid} | Role: ${role.name} | CafeId: $cafeId');
-
-    await _firestore.collection('users').doc(user.uid).set(
-      userModel.toMap(),
-      SetOptions(merge: true),
-    );
+    await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .set(userModel.toMap(), SetOptions(merge: true));
 
     return userModel;
   }
@@ -166,7 +162,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     UserRole role = UserRole.customer,
     String? cafeId,
   }) async {
+    // 1. تهيئة مدير تسجيل الدخول كما تتطلبه الحزمة في هذا الإصدار
     await _googleSignIn.initialize();
+
+    // 2. استخدام authenticate بدلاً من signIn
     final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
 
     if (googleUser == null) {
@@ -174,7 +173,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceInterface {
     }
 
     final GoogleSignInAuthentication googleAuth =
-    await googleUser.authentication;
+        await googleUser.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.credential(
       idToken: googleAuth.idToken,

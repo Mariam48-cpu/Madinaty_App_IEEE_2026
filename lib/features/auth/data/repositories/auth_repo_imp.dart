@@ -7,9 +7,8 @@ import '../data_sources/auth_data_source_interface.dart';
 class AuthRepoImpl implements AuthRepoInterface {
   final AuthRemoteDataSourceInterface _remoteDataSource;
 
-  AuthRepoImpl({
-    required AuthRemoteDataSourceInterface remoteDataSource,
-  }) : _remoteDataSource = remoteDataSource;
+  AuthRepoImpl({required AuthRemoteDataSourceInterface remoteDataSource})
+    : _remoteDataSource = remoteDataSource;
 
   @override
   bool get isAuthenticated => _remoteDataSource.currentUser != null;
@@ -23,14 +22,20 @@ class AuthRepoImpl implements AuthRepoInterface {
     UserRole role = UserRole.customer,
     String? cafeId,
   }) async {
-    return await _remoteDataSource.registerWithEmailAndPassword(
-      email: email,
-      password: password,
-      name: name,
-      phone: phone,
-      role: role,
-      cafeId: cafeId,
-    );
+    try {
+      return await _remoteDataSource.registerWithEmailAndPassword(
+        email: email,
+        password: password,
+        name: name,
+        phone: phone,
+        role: role,
+        cafeId: cafeId,
+      );
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_handleFirebaseAuthException(e));
+    } catch (e) {
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
+    }
   }
 
   @override
@@ -130,7 +135,7 @@ class AuthRepoImpl implements AuthRepoInterface {
       case 'requires-recent-login':
         return 'لأسباب أمنية، يرجى تسجيل الدخول مرة أخرى ثم محاولة حذف الحساب';
       default:
-        return e.message ?? 'حدث خطأ في عملية تسجيل الدخول';
+        return e.message ?? 'حدث خطأ في عملية المصادقة';
     }
   }
 

@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
+
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/completed_group_view.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/presentation/view/widgets/spin_button.dart';
@@ -144,11 +148,10 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
       return;
     }
 
-    // Only creator can spin
     if (group.creatorId != widget.currentUser.userId) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Only the group creator can spin the wheel.'),
+        SnackBar(
+          content: Text(AppLocale.onlyCreatorCanSpinError.getString(context)),
         ),
       );
 
@@ -161,7 +164,9 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
 
     if (uniqueCafes.isEmpty || weightedCafes.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No cafe choices are available.')),
+        SnackBar(
+          content: Text(AppLocale.noCafesAvailableSpinError.getString(context)),
+        ),
       );
 
       return;
@@ -210,7 +215,6 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
         _currentWinner = randomPick;
       });
 
-      // Celebration 🎉
       _confettiController.play();
 
       _winnerAnimationController.forward();
@@ -231,9 +235,11 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
         _isSpinning = false;
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Something went wrong: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${AppLocale.errorPrefix.getString(context)} $e'),
+        ),
+      );
     }
   }
 
@@ -258,7 +264,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Choose Your Cafe 🎡'),
+        title: Text(AppLocale.chooseYourCafeTitle.getString(context)),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
@@ -295,7 +301,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
                           widget.groupId,
                         );
                       },
-                      child: const Text('Try Again'),
+                      child: Text(AppLocale.tryAgainBtn.getString(context)),
                     ),
                   ],
                 ),
@@ -304,7 +310,9 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
           }
 
           if (state is! GroupCafeLoaded) {
-            return const Center(child: Text('No group data available.'));
+            return Center(
+              child: Text(AppLocale.noGroupDataError.getString(context)),
+            );
           }
 
           final group = state.group;
@@ -317,7 +325,11 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
             final winner = _findCafeById(picks, group.winnerCafeId);
 
             if (winner == null) {
-              return const Center(child: Text('Winner data is not available.'));
+              return Center(
+                child: Text(
+                  AppLocale.winnerDataNotAvailable.getString(context),
+                ),
+              );
             }
 
             final pickedBy = _getPickedBy(picks, group, winner.cafeId);
@@ -330,11 +342,11 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
           }
 
           if (uniqueCafes.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Text(
-                  'No cafes have been selected yet.',
+                  AppLocale.noCafesSelectedYet.getString(context),
                   textAlign: TextAlign.center,
                 ),
               ),

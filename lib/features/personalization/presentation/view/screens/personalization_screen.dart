@@ -63,37 +63,62 @@ class PersonalizationView extends StatefulWidget {
 
 class _PersonalizationViewState extends State<PersonalizationView> {
   int? _previousStep;
+
+  // مهم جدًا:
+  // يمنع الـ Home من الفتح أكثر من مرة
+  // لو الـ Cubit أصدر SuccessState أكثر من مرة.
+  bool _hasNavigatedAfterSave = false;
+
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkRoleSafety();
     });
   }
 
+  // ============================================================
+  // ROLE SAFETY
+  // ============================================================
+
   Future<void> _checkRoleSafety() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+
+    if (user == null) return;
+
+    try {
       final doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .get();
 
-      if (doc.exists) {
-        final role = (doc.data()?['role'] as String?)?.trim().toLowerCase();
-        final cafeId = doc.data()?['cafeId'] as String?;
+      if (!mounted) return;
 
-        if (role == 'cafe_owner' || role == 'cafeowner') {
-          if (mounted) {
-            Navigator.of(context).pushReplacementNamed(
-              AppRoutes.ownerDashboard,
-              arguments: cafeId,
-            );
-          }
-        }
+      if (!doc.exists) return;
+
+      final data = doc.data();
+
+      if (data == null) return;
+
+      final role = (data['role'] as String?)?.trim().toLowerCase();
+
+      final cafeId = data['cafeId'] as String?;
+
+      if (role == 'cafe_owner' || role == 'cafeowner') {
+        Navigator.of(
+          context,
+        ).pushReplacementNamed(AppRoutes.ownerDashboard, arguments: cafeId);
       }
+    } catch (_) {
+      // لو حصل خطأ في قراءة الـ role
+      // نخلي شاشة الـ Personalization تكمل طبيعي.
     }
   }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -102,25 +127,47 @@ class _PersonalizationViewState extends State<PersonalizationView> {
       child: Scaffold(
         backgroundColor: AppColors.background,
 
-        // ==========================================================
-        // BODY
-        // ==========================================================
         body: BlocConsumer<PersonalizationCubit, PersonalizationState>(
+          // ======================================================
+          // LISTENER
+          // ======================================================
+
           listener: (context, state) {
-            // ------------------------------------------------------
+            // ----------------------------------------------------
             // SUCCESS
-            // ------------------------------------------------------
+            // ----------------------------------------------------
+
             if (state is PersonalizationSuccessState) {
+              // حماية إضافية من فتح Home مرتين.
+              if (_hasNavigatedAfterSave) return;
+
+              _hasNavigatedAfterSave = true;
+
+              // لو فيه callback من الشاشة اللي فتحت
+              // Personalization، نخليه هو المسؤول عن navigation.
               if (widget.onSaved != null) {
                 widget.onSaved!();
               } else {
-                Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+                // Home تبقى route واحدة فقط.
+                //
+                // أي route قبلها يتم حذفها:
+                //
+                // Splash
+                // Personalization
+                //        ↓
+                //       Home
+                //
+                // والـ Back مش هيرجع للـ Personalization.
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
               }
             }
-            // ------------------------------------------------------
+            // ----------------------------------------------------
             // LOADED
-            // ------------------------------------------------------
+            // ----------------------------------------------------
             else if (state is PersonalizationLoadedState) {
+              // Toast لما ننتقل من Step 0 إلى Step 1.
               if (_previousStep == 0 &&
                   state.currentStep == 1 &&
                   state.errorMessage == null) {
@@ -136,6 +183,7 @@ class _PersonalizationViewState extends State<PersonalizationView> {
 
               _previousStep = state.currentStep;
 
+              // Error Toast
               if (state.errorMessage != null) {
                 AppToast.showToast(
                   context: context,
@@ -145,9 +193,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
                 );
               }
             }
-            // ------------------------------------------------------
+            // ----------------------------------------------------
             // ERROR
-            // ------------------------------------------------------
+            // ----------------------------------------------------
             else if (state is PersonalizationErrorState) {
               AppToast.showToast(
                 context: context,
@@ -158,18 +206,23 @@ class _PersonalizationViewState extends State<PersonalizationView> {
             }
           },
 
+          // ======================================================
+          // BUILDER
+          // ======================================================
           builder: (context, state) {
-            // ======================================================
+            // ----------------------------------------------------
             // LOADING
-            // ======================================================
+            // ----------------------------------------------------
+
             if (state is PersonalizationLoadingState ||
                 state is PersonalizationInitialState) {
               return const PersonalizationSkeleton();
             }
 
-            // ======================================================
+            // ----------------------------------------------------
             // ERROR
-            // ======================================================
+            // ----------------------------------------------------
+
             if (state is PersonalizationErrorState) {
               return ErrorStateWidget(
                 errorMessage: state.message,
@@ -179,13 +232,14 @@ class _PersonalizationViewState extends State<PersonalizationView> {
               );
             }
 
+            // ----------------------------------------------------
+            // LOADED
+            // ----------------------------------------------------
+
             final loadedState = state is PersonalizationLoadedState
                 ? state
                 : const PersonalizationLoadedState();
 
-            // ======================================================
-            // CONTENT
-            // ======================================================
             return SafeArea(
               child: loadedState.currentStep == 0
                   ? _buildInterestsScreen(context, loadedState)
@@ -193,20 +247,12 @@ class _PersonalizationViewState extends State<PersonalizationView> {
             );
           },
         ),
-
-        // ==========================================================
-        // IMPORTANT:
-        // مفيش BottomNavigationBar هنا خالص.
-        //
-        // الـ Personalization شاشة إعدادات قبل دخول الـ Home.
-        // وبعد الحفظ /home بيفتح MainNavigationScreen.
-        // ==========================================================
       ),
     );
   }
 
   // ================================================================
-  // STEP 1 — INTERESTS
+  // STEP 0 — INTERESTS
   // ================================================================
 
   Widget _buildInterestsScreen(
@@ -264,9 +310,10 @@ class _PersonalizationViewState extends State<PersonalizationView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ========================================================
+          // ------------------------------------------------------
           // STEP INDICATOR
-          // ========================================================
+          // ------------------------------------------------------
+
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
@@ -281,9 +328,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
 
           const SizedBox(height: 20),
 
-          // ========================================================
+          // ------------------------------------------------------
           // TITLE
-          // ========================================================
+          // ------------------------------------------------------
           Center(
             child: Column(
               children: [
@@ -313,9 +360,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
 
           const SizedBox(height: 22),
 
-          // ========================================================
+          // ------------------------------------------------------
           // INTERESTS GRID
-          // ========================================================
+          // ------------------------------------------------------
           Expanded(
             child: GridView.builder(
               physics: const BouncingScrollPhysics(),
@@ -352,22 +399,20 @@ class _PersonalizationViewState extends State<PersonalizationView> {
 
           const SizedBox(height: 12),
 
-          // ========================================================
-          // CONTINUE BUTTON
-          // ========================================================
+          // ------------------------------------------------------
+          // CONTINUE
+          // ------------------------------------------------------
           CustomButton(
             text: AppLocale.continueBtn.getString(context),
             backgroundColor: AppColors.darkButton,
             textColor: AppColors.onDarkButton,
             borderRadius: 18,
             height: 58,
-
             textStyle: theme.textTheme.titleMedium?.copyWith(
               color: AppColors.onDarkButton,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
-
             onPressed: () {
               cubit.goToNextStep();
             },
@@ -380,7 +425,7 @@ class _PersonalizationViewState extends State<PersonalizationView> {
   }
 
   // ================================================================
-  // STEP 2 — MOOD / OCCASION
+  // STEP 1 — MOOD / OCCASION
   // ================================================================
 
   Widget _buildMoodOccasionScreen(
@@ -438,11 +483,11 @@ class _PersonalizationViewState extends State<PersonalizationView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ========================================================
-          // TITLE
-          // ========================================================
           const SizedBox(height: 12),
 
+          // ------------------------------------------------------
+          // TITLE
+          // ------------------------------------------------------
           Center(
             child: Column(
               children: [
@@ -472,9 +517,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
 
           const SizedBox(height: 22),
 
-          // ========================================================
+          // ------------------------------------------------------
           // OPTIONS GRID
-          // ========================================================
+          // ------------------------------------------------------
           Expanded(
             child: GridView.builder(
               physics: const BouncingScrollPhysics(),
@@ -512,9 +557,9 @@ class _PersonalizationViewState extends State<PersonalizationView> {
 
           const SizedBox(height: 10),
 
-          // ========================================================
-          // SAVE BUTTON
-          // ========================================================
+          // ------------------------------------------------------
+          // SAVE
+          // ------------------------------------------------------
           CustomButton(
             text: AppLocale.showSuitablePlaces.getString(context),
 

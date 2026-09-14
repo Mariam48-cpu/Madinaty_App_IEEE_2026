@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 
 class PickedBySection extends StatelessWidget {
   final List<String> names;
   final bool compact;
 
-  const PickedBySection({
-    super.key,
-    required this.names,
-    this.compact = false,
-  });
+  const PickedBySection({super.key, required this.names, this.compact = false});
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +16,12 @@ class PickedBySection extends StatelessWidget {
       padding: EdgeInsets.all(compact ? 16 : 18),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(
-          compact ? 18 : 20,
-        ),
+        borderRadius: BorderRadius.circular(compact ? 18 : 20),
       ),
       child: Column(
         children: [
           Text(
-            '☕ Picked by',
+            AppLocale.pickedByTitle.getString(context),
             style: TextStyle(
               fontSize: compact ? 15 : 16,
               fontWeight: FontWeight.w700,
@@ -35,7 +31,7 @@ class PickedBySection extends StatelessWidget {
           const SizedBox(height: 10),
 
           if (names.isEmpty)
-            const Text('Group members')
+            Text(AppLocale.groupMembersFallback.getString(context))
           else if (compact)
             Wrap(
               alignment: WrapAlignment.center,
@@ -48,9 +44,7 @@ class PickedBySection extends StatelessWidget {
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surface,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -64,13 +58,9 @@ class PickedBySection extends StatelessWidget {
               }).toList(),
             )
           else
-            Text(
-              names.join(' • '),
-              textAlign: TextAlign.center,
-            ),
+            Text(names.join(' • '), textAlign: TextAlign.center),
         ],
       ),
     );
   }
 }
-

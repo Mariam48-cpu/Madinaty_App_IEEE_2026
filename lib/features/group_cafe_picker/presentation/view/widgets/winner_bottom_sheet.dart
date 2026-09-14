@@ -1,8 +1,11 @@
 import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_confetti_master/flutter_confetti_master.dart'
     as balloon_confetti;
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/theme/app_colors.dart';
 import 'package:madinaty_app_ieee_2026/features/group_cafe_picker/domain/entities/group_cafe_entity.dart';
 import 'winner_card.dart';
@@ -159,10 +162,10 @@ class WinnerBottomSheet extends StatelessWidget {
 
                         const SizedBox(height: 5),
 
-                        const Text(
-                          'We Have a Winner!',
+                        Text(
+                          AppLocale.weHaveAWinnerTitle.getString(context),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.w800,
                           ),
@@ -171,7 +174,7 @@ class WinnerBottomSheet extends StatelessWidget {
                         const SizedBox(height: 5),
 
                         Text(
-                          'Your group is going to...',
+                          AppLocale.groupGoingToText.getString(context),
                           style: TextStyle(
                             fontSize: 14,
                             color: theme.colorScheme.onSurface.withValues(
@@ -207,9 +210,9 @@ class WinnerBottomSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(18),
                         ),
                       ),
-                      child: const Text(
-                        "Let's Go! ☕",
-                        style: TextStyle(
+                      child: Text(
+                        AppLocale.letsGoBtn.getString(context),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                         ),
