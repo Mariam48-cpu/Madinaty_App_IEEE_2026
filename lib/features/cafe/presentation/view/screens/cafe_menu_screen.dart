@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/core/di/injection.dart';
 import 'package:madinaty_app_ieee_2026/core/routes/app_routes.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/cart_skeleton.dart';
@@ -144,11 +146,11 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                         ),
                         children: [
                           if (popularProducts().isNotEmpty) ...[
-                            const Align(
+                            Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                'الأكثر مبيعاً',
-                                style: TextStyle(
+                                AppLocale.topSellers.getString(context),
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF2D2521),
@@ -213,11 +215,11 @@ class _CafeMenuViewState extends State<_CafeMenuView> {
                           ],
 
                           if (regularProducts().isNotEmpty) ...[
-                            const Align(
+                            Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                'المشروبات والحلويات',
-                                style: TextStyle(
+                                AppLocale.beveragesAndDesserts.getString(context),
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF2D2521),

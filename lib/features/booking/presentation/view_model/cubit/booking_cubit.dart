@@ -8,6 +8,7 @@ import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/get_boo
 import 'package:madinaty_app_ieee_2026/features/booking/domain/use_cases/update_booking_status_usecase.dart';
 import 'package:madinaty_app_ieee_2026/features/notifications/domain/use_cases/create_notification_use_case.dart';
 
+import 'package:madinaty_app_ieee_2026/features/booking/domain/repositories/booking_repository_interface.dart';
 import 'booking_state.dart';
 
 @injectable
@@ -16,12 +17,14 @@ class BookingCubit extends Cubit<BookingState> {
   final GetBookingUseCase getBookingUseCase;
   final UpdateBookingStatusUseCase updateBookingStatusUseCase;
   final CreateNotificationUseCase createNotificationUseCase;
+  final BookingRepositoryInterface bookingRepository;
 
   BookingCubit(
     this.createBookingUseCase,
     this.getBookingUseCase,
     this.updateBookingStatusUseCase,
     this.createNotificationUseCase,
+    this.bookingRepository,
   ) : super(BookingInitial());
 
   String? cafeId;
@@ -34,6 +37,7 @@ class BookingCubit extends Cubit<BookingState> {
   String? seatingPreference;
 
   String? bookingId;
+  List<String> bookedTableIds = [];
 
   void reset() {
     cafeId = null;
@@ -45,6 +49,27 @@ class BookingCubit extends Cubit<BookingState> {
     occasion = null;
     seatingPreference = null;
     bookingId = null;
+    bookedTableIds = [];
+
+    emit(BookingInitial());
+  }
+
+  Future<void> fetchBookedTables() async {
+    if (cafeId == null || date == null || time == null) {
+      bookedTableIds = [];
+      emit(BookingInitial());
+      return;
+    }
+
+    try {
+      bookedTableIds = await bookingRepository.getBookedTableIds(
+        cafeId: cafeId!,
+        date: date!,
+        time: time!,
+      );
+    } catch (_) {
+      bookedTableIds = [];
+    }
 
     emit(BookingInitial());
   }

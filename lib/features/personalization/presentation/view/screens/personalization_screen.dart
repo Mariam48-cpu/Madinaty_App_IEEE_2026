@@ -443,7 +443,7 @@ class _PersonalizationViewState extends State<PersonalizationView> {
       },
       {
         'id': 'date',
-        'label': AppLocale.date.getString(context),
+        'label': AppLocale.romanticDate.getString(context),
         'svg': AppAssets.dateIcon,
       },
       {

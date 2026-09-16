@@ -171,10 +171,20 @@ abstract class AppRoutes {
       case personalization:
         final discoveryCubit = sl<DiscoveryCubit>();
 
+        int initialStep = 0;
+        if (settings.arguments is int) {
+          initialStep = settings.arguments as int;
+        } else if (settings.arguments is Map<String, dynamic>) {
+          initialStep =
+              (settings.arguments as Map<String, dynamic>)['initialStep'] as int? ??
+                  0;
+        }
+
         return MaterialPageRoute(
           builder: (_) => BlocProvider<DiscoveryCubit>.value(
             value: discoveryCubit,
             child: PersonalizationScreen(
+              initialStep: initialStep,
               userLocation: discoveryCubit.currentLocation,
             ),
           ),

@@ -8,12 +8,14 @@ class SeatingMap extends StatelessWidget {
   final String? selectedTable;
   final String filterCategory;
   final ValueChanged<String> onTableSelected;
+  final List<String> bookedTables;
 
   const SeatingMap({
     super.key,
     required this.selectedTable,
     required this.onTableSelected,
     required this.filterCategory,
+    this.bookedTables = const [],
   });
 
   bool isTableMatchingFilter(BuildContext context, String? category) {
@@ -40,6 +42,15 @@ class SeatingMap extends StatelessWidget {
       'T7': nileView,
       'BAR': barText,
     };
+
+    final isT1Booked = bookedTables.contains('T1');
+    final isT2Booked = bookedTables.contains('T2');
+    final isT3Booked = bookedTables.contains('T3');
+    final isT4Booked = bookedTables.contains('T4');
+    final isT5Booked = bookedTables.contains('T5');
+    final isT6Booked = bookedTables.contains('T6');
+    final isT7Booked = bookedTables.contains('T7');
+    final isBarBooked = bookedTables.contains('BAR');
 
     return Container(
       height: 320,
@@ -75,8 +86,8 @@ class SeatingMap extends StatelessWidget {
               child: SeatingTable(
                 id: 'T1',
                 selected: selectedTable == 'T1',
-                booked: false,
-                onTap: () => onTableSelected('T1'),
+                booked: isT1Booked,
+                onTap: isT1Booked ? () {} : () => onTableSelected('T1'),
               ),
             ),
           if (isTableMatchingFilter(context, tableCategories['T2']))
@@ -86,9 +97,9 @@ class SeatingMap extends StatelessWidget {
               child: SeatingTable(
                 id: 'T2',
                 selected: selectedTable == 'T2',
-                booked: false,
+                booked: isT2Booked,
                 rectangle: true,
-                onTap: () => onTableSelected('T2'),
+                onTap: isT2Booked ? () {} : () => onTableSelected('T2'),
               ),
             ),
           if (isTableMatchingFilter(context, tableCategories['T3']))
@@ -98,8 +109,8 @@ class SeatingMap extends StatelessWidget {
               child: SeatingTable(
                 id: 'T3',
                 selected: selectedTable == 'T3',
-                booked: false,
-                onTap: () => onTableSelected('T3'),
+                booked: isT3Booked,
+                onTap: isT3Booked ? () {} : () => onTableSelected('T3'),
               ),
             ),
           if (isTableMatchingFilter(context, tableCategories['T4']))
@@ -109,8 +120,8 @@ class SeatingMap extends StatelessWidget {
               child: SeatingTable(
                 id: 'T4',
                 selected: selectedTable == 'T4',
-                booked: false,
-                onTap: () => onTableSelected('T4'),
+                booked: isT4Booked,
+                onTap: isT4Booked ? () {} : () => onTableSelected('T4'),
               ),
             ),
           if (isTableMatchingFilter(context, tableCategories['T5']))
@@ -120,9 +131,9 @@ class SeatingMap extends StatelessWidget {
               child: SeatingTable(
                 id: 'T5',
                 selected: selectedTable == 'T5',
-                booked: false,
+                booked: isT5Booked,
                 size: 68,
-                onTap: () => onTableSelected('T5'),
+                onTap: isT5Booked ? () {} : () => onTableSelected('T5'),
               ),
             ),
           if (isTableMatchingFilter(context, tableCategories['T6']))
@@ -132,8 +143,8 @@ class SeatingMap extends StatelessWidget {
               child: SeatingTable(
                 id: 'T6',
                 selected: selectedTable == 'T6',
-                booked: true,
-                onTap: () {},
+                booked: isT6Booked,
+                onTap: isT6Booked ? () {} : () => onTableSelected('T6'),
               ),
             ),
           if (isTableMatchingFilter(context, tableCategories['T7']))
@@ -143,8 +154,8 @@ class SeatingMap extends StatelessWidget {
               child: SeatingTable(
                 id: 'T7',
                 selected: selectedTable == 'T7',
-                booked: false,
-                onTap: () => onTableSelected('T7'),
+                booked: isT7Booked,
+                onTap: isT7Booked ? () {} : () => onTableSelected('T7'),
               ),
             ),
           if (isTableMatchingFilter(context, tableCategories['BAR']))
@@ -152,16 +163,18 @@ class SeatingMap extends StatelessWidget {
               bottom: 18,
               right: 20,
               child: GestureDetector(
-                onTap: () => onTableSelected('BAR'),
+                onTap: isBarBooked ? () {} : () => onTableSelected('BAR'),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                   decoration: BoxDecoration(
-                    color: selectedTable == 'BAR'
-                        ? AppColors.primaryDark
-                        : AppColors.surfaceVariant,
+                    color: isBarBooked
+                        ? AppColors.surfaceVariant
+                        : (selectedTable == 'BAR'
+                            ? AppColors.primaryDark
+                            : AppColors.surfaceVariant),
                     borderRadius: BorderRadius.circular(10),
-                    border: selectedTable == 'BAR'
+                    border: selectedTable == 'BAR' && !isBarBooked
                         ? Border.all(color: AppColors.primary, width: 1.5)
                         : null,
                   ),
@@ -170,9 +183,11 @@ class SeatingMap extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: selectedTable == 'BAR'
-                          ? AppColors.textWhite
-                          : AppColors.textSecondary,
+                      color: isBarBooked
+                          ? AppColors.textMuted
+                          : (selectedTable == 'BAR'
+                              ? AppColors.textWhite
+                              : AppColors.textSecondary),
                     ),
                   ),
                 ),

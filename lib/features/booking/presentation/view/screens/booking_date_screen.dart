@@ -73,14 +73,6 @@ class BookingDateScreen extends StatelessWidget {
                           color: AppColors.textDark,
                         ),
                       ),
-                      Text(
-                        '${cubit.guests} ${AppLocale.guestsCountText.getString(context)}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textDark,
-                        ),
-                      ),
                     ],
                   ),
                 ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import 'package:madinaty_app_ieee_2026/features/discovery/domain/entities/cafe_entity.dart';
 
@@ -10,15 +12,21 @@ class CafeInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            const Icon(
+              Icons.location_on_outlined,
+              size: 16,
+              color: Color(0xFF8D6654),
+            ),
+            const SizedBox(width: 5),
             Expanded(
               child: Text(
-                cafe.address.isNotEmpty ? cafe.address : 'العنوان غير متوفر',
-                textAlign: TextAlign.right,
+                cafe.address.isNotEmpty
+                    ? cafe.address
+                    : AppLocale.addressNotAvailable.getString(context),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -28,33 +36,13 @@ class CafeInfoSection extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 5),
-            const Icon(
-              Icons.location_on_outlined,
-              size: 16,
-              color: Color(0xFF8D6654),
-            ),
           ],
         ),
 
         const SizedBox(height: 10),
 
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            if (cafe.openingHours.isNotEmpty)
-              Expanded(
-                child: Text(
-                  cafe.openingHours,
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 9, color: Colors.grey.shade600),
-                ),
-              ),
-
-            const SizedBox(width: 8),
-
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -64,7 +52,9 @@ class CafeInfoSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                cafe.isOpen ? 'مفتوح الآن' : 'مغلق الآن',
+                cafe.isOpen
+                    ? AppLocale.openNow.getString(context)
+                    : AppLocale.closedNow.getString(context),
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
@@ -74,13 +64,24 @@ class CafeInfoSection extends StatelessWidget {
                 ),
               ),
             ),
+
+            const SizedBox(width: 8),
+
+            if (cafe.openingHours.isNotEmpty)
+              Expanded(
+                child: Text(
+                  cafe.openingHours,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 9, color: Colors.grey.shade600),
+                ),
+              ),
           ],
         ),
 
         if (cafe.attributes.isNotEmpty) ...[
           const SizedBox(height: 10),
           Wrap(
-            alignment: WrapAlignment.end,
             spacing: 6,
             runSpacing: 6,
             children: cafe.attributes.take(4).map((attribute) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 class CafeHeader extends StatelessWidget {
   final String name;
@@ -17,11 +19,27 @@ class CafeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Expanded(
+              flex: 3,
+              child: Text(
+                name.isNotEmpty ? name : AppLocale.defaultCafeFallback.getString(context),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D2521),
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
             InkWell(
               onTap: onReviewsTap,
               borderRadius: BorderRadius.circular(8),
@@ -44,23 +62,6 @@ class CafeHeader extends StatelessWidget {
                 ),
               ),
             ),
-
-            const Spacer(),
-
-            Expanded(
-              flex: 3,
-              child: Text(
-                name.isNotEmpty ? name : 'كافيه',
-                textAlign: TextAlign.right,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 21,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D2521),
-                ),
-              ),
-            ),
           ],
         ),
 
@@ -71,18 +72,17 @@ class CafeHeader extends StatelessWidget {
           borderRadius: BorderRadius.circular(6),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(
-                '($reviewsCount تقييم)',
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-              ),
-              const SizedBox(width: 4),
               const Icon(Icons.star, color: Colors.amber, size: 14),
               const SizedBox(width: 3),
               Text(
                 rating.toStringAsFixed(1),
                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '($reviewsCount ${AppLocale.ratingsCountSuffix.getString(context)})',
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
               ),
             ],
           ),

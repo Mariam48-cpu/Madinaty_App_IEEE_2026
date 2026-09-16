@@ -141,7 +141,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                     ),
                     subtitle: Text(AppLocale.whatsappSupportDesc.getString(context)),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSecondary),
-                    onTap: () => _launchWhatsApp(context, '201095190722'),
+                    onTap: () => _launchWhatsApp(context, '201034841756'),
                   ),
                   const Divider(color: AppColors.border),
                   ListTile(

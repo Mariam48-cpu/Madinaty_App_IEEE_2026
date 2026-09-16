@@ -20,12 +20,10 @@ class ReservationDetailsCard extends StatelessWidget {
         : notSpecified;
     final String bookingTimeStr = booking.time ?? notSpecified;
 
-    // جلب اسم الكافيه الحقيقي من الحجز ديناميكياً
     final String resolvedCafeName = (booking.cafeName != null && booking.cafeName!.trim().isNotEmpty)
         ? booking.cafeName!
         : (booking.cafeId.isNotEmpty ? booking.cafeId : AppLocale.cafeLabel.getString(context));
 
-    // جلب عنوان الكافيه الحقيقي من الحجز ديناميكياً
     final String resolvedCafeLocation = (booking.cafeLocation != null && booking.cafeLocation!.trim().isNotEmpty)
         ? booking.cafeLocation!
         : AppLocale.locationNotSpecified.getString(context);
@@ -76,29 +74,7 @@ class ReservationDetailsCard extends StatelessWidget {
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        directName != null && directName.isNotEmpty
-                            ? Text(
-                                directName,
-                                style: AppTypography.titleLarge,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              )
-                            : FutureBuilder<String>(
-                                future: CafeNameResolver.resolveCafeName(
-                                  booking.cafeId,
-                                ),
-                                builder: (context, snapshot) {
-                                  return Text(
-                                    snapshot.data ??
-                                        booking.cafeId
-                                            .replaceAll('cafe_', '')
-                                            .toUpperCase(),
-                                    style: AppTypography.titleLarge,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  );
-                                },
-                              ),
+
                         const SizedBox(height: 4),
                         Row(
                           children: [
@@ -191,11 +167,14 @@ class ReservationDetailsCard extends StatelessWidget {
                         color: AppColors.primary,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '${AppLocale.occasionOptionalLabel.getString(context)}: ${booking.occasion}',
-                        style: AppTypography.labelMedium.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.onPrimaryContainer,
+                      Flexible(
+                        child: Text(
+                          '${AppLocale.occasionOptionalLabel.getString(context)}: ${booking.occasion}',
+                          style: AppTypography.labelMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.onPrimaryContainer,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

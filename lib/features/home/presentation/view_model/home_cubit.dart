@@ -31,11 +31,24 @@ class HomeCubit extends Cubit<HomeState> {
     @factoryParam required this.currentUserId,
   }) : super(const HomeInitial());
 
+  bool _isToday(DateTime? date) {
+    if (date == null) return false;
+    final now = DateTime.now();
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
+  }
+
   Future<void> fetchHomeData({
     String? categoryFilter,
     LatLng? userLocation,
   }) async {
     if (isClosed) return;
+
+    if (userLocation == null) {
+      emit(HomeError(AppLocale.locationError));
+      return;
+    }
 
     final int requestId = ++_homeRequestId;
 
@@ -52,44 +65,42 @@ class HomeCubit extends Cubit<HomeState> {
           preferences?.interests ??
           [AppLocale.specialtyCoffee, AppLocale.studyPlaces];
 
-      final mood = preferences?.selectedMood;
-      final occasion = preferences?.selectedOccasion;
+      final isSelectionFromToday = _isToday(preferences?.outingReasonDate);
+      final mood = isSelectionFromToday ? preferences?.selectedMood : null;
+      final occasion =
+          isSelectionFromToday ? preferences?.selectedOccasion : null;
 
       String location = '';
 
-      // تحويل الـ GPS الحالي إلى اسم منطقة لاستخدامه
-      // كمعلومة إضافية في نظام التوصيات.
-      if (userLocation != null) {
-        try {
-          final placemarks = await placemarkFromCoordinates(
-            userLocation.latitude,
-            userLocation.longitude,
-          );
+      try {
+        final placemarks = await placemarkFromCoordinates(
+          userLocation.latitude,
+          userLocation.longitude,
+        );
 
-          if (isClosed || requestId != _homeRequestId) {
-            return;
-          }
+        if (isClosed || requestId != _homeRequestId) {
+          return;
+        }
 
-          if (placemarks.isNotEmpty) {
-            final place = placemarks.first;
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
 
-            final possibleNames = <String?>[
-              place.subLocality,
-              place.locality,
-              place.subAdministrativeArea,
-              place.administrativeArea,
-            ];
+          final possibleNames = <String?>[
+            place.subLocality,
+            place.locality,
+            place.subAdministrativeArea,
+            place.administrativeArea,
+          ];
 
-            for (final value in possibleNames) {
-              if (value != null && value.trim().isNotEmpty) {
-                location = value.trim();
-                break;
-              }
+          for (final value in possibleNames) {
+            if (value != null && value.trim().isNotEmpty) {
+              location = value.trim();
+              break;
             }
           }
-        } catch (_) {
-          location = '';
         }
+      } catch (_) {
+        location = '';
       }
 
       if (location.isEmpty) {

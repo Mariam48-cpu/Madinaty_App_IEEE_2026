@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -102,48 +101,9 @@ class CartCubit extends Cubit<CartState> {
 
   Future<void> addToCart(CartItemEntity item) async {
     try {
-      // 1️⃣ Add product to cart
       await addToCartUseCase(item);
-
-      // 2️⃣ Create notification
-      await _createProductAddedNotification();
     } catch (e) {
       emit(CartError(e.toString()));
-    }
-  }
-
-  // ============================================================
-  // PRODUCT ADDED NOTIFICATION
-  // ============================================================
-
-  Future<void> _createProductAddedNotification() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    // User must be logged in
-    if (user == null) {
-      return;
-    }
-
-    try {
-      final result = await createNotificationUseCase(
-        uid: user.uid,
-        title: 'تمت إضافة المنتج 🛒',
-        body: 'تمت إضافة المنتج إلى سلة المشتريات بنجاح.',
-        type: 'product_added_to_cart',
-      );
-
-      result.fold(
-        (failure) {
-          // Notification failed
-          // We don't fail the cart operation because
-          // the product was already added successfully.
-        },
-        (_) {
-          // Notification created successfully
-        },
-      );
-    } catch (_) {
-      // Don't break cart functionality if notification fails.
     }
   }
 

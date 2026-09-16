@@ -61,101 +61,74 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _handleNavigation() async {
     if (_isNavigating) return;
 
-    await Future.delayed(const Duration(seconds: 2));
+    // Synchronize animation completion (1500ms) and minimum splash duration (2000ms)
+    // with asynchronous destination determination.
+    final results = await Future.wait([
+      _controller.forward().catchError((_) => 1.0),
+      Future.delayed(const Duration(seconds: 2)),
+      _determineDestination(),
+    ]);
 
     if (!mounted || _isNavigating) return;
 
-    final isOnboardingSeen = await GetIt.I<IsOnboardingSeen>().call();
+    final destination = results[2] as _SplashDestination;
 
-    if (!mounted || _isNavigating) return;
-
-    // ============================================================
-    // FIRST LAUNCH
-    // ============================================================
-
-    if (!isOnboardingSeen) {
-      _navigateToOnboarding();
-      return;
+    switch (destination.target) {
+      case _SplashTarget.onboarding:
+        _navigateToOnboarding();
+        break;
+      case _SplashTarget.auth:
+        _navigateToAuth();
+        break;
+      case _SplashTarget.ownerDashboard:
+        _navigateToOwnerDashboard(destination.cafeId ?? '');
+        break;
+      case _SplashTarget.personalization:
+        _navigateToPersonalization(initialStep: destination.step ?? 0);
+        break;
+      case _SplashTarget.home:
+        _navigateToHome();
+        break;
     }
+  }
 
-    // ============================================================
-    // FIREBASE USER
-    // ============================================================
-
-    final currentUser = FirebaseAuth.instance.currentUser;
-
-    if (!mounted || _isNavigating) return;
-
-    // ============================================================
-    // NOT LOGGED IN
-    // ============================================================
-
-    if (currentUser == null) {
-      _navigateToAuth();
-      return;
-    }
-
-    // ============================================================
-    // GET USER DATA
-    // ============================================================
-
+  Future<_SplashDestination> _determineDestination() async {
     try {
+      final isOnboardingSeen = await GetIt.I<IsOnboardingSeen>().call();
+
+      if (!isOnboardingSeen) {
+        return _SplashDestination.onboarding;
+      }
+
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser == null) {
+        return _SplashDestination.auth;
+      }
+
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser.uid)
           .get();
 
-      if (!mounted || _isNavigating) return;
-
       if (userDoc.exists && userDoc.data() != null) {
         final data = userDoc.data()!;
-
         final role = (data['role'] as String?)?.trim().toLowerCase();
-
         final cafeId = data['cafeId'] as String?;
-
         final interests = data['interests'] as List<dynamic>?;
 
-        // ========================================================
-        // CAFE OWNER
-        // ========================================================
-
         if (role == 'cafe_owner' || role == 'cafeowner') {
-          _navigateToOwnerDashboard(cafeId ?? '');
-          return;
+          return _SplashDestination.ownerDashboard(cafeId: cafeId ?? '');
         }
 
-        // ========================================================
-        // EXISTING CUSTOMER
-        //
-        // مهم:
-        // لو عنده interests محفوظة، مش هنروح Home مباشرة.
-        //
-        // هنفتح Personalization على STEP 1:
-        // "ليه خارج النهارده؟"
-        // ========================================================
-
         if (interests != null && interests.isNotEmpty) {
-          _navigateToPersonalization(initialStep: 1);
-          return;
+          return _SplashDestination.personalization(step: 1);
         }
       }
 
-      // ==========================================================
-      // NEW CUSTOMER
-      //
-      // مفيش interests محفوظة
-      // نبدأ من STEP 0:
-      // "إيه اللي بتحبه؟"
-      // ==========================================================
-
-      _navigateToPersonalization(initialStep: 0);
+      return _SplashDestination.personalization(step: 0);
     } catch (_) {
-      if (!mounted || _isNavigating) return;
-
-      // لو حصل خطأ في قراءة Firestore
-      // نرجع للـ Home بدل ما التطبيق يعلق.
-      _navigateToHome();
+      return _SplashDestination.home;
     }
   }
 
@@ -281,7 +254,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 children: [
                   const Text(
-                    'Madinaty',
+                    'مدينتي',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -308,4 +281,30 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
+}
+
+class _SplashDestination {
+  final _SplashTarget target;
+  final String? cafeId;
+  final int? step;
+
+  const _SplashDestination._(this.target, {this.cafeId, this.step});
+
+  static const onboarding = _SplashDestination._(_SplashTarget.onboarding);
+  static const auth = _SplashDestination._(_SplashTarget.auth);
+  static const home = _SplashDestination._(_SplashTarget.home);
+
+  factory _SplashDestination.ownerDashboard({required String cafeId}) =>
+      _SplashDestination._(_SplashTarget.ownerDashboard, cafeId: cafeId);
+
+  factory _SplashDestination.personalization({required int step}) =>
+      _SplashDestination._(_SplashTarget.personalization, step: step);
+}
+
+enum _SplashTarget {
+  onboarding,
+  auth,
+  ownerDashboard,
+  personalization,
+  home,
 }

@@ -517,6 +517,7 @@ Future<void> initDependencies() async {
       sl<GetBookingUseCase>(),
       sl<UpdateBookingStatusUseCase>(),
       sl<CreateNotificationUseCase>(),
+      sl<BookingRepositoryInterface>(),
     ),
   );
 

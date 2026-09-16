@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import 'feature_card.dart';
 
@@ -9,22 +11,21 @@ class CafeFeatures extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final features = buildFeatures();
+    final features = buildFeatures(context);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'المرافق والخدمات',
-          textAlign: TextAlign.right,
-          style: TextStyle(
+          AppLocale.facilitiesAndServices.getString(context),
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Color(0xFF2D2521),
           ),
         ),
 
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
 
         GridView.builder(
           shrinkWrap: true,
@@ -49,7 +50,7 @@ class CafeFeatures extends StatelessWidget {
     );
   }
 
-  List<FeatureDataModel> buildFeatures() {
+  List<FeatureDataModel> buildFeatures(BuildContext context) {
     final result = <FeatureDataModel>[];
 
     if (attributes.isNotEmpty) {
@@ -58,7 +59,7 @@ class CafeFeatures extends StatelessWidget {
           FeatureDataModel(
             icon: getIcon(attribute),
             title: attribute,
-            subtitle: 'متاح',
+            subtitle: AppLocale.available.getString(context),
           ),
         );
       }
@@ -66,25 +67,25 @@ class CafeFeatures extends StatelessWidget {
 
     if (result.isEmpty) {
       result.addAll([
-        const FeatureDataModel(
+        FeatureDataModel(
           icon: Icons.wifi,
-          title: 'واي فاي',
-          subtitle: 'متوفر مجانًا',
+          title: AppLocale.wifi.getString(context),
+          subtitle: AppLocale.available.getString(context),
         ),
-        const FeatureDataModel(
+        FeatureDataModel(
           icon: Icons.home_work_outlined,
-          title: 'جلسات داخلية',
-          subtitle: 'متاحة',
+          title: AppLocale.indoorSeating.getString(context),
+          subtitle: AppLocale.available.getString(context),
         ),
-        const FeatureDataModel(
+        FeatureDataModel(
           icon: Icons.pets_outlined,
-          title: 'يسمح بالحيوانات',
-          subtitle: 'الخدمة متاحة',
+          title: AppLocale.petFriendly.getString(context),
+          subtitle: AppLocale.available.getString(context),
         ),
-        const FeatureDataModel(
+        FeatureDataModel(
           icon: Icons.accessible_forward,
-          title: 'مناسب للجميع',
-          subtitle: 'سهولة الوصول',
+          title: AppLocale.wheelchairAccessible.getString(context),
+          subtitle: AppLocale.available.getString(context),
         ),
       ]);
     }

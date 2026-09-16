@@ -7,6 +7,7 @@ class PersonalizationModel extends PersonalizationEntity {
     super.interests,
     super.selectedMood,
     super.selectedOccasion,
+    super.outingReasonDate,
     super.updatedAt,
   });
 
@@ -16,6 +17,7 @@ class PersonalizationModel extends PersonalizationEntity {
       interests: entity.interests,
       selectedMood: entity.selectedMood,
       selectedOccasion: entity.selectedOccasion,
+      outingReasonDate: entity.outingReasonDate,
       updatedAt: entity.updatedAt,
     );
   }
@@ -39,6 +41,7 @@ class PersonalizationModel extends PersonalizationEntity {
           const [],
       selectedMood: map['selectedMood'] as String?,
       selectedOccasion: map['selectedOccasion'] as String?,
+      outingReasonDate: parseDate(map['outingReasonDate']),
       updatedAt: parseDate(map['updatedAt']),
     );
   }
@@ -49,6 +52,9 @@ class PersonalizationModel extends PersonalizationEntity {
       'selectedMood': selectedMood,
       'selectedOccasion': selectedOccasion,
     };
+    if (outingReasonDate != null) {
+      data['outingReasonDate'] = Timestamp.fromDate(outingReasonDate!);
+    }
     if (updatedAt != null) {
       data['updatedAt'] = Timestamp.fromDate(updatedAt!);
     }

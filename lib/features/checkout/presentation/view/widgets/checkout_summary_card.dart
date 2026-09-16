@@ -72,14 +72,17 @@ class CheckoutSummaryCard extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppLocale.total.getString(context),
-                style: AppTypography.titleLarge.copyWith(
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  AppLocale.total.getString(context),
+                  style: AppTypography.titleLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -112,54 +115,38 @@ class CheckoutSummaryCard extends StatelessWidget {
     required String value,
   }) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Flexible(
-                child: Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              Text(
+                title,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
                 ),
               ),
-
               if (subtitle != null) ...[
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.bodySmall.copyWith(
-                      fontSize: 10,
-                      color: AppColors.textMuted,
-                    ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: AppTypography.bodySmall.copyWith(
+                    fontSize: 10,
+                    color: AppColors.textMuted,
                   ),
                 ),
               ],
             ],
           ),
         ),
-
         const SizedBox(width: 12),
-
-        Flexible(
-          flex: 0,
-          child: Text(
-            value,
-            maxLines: 2,
-            textAlign: TextAlign.end,
-            overflow: TextOverflow.ellipsis,
-            style: AppTypography.titleSmall.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
+        Text(
+          value,
+          style: AppTypography.titleSmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
           ),
         ),
       ],

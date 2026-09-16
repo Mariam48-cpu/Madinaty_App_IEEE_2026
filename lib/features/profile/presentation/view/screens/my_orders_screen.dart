@@ -80,9 +80,7 @@ class MyOrdersScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          AppLocale.noNotificationsTitle.getString(context) == 'لا توجد إشعارات'
-                              ? 'لا توجد طلبات حتى الآن'
-                              : 'No orders found yet',
+                          AppLocale.noOrdersYet.getString(context),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

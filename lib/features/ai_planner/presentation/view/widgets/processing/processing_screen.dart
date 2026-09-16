@@ -20,8 +20,8 @@ class ProcessingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       key: const ValueKey('processing'),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

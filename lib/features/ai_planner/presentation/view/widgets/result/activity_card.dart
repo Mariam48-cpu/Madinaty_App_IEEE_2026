@@ -80,7 +80,7 @@ class ActivityCard extends StatelessWidget {
               if (index < totalActivities - 1)
                 Container(
                   width: 2,
-                  height: 155,
+                  height: 180,
                   color: AppColors.primary.withValues(alpha: 0.15),
                 ),
             ],

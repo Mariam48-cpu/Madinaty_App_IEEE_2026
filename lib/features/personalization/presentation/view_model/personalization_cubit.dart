@@ -29,7 +29,7 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
   // LOAD PREFERENCES
   // ============================================================
 
-  Future<void> loadPreferences() async {
+  Future<void> loadPreferences({DateTime? currentDate}) async {
     if (isClosed) return;
 
     emit(const PersonalizationLoadingState());
@@ -39,30 +39,27 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
 
       if (isClosed) return;
 
+      final now = currentDate ?? DateTime.now();
+
+      bool isSameDay(DateTime? d1, DateTime d2) {
+        if (d1 == null) return false;
+        return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
+      }
+
+      final isSelectionFromToday = preferences != null &&
+          isSameDay(preferences.outingReasonDate, now);
+
       // ----------------------------------------------------------
       // USER ALREADY HAS SAVED INTERESTS
       // ----------------------------------------------------------
 
       if (preferences != null && preferences.interests.isNotEmpty) {
-        /*
-         * initialStep determines what we want to show:
-         *
-         * initialStep == 0
-         * ----------------
-         * Show "What do you like?"
-         *
-         * initialStep == 1
-         * ----------------
-         * Skip interests and show
-         * "Why are you going out?"
-         */
-
         if (initialStep == 0) {
           emit(
             PersonalizationLoadedState(
               selectedInterests: preferences.interests,
-              selectedMood: preferences.selectedMood,
-              selectedOccasion: preferences.selectedOccasion,
+              selectedMood: isSelectionFromToday ? preferences.selectedMood : null,
+              selectedOccasion: isSelectionFromToday ? preferences.selectedOccasion : null,
               currentStep: 0,
             ),
           );
@@ -70,8 +67,8 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
           emit(
             PersonalizationLoadedState(
               selectedInterests: preferences.interests,
-              selectedMood: null,
-              selectedOccasion: null,
+              selectedMood: isSelectionFromToday ? preferences.selectedMood : null,
+              selectedOccasion: isSelectionFromToday ? preferences.selectedOccasion : null,
               currentStep: 1,
             ),
           );
@@ -326,12 +323,14 @@ class PersonalizationCubit extends Cubit<PersonalizationState> {
     emit(currentState.copyWith(isSaving: true, clearErrorMessage: true));
 
     try {
+      final now = DateTime.now();
       final entity = PersonalizationEntity(
         userId: currentUserId,
         interests: currentState.selectedInterests,
         selectedMood: currentState.selectedMood,
         selectedOccasion: currentState.selectedOccasion,
-        updatedAt: DateTime.now(),
+        outingReasonDate: now,
+        updatedAt: now,
       );
 
       await _saveUserPreferencesUseCase(entity);

@@ -3,6 +3,7 @@ class PersonalizationEntity {
   final List<String> interests;
   final String? selectedMood;
   final String? selectedOccasion;
+  final DateTime? outingReasonDate;
   final DateTime? updatedAt;
 
   const PersonalizationEntity({
@@ -10,6 +11,7 @@ class PersonalizationEntity {
     this.interests = const [],
     this.selectedMood,
     this.selectedOccasion,
+    this.outingReasonDate,
     this.updatedAt,
   });
 
@@ -18,6 +20,7 @@ class PersonalizationEntity {
     List<String>? interests,
     String? selectedMood,
     String? selectedOccasion,
+    DateTime? outingReasonDate,
     DateTime? updatedAt,
   }) {
     return PersonalizationEntity(
@@ -25,6 +28,7 @@ class PersonalizationEntity {
       interests: interests ?? this.interests,
       selectedMood: selectedMood ?? this.selectedMood,
       selectedOccasion: selectedOccasion ?? this.selectedOccasion,
+      outingReasonDate: outingReasonDate ?? this.outingReasonDate,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -38,6 +42,7 @@ class PersonalizationEntity {
           _listEquals(interests, other.interests) &&
           selectedMood == other.selectedMood &&
           selectedOccasion == other.selectedOccasion &&
+          outingReasonDate == other.outingReasonDate &&
           updatedAt == other.updatedAt;
 
   @override
@@ -46,6 +51,7 @@ class PersonalizationEntity {
         Object.hashAll(interests),
         selectedMood,
         selectedOccasion,
+        outingReasonDate,
         updatedAt,
       );
 

@@ -35,7 +35,7 @@ class GooglePlacesDataSource {
   Future<List<CafeDto>> getNearbyCafes({
     required double latitude,
     required double longitude,
-    double radiusMeters = 2000,
+    double radiusMeters = 3000,
   }) async {
     final url = Uri.parse(
       'https://places.googleapis.com/v1/places:searchNearby',
@@ -74,7 +74,7 @@ class GooglePlacesDataSource {
     required String query,
     double? latitude,
     double? longitude,
-    double radiusMeters = 2000,
+    double radiusMeters = 3000,
   }) async {
     final searchQuery = query.trim();
 

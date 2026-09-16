@@ -66,13 +66,13 @@ class _MyAppState extends State<MyApp> {
           'ar',
           AppLocale.AR,
           countryCode: 'EG',
-          fontFamily: 'Cairo',
+          fontFamily: 'Kufam',
         ),
         const MapLocale(
           'en',
           AppLocale.EN,
           countryCode: 'US',
-          fontFamily: 'Cairo',
+          fontFamily: 'Tajawal',
         ),
       ],
     );
@@ -115,9 +115,9 @@ class _MyAppState extends State<MyApp> {
 
         onGenerateRoute: AppRoutes.onGenerateRoute,
 
-        theme: AppTheme.lightTheme.copyWith(
-          scaffoldBackgroundColor: AppColors.background,
-        ),
+        theme: AppTheme.lightThemeForLocale(
+          _currentLocale,
+        ).copyWith(scaffoldBackgroundColor: AppColors.background),
 
         builder: (context, child) {
           return Directionality(

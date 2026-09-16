@@ -49,12 +49,14 @@ class ResultHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 11),
-              Text(
-                AppLocale.aiPlanReadyTitle.getString(context),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  AppLocale.aiPlanReadyTitle.getString(context),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -89,7 +91,7 @@ class ResultHeader extends StatelessWidget {
               ),
               ResultBadge(
                 text:
-                '${plan.estimatedTotal.round()} ${AppLocale.currency.getString(context)}',
+                '${plan.estimatedTotal.isFinite ? plan.estimatedTotal.round() : 0} ${AppLocale.currency.getString(context)}',
               ),
               if (plan.weatherSummary.isNotEmpty)
                 ResultBadge(text: plan.weatherSummary),

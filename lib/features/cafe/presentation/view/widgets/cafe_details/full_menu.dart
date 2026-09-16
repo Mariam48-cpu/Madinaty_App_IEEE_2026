@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
@@ -19,13 +21,12 @@ class FullMenu extends StatelessWidget {
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 20),
 
         Text(
-          'القائمة الكاملة',
-          textAlign: TextAlign.right,
+          AppLocale.fullMenu.getString(context),
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,

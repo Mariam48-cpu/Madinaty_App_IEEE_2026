@@ -55,8 +55,9 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
       latitude: position.latitude,
       longitude: position.longitude,
     );
-    final weatherText = AppLocale.AR[weather.summaryKey] ?? AppLocale.weatherUnavailable;
-
+    final weatherText = AppLocale.AR[weather.summaryKey] ??
+        AppLocale.AR[AppLocale.weatherUnavailable] ??
+        '';
 
     final nearby = await discoveryRepository.getNearbyCafes(
       latitude: position.latitude,
@@ -66,7 +67,6 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
     if (nearby.isEmpty) {
       throw Exception(AppLocale.noNearbyPlacesAvailable);
     }
-
 
     final preRanked = _preRank(nearby, intent.requirements, position);
 
@@ -81,7 +81,6 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
       );
     }
 
-
     final finalDto = await aiDataSource.rankCandidates(
       intent: intent,
       candidates: candidates,
@@ -89,7 +88,6 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
           '${weather.temperature.toStringAsFixed(0)}°C. '
           '${weatherText}',
     );
-
 
     final byId = {for (final cafe in preRanked) cafe.id: cafe};
 
@@ -128,8 +126,7 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
             photos: cafe.photos,
             location: cafe.location,
             distanceMeters: _distanceMeters(position, cafe),
-            estimatedCost:
-                (candidate?['estimatedCost'] as num?)?.toDouble() ?? 0,
+            estimatedCost: _parseDynamicDouble(candidate?['estimatedCost']),
             matchScore: dto.matchScore,
             reason: dto.reason,
           ),
@@ -137,21 +134,21 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
       );
     }
 
-
     if (activities.isEmpty) {
       final fallback = preRanked.first;
 
       double fallbackCost = 0;
 
       if (candidates.isNotEmpty) {
-        fallbackCost =
-            (candidates.first['estimatedCost'] as num?)?.toDouble() ?? 0;
+        fallbackCost = _parseDynamicDouble(candidates.first['estimatedCost']);
       }
 
       activities.add(
         AIPlanActivityEntity(
-          title: AppLocale.suitableCafeForYou,
-          purpose: intent.mood.isEmpty ? AppLocale.chillSitting : intent.mood,
+          title: AppLocale.AR[AppLocale.suitableCafeForYou] ?? 'كافيه مناسب لك',
+          purpose: intent.mood.isEmpty
+              ? (AppLocale.AR[AppLocale.chillSitting] ?? 'جلسة هادية')
+              : intent.mood,
           category: 'cafe',
           requirements: intent.requirements,
           durationMinutes: request.durationHours * 60 < 45
@@ -171,8 +168,8 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
             distanceMeters: _distanceMeters(position, fallback),
             estimatedCost: fallbackCost,
             matchScore: 80,
-            reason:
-            AppLocale.nearbyRecommendation
+            reason: AppLocale.AR[AppLocale.nearbyRecommendation] ??
+                'ترشيح بناءً على الأماكن القريبة منك',
           ),
         ),
       );
@@ -326,5 +323,11 @@ class AIPlannerRepositoryImpl implements AIPlannerRepository {
 
   String _normalize(String value) {
     return value.toLowerCase().replaceAll('-', ' ').trim();
+  }
+
+  double _parseDynamicDouble(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value.trim()) ?? 0.0;
+    return 0.0;
   }
 }

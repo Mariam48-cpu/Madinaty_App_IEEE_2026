@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
 
@@ -19,17 +21,17 @@ class _MenuProductItemState extends State<MenuProductItem> {
       onTap: widget.onTap,
       child: Container(
         width: 145,
-        margin: EdgeInsets.only(left: 10),
+        margin: const EdgeInsets.only(left: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Color(0xFFF0E5DF)),
+          border: Border.all(color: const Color(0xFFF0E5DF)),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
               child: SizedBox(
                 height: 82,
                 width: double.infinity,
@@ -39,8 +41,8 @@ class _MenuProductItemState extends State<MenuProductItem> {
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) {
                           return Container(
-                            color: Color(0xFFF3EAE5),
-                            child: Center(
+                            color: const Color(0xFFF3EAE5),
+                            child: const Center(
                               child: Icon(
                                 Icons.local_cafe,
                                 color: Color(0xFF8D6654),
@@ -51,8 +53,8 @@ class _MenuProductItemState extends State<MenuProductItem> {
                         },
                       )
                     : Container(
-                        color: Color(0xFFF3EAE5),
-                        child: Center(
+                        color: const Color(0xFFF3EAE5),
+                        child: const Center(
                           child: Icon(
                             Icons.local_cafe,
                             color: Color(0xFF8D6654),
@@ -64,25 +66,24 @@ class _MenuProductItemState extends State<MenuProductItem> {
             ),
 
             Padding(
-              padding: EdgeInsets.fromLTRB(8, 7, 8, 8),
+              padding: const EdgeInsets.fromLTRB(8, 7, 8, 8),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.product.name.isNotEmpty
                         ? widget.product.name
-                        : 'منتج',
-                    textAlign: TextAlign.right,
+                        : AppLocale.defaultProductFallback.getString(context),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                   ),
 
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
 
                   Text(
-                    '${widget.product.price.toStringAsFixed(0)} ج.م',
-                    style: TextStyle(
+                    '${widget.product.price.toStringAsFixed(0)} ${AppLocale.egpCurrency.getString(context)}',
+                    style: const TextStyle(
                       color: Color(0xFF8D6654),
                       fontSize: 10,
                       fontWeight: FontWeight.bold,

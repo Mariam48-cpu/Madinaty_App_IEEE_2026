@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:madinaty_app_ieee_2026/core/widgets/skeletons/payment_skeleton.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
 import '../../../../booking/domain/entities/booking_entity.dart';
 
 class PaymobWebViewScreen extends StatefulWidget {
@@ -20,14 +20,54 @@ class PaymobWebViewScreen extends StatefulWidget {
 
 class _PaymobWebViewScreenState extends State<PaymobWebViewScreen> {
   late final WebViewController _controller;
-
   bool _isLoading = true;
   bool _isHandled = false;
+  Timer? _pollingTimer;
 
   @override
   void initState() {
     super.initState();
     _initWebViewController();
+    _startStatusPolling();
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startStatusPolling() {
+    _pollingTimer = Timer.periodic(const Duration(milliseconds: 800), (timer) async {
+      if (_isHandled || !mounted) {
+        timer.cancel();
+        return;
+      }
+      try {
+        final currentUrl = await _controller.currentUrl();
+        if (currentUrl != null) {
+          _checkTransactionStatus(currentUrl);
+        }
+
+        final pageContent = await _controller
+            .runJavaScriptReturningResult("document.body.innerText");
+        final contentStr = pageContent.toString().toLowerCase();
+
+        if (contentStr.contains('approved') ||
+            contentStr.contains('successful') ||
+            contentStr.contains('success') ||
+            contentStr.contains('تمت العملية') ||
+            contentStr.contains('تم الدفع بنجاح') ||
+            contentStr.contains('transaction successful')) {
+          _handleSuccess();
+        } else if (contentStr.contains('declined') ||
+            contentStr.contains('failed') ||
+            contentStr.contains('فشلت') ||
+            contentStr.contains('rejected')) {
+          _handleFailure();
+        }
+      } catch (_) {}
+    });
   }
 
   void _initWebViewController() {
@@ -37,40 +77,15 @@ class _PaymobWebViewScreenState extends State<PaymobWebViewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
-            debugPrint('PAYMOB PAGE STARTED: $url');
             _checkTransactionStatus(url);
           },
-
           onPageFinished: (String url) {
-            debugPrint('PAYMOB PAGE FINISHED: $url');
-
-            if (mounted) {
-              setState(() {
-                _isLoading = false;
-              });
-            }
-
+            if (mounted) setState(() => _isLoading = false);
             _checkTransactionStatus(url);
           },
-
           onNavigationRequest: (NavigationRequest request) {
-            debugPrint('PAYMOB NAVIGATION: ${request.url}');
-
             _checkTransactionStatus(request.url);
-
-            /*
-             * مهم:
-             * لا نوقف أي navigation.
-             * Paymob محتاج يكمل الـ flow الطبيعي بتاعه.
-             */
             return NavigationDecision.navigate;
-          },
-
-          onWebResourceError: (WebResourceError error) {
-            debugPrint(
-              'PAYMOB WEBVIEW ERROR: '
-              '${error.errorCode} - ${error.description}',
-            );
           },
         ),
       )
@@ -79,174 +94,67 @@ class _PaymobWebViewScreenState extends State<PaymobWebViewScreen> {
 
   void _checkTransactionStatus(String url) {
     if (_isHandled) return;
+    debugPrint('PAYMOB URL CHECK: $url');
 
-    debugPrint('PAYMOB STATUS CHECK: $url');
-
-    Uri uri;
-
-    try {
-      uri = Uri.parse(url);
-    } catch (_) {
-      return;
-    }
-
+    final uri = Uri.parse(url);
     final query = uri.queryParameters;
 
-    final successValue = query['success']?.trim().toLowerCase();
+    final isCallbackHit = url.contains('madinaty-app.web.app') ||
+        url.contains('post_pay') ||
+        url.contains('acceptance/post_pay');
 
-    final transactionResponse = query['txn_response_code']
-        ?.trim()
-        .toUpperCase();
+    final isExplicitSuccess = url.contains('success=true') ||
+        query['success'] == 'true' ||
+        url.contains('txn_response_code=APPROVED') ||
+        (query['data.message']?.toLowerCase().contains('approved') ?? false) ||
+        (query['message']?.toLowerCase().contains('approved') ?? false);
 
-    final message = (query['message'] ?? query['data.message'] ?? '')
-        .trim()
-        .toLowerCase();
+    final isFailed = url.contains('success=false') ||
+        query['success'] == 'false' ||
+        url.contains('txn_response_code=DECLINED') ||
+        (query['data.message']?.toLowerCase().contains('declined') ?? false);
 
-    /*
-     * ============================================================
-     * SUCCESS
-     * ============================================================
-     *
-     * لازم يكون فيه دليل صريح جدًا على نجاح العملية.
-     *
-     * مجرد:
-     * - callback
-     * - post_pay
-     * - acceptance
-     * - رجوع من Paymob
-     *
-     * لا يعني أن الدفع نجح.
-     */
-    final isExplicitSuccess =
-        successValue == 'true' ||
-        transactionResponse == 'APPROVED' ||
-        message == 'approved' ||
-        message.contains('transaction approved') ||
-        message.contains('payment approved');
-
-    /*
-     * ============================================================
-     * FAILURE
-     * ============================================================
-     */
-    final isExplicitFailure =
-        successValue == 'false' ||
-        transactionResponse == 'DECLINED' ||
-        transactionResponse == 'FAILED' ||
-        transactionResponse == 'CANCELLED' ||
-        transactionResponse == 'CANCELED' ||
-        message == 'declined' ||
-        message == 'failed' ||
-        message == 'rejected' ||
-        message == 'cancelled' ||
-        message == 'canceled' ||
-        message.contains('transaction declined') ||
-        message.contains('payment failed');
-
-    if (isExplicitFailure) {
-      debugPrint('PAYMOB RESULT: FAILED');
-
-      _handleFailure();
-      return;
-    }
-
-    if (isExplicitSuccess) {
-      debugPrint('PAYMOB RESULT: SUCCESS');
-
+    if (isExplicitSuccess || (isCallbackHit && !isFailed)) {
       _handleSuccess();
-      return;
+    } else if (isFailed) {
+      _handleFailure();
     }
-
-    /*
-     * أي URL آخر:
-     *
-     * لا نعمل أي حاجة.
-     *
-     * مهم جدًا إننا ما نقولش success لمجرد إننا وصلنا
-     * إلى callback URL.
-     */
   }
 
   void _handleSuccess() {
     if (_isHandled) return;
-
     _isHandled = true;
+    _pollingTimer?.cancel();
 
-    debugPrint('PAYMOB WEBVIEW: returning TRUE');
-
-    if (!mounted) return;
-
-    Navigator.of(context).pop(true);
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
   }
 
   void _handleFailure() {
     if (_isHandled) return;
-
     _isHandled = true;
-
-    debugPrint('PAYMOB WEBVIEW: returning FALSE');
-
-    if (!mounted) return;
-
-    Navigator.of(context).pop(false);
-  }
-
-  Future<bool> _handleBackPressed() async {
-    /*
-     * لو المستخدم ضغط Back:
-     *
-     * لا نعتبر الدفع ناجح.
-     * نرجع false للـ CheckoutScreen.
-     */
-    if (_isHandled) {
-      return true;
-    }
-
-    _isHandled = true;
-
-    debugPrint('PAYMOB WEBVIEW: USER CANCELLED / BACK');
+    _pollingTimer?.cancel();
 
     if (mounted) {
       Navigator.of(context).pop(false);
     }
-
-    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-
-        await _handleBackPressed();
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-
-        appBar: AppBar(
-          title: const Text('بوابة الدفع الآمن'),
-          centerTitle: true,
-
-          /*
-           * زر الرجوع في الـ AppBar لازم يتعامل كـ cancel
-           * وليس success.
-           */
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: _handleBackPressed,
-          ),
-        ),
-
-        body: Stack(
-          children: [
-            WebViewWidget(controller: _controller),
-
-            if (_isLoading)
-              const Positioned.fill(child: PaymentWebViewSkeleton()),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('بوابة الدفع الآمن'),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (_isLoading)
+            const Positioned.fill(child: PaymentWebViewSkeleton()),
+        ],
       ),
     );
   }

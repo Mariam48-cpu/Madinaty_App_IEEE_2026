@@ -12,9 +12,6 @@ import '../models/cafe_dto.dart';
 
 @LazySingleton(as: RecommendationRepository)
 class RecommendationRepositoryImpl implements RecommendationRepository {
-  static const double _homeRadiusKm = 2.0;
-  static const double _homeRadiusMeters = 2000;
-
   final GooglePlacesDataSource placesDataSource;
   final FirebaseFirestore firestore;
 
@@ -98,15 +95,95 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
   }
 
   // ============================================================
-  // Distance validation
+  // Centralized Interest / Search Terms Mapper
   // ============================================================
 
-  bool _isInsideHomeRadius(double distanceKm) {
-    if (distanceKm == double.infinity) {
-      return false;
+  List<String> _getSearchQueriesForInterest(String interest) {
+    final trimmed = interest.trim();
+    const Map<String, List<String>> mapping = {
+      'قهوة مختصة': ['specialty coffee', 'coffee shop'],
+      'أماكن للمذاكرة': ['study cafe', 'quiet cafe', 'workspace cafe'],
+      'جلسة هادئة': ['quiet cafe', 'cozy cafe'],
+      'مناسبة خاصة': ['cozy cafe', 'restaurant cafe'],
+      'أنا وإخوتي/أصدقائي': ['group cafe', 'lounge cafe'],
+      'عمل / مذاكرة': ['study cafe', 'workspace cafe'],
+      'work': ['workspace cafe', 'study cafe'],
+      'study': ['study cafe'],
+      'coffee': ['specialty coffee'],
+    };
+
+    if (mapping.containsKey(trimmed)) {
+      return mapping[trimmed]!;
     }
 
-    return distanceKm <= _homeRadiusKm;
+    if (trimmed.toLowerCase().contains('cafe') ||
+        trimmed.toLowerCase().contains('قهوة')) {
+      return [trimmed];
+    }
+
+    return ['$trimmed cafe'];
+  }
+
+  // ============================================================
+  // Ranking Score Calculation
+  // ============================================================
+
+  double _calculateRankScore({
+    required CafeRecommendationEntity cafe,
+    required List<String> userInterests,
+    required String? mood,
+    required String? occasion,
+  }) {
+    final d = cafe.distanceKm;
+    if (d == double.infinity) return -1.0;
+
+    // 1. Proximity Score (Max 100)
+    double proximityScore;
+    if (d <= 1.0) {
+      proximityScore = 100.0;
+    } else if (d <= 3.0) {
+      proximityScore = 100.0 - (d - 1.0) * 20.0; // 3km -> 60.0
+    } else if (d <= 5.0) {
+      proximityScore = 60.0 - (d - 3.0) * 15.0; // 5km -> 30.0
+    } else {
+      proximityScore = math.max(0.0, 30.0 - (d - 5.0) * 4.0);
+    }
+
+    // 2. Personalization Relevance Score (Max ~40)
+    double personalizationScore = 0.0;
+    for (final interest in userInterests) {
+      final normInterest = interest.trim().toLowerCase();
+      for (final cafeInterest in cafe.interests) {
+        final normCafeInterest = cafeInterest.trim().toLowerCase();
+        if (normCafeInterest.contains(normInterest) ||
+            normInterest.contains(normCafeInterest)) {
+          personalizationScore += 15.0;
+          break;
+        }
+      }
+    }
+
+    if (mood != null && mood.trim().isNotEmpty) {
+      final normMood = mood.trim().toLowerCase();
+      if (cafe.name.toLowerCase().contains(normMood) ||
+          cafe.description.toLowerCase().contains(normMood)) {
+        personalizationScore += 10.0;
+      }
+    }
+
+    if (occasion != null && occasion.trim().isNotEmpty) {
+      final normOcc = occasion.trim().toLowerCase();
+      if (cafe.name.toLowerCase().contains(normOcc) ||
+          cafe.description.toLowerCase().contains(normOcc)) {
+        personalizationScore += 10.0;
+      }
+    }
+
+    // 3. Quality & Rating Score (Max ~20)
+    final qualityScore =
+        (cafe.rating / 5.0) * 15.0 + math.min(cafe.reviewsCount / 100.0, 5.0);
+
+    return proximityScore + personalizationScore + qualityScore;
   }
 
   // ============================================================
@@ -156,60 +233,52 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
     required String location,
     LatLng? userLocation,
   }) async {
-    final List<CafeRecommendationEntity> allCafes = [];
+    // ------------------------------------------------------------
+    // LOCATION IS MANDATORY. Return empty list if no GPS/location.
+    // ------------------------------------------------------------
+    if (userLocation == null) {
+      return [];
+    }
 
+    final List<CafeRecommendationEntity> allCafes = [];
     final firebaseImages = await _getFirebaseImages();
 
-    // ==========================================================
-    // 1. GPS موجود
-    // ==========================================================
+    // Dynamic radius stages: 3 KM -> 5 KM -> 8 KM
+    final radiusStagesMeters = [3000.0, 5000.0, 8000.0];
 
-    if (userLocation != null) {
-      try {
-        // --------------------------------------------------------
-        // Search by interests
-        // --------------------------------------------------------
+    for (final radiusMeters in radiusStagesMeters) {
+      final radiusKm = radiusMeters / 1000.0;
 
-        if (interests.isNotEmpty) {
-          for (final interest in interests) {
+      // 1. Search by personalized interests
+      if (interests.isNotEmpty) {
+        for (final interest in interests) {
+          final queries = _getSearchQueriesForInterest(interest);
+
+          for (final query in queries) {
             try {
               final dtos = await placesDataSource.searchCafes(
-                query: '$interest cafe',
+                query: query,
                 latitude: userLocation.latitude,
                 longitude: userLocation.longitude,
-                radiusMeters: _homeRadiusMeters,
+                radiusMeters: radiusMeters,
               );
 
               for (final dto in dtos) {
-                if (dto.id == null || dto.id!.isEmpty) {
-                  continue;
-                }
+                if (dto.id == null || dto.id!.isEmpty) continue;
 
                 final distanceKm = _calculateDistanceKm(
                   userLocation: userLocation,
                   cafe: dto,
                 );
 
-                // ------------------------------------------------
-                // IMPORTANT:
-                //
-                // Google locationBias is NOT a strict radius.
-                //
-                // لذلك هنا نعمل فلترة حقيقية.
-                // أي مكان أبعد من 2 KM يتم تجاهله.
-                // ------------------------------------------------
-
-                if (!_isInsideHomeRadius(distanceKm)) {
+                if (distanceKm == double.infinity || distanceKm > radiusKm) {
                   continue;
                 }
 
                 String imageUrl = '';
-
                 if (firebaseImages.isNotEmpty) {
-                  imageUrl =
-                      firebaseImages[allCafes.length % firebaseImages.length];
+                  imageUrl = firebaseImages[allCafes.length % firebaseImages.length];
                 }
-
                 if (imageUrl.isEmpty) {
                   imageUrl = _getGoogleImageUrl(dto);
                 }
@@ -220,63 +289,46 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
                     imageUrl: imageUrl,
                     location: location,
                     interests: [interest],
-                    moods: [
-                      if (mood != null && mood.trim().isNotEmpty)
-                        mood
-                      else
-                        AppLocale.quietChill,
-                    ],
-                    occasions: [
-                      if (occasion != null && occasion.trim().isNotEmpty)
-                        occasion
-                      else
-                        AppLocale.occasionOther,
-                    ],
+                    moods: [if (mood != null && mood.trim().isNotEmpty) mood else AppLocale.quietChill],
+                    occasions: [if (occasion != null && occasion.trim().isNotEmpty) occasion else AppLocale.occasionOther],
                     description: '${AppLocale.suitableForPrefix} $interest',
                     distanceKm: distanceKm,
                   ),
                 );
               }
             } catch (_) {
-              // لو interest معين فشل، نكمل باقي interests.
+              // Ignore single query error and continue
             }
           }
         }
+      }
 
-        // ========================================================
-        // 2. لو مفيش نتائج بالـ interests
-        // ========================================================
-
-        if (allCafes.isEmpty) {
+      // 2. Fetch nearby cafes if interest search yielded too few results
+      if (allCafes.length < 5) {
+        try {
           final dtos = await placesDataSource.getNearbyCafes(
             latitude: userLocation.latitude,
             longitude: userLocation.longitude,
-            radiusMeters: _homeRadiusMeters,
+            radiusMeters: radiusMeters,
           );
 
           for (int i = 0; i < dtos.length; i++) {
             final dto = dtos[i];
-
-            if (dto.id == null || dto.id!.isEmpty) {
-              continue;
-            }
+            if (dto.id == null || dto.id!.isEmpty) continue;
 
             final distanceKm = _calculateDistanceKm(
               userLocation: userLocation,
               cafe: dto,
             );
 
-            // Strict 2 KM filtering.
-            if (!_isInsideHomeRadius(distanceKm)) {
+            if (distanceKm == double.infinity || distanceKm > radiusKm) {
               continue;
             }
 
             String imageUrl = '';
-
             if (firebaseImages.isNotEmpty) {
               imageUrl = firebaseImages[i % firebaseImages.length];
             }
-
             if (imageUrl.isEmpty) {
               imageUrl = _getGoogleImageUrl(dto);
             }
@@ -294,126 +346,19 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
               ),
             );
           }
-        }
-      } catch (_) {
-        // لو Google فشل والمستخدم عنده GPS،
-        // نرجع للقائمة الفارغة بدل استخدام موقع القاهرة
-        // كموقع للمستخدم.
+        } catch (_) {}
+      }
+
+      // Stop expanding radius if we found enough cafes (>= 5)
+      if (allCafes.length >= 5) {
+        break;
       }
     }
 
-    // ============================================================
-    // 3. بدون GPS
-    // ============================================================
-
-    if (allCafes.isEmpty && userLocation == null) {
-      if (interests.isNotEmpty) {
-        for (final interest in interests) {
-          try {
-            final dtos = await placesDataSource.searchCafes(query: interest);
-
-            for (final dto in dtos) {
-              if (dto.id == null || dto.id!.isEmpty) {
-                continue;
-              }
-
-              String imageUrl = '';
-
-              if (firebaseImages.isNotEmpty) {
-                imageUrl =
-                    firebaseImages[allCafes.length % firebaseImages.length];
-              }
-
-              if (imageUrl.isEmpty) {
-                imageUrl = _getGoogleImageUrl(dto);
-              }
-
-              allCafes.add(
-                _createCafeEntity(
-                  dto: dto,
-                  imageUrl: imageUrl,
-                  location: location,
-                  interests: [interest],
-                  moods: [
-                    if (mood != null && mood.trim().isNotEmpty)
-                      mood
-                    else
-                      AppLocale.quietChill,
-                  ],
-                  occasions: [
-                    if (occasion != null && occasion.trim().isNotEmpty)
-                      occasion
-                    else
-                      AppLocale.occasionOther,
-                  ],
-                  description: '${AppLocale.suitableForPrefix} $interest',
-                ),
-              );
-            }
-          } catch (_) {
-            // Continue with the next interest.
-          }
-        }
-      }
-
-      // ----------------------------------------------------------
-      // Last technical fallback:
-      // Cairo only when there is NO GPS at all.
-      // ----------------------------------------------------------
-
-      if (allCafes.isEmpty) {
-        try {
-          final defaultDtos = await placesDataSource.getNearbyCafes(
-            latitude: 30.0444,
-            longitude: 31.2357,
-            radiusMeters: _homeRadiusMeters,
-          );
-
-          for (int i = 0; i < defaultDtos.length; i++) {
-            final dto = defaultDtos[i];
-
-            if (dto.id == null || dto.id!.isEmpty) {
-              continue;
-            }
-
-            String imageUrl = '';
-
-            if (firebaseImages.isNotEmpty) {
-              imageUrl = firebaseImages[i % firebaseImages.length];
-            }
-
-            if (imageUrl.isEmpty) {
-              imageUrl = _getGoogleImageUrl(dto);
-            }
-
-            allCafes.add(
-              _createCafeEntity(
-                dto: dto,
-                imageUrl: imageUrl,
-                location: location,
-                interests: [AppLocale.specialtyCoffee],
-                moods: [mood ?? AppLocale.quietChill],
-                occasions: [occasion ?? AppLocale.occasionOther],
-                description: AppLocale.nearbyRecommendation,
-              ),
-            );
-          }
-        } catch (e) {
-          throw Exception('${AppLocale.failedToLoadCafesError}: $e');
-        }
-      }
-    }
-
-    // ============================================================
-    // Remove duplicates
-    // ============================================================
-
+    // Deduplicate cafes by ID
     final uniqueCafes = <String, CafeRecommendationEntity>{};
-
     for (final cafe in allCafes) {
-      if (cafe.id.isEmpty) {
-        continue;
-      }
+      if (cafe.id.isEmpty) continue;
 
       if (!uniqueCafes.containsKey(cafe.id)) {
         uniqueCafes[cafe.id] = cafe;
@@ -421,35 +366,19 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
       }
 
       final existing = uniqueCafes[cafe.id]!;
-
-      final mergedInterests = [
-        ...existing.interests,
-        ...cafe.interests,
-      ].toSet().toList();
-
-      final mergedMoods = [...existing.moods, ...cafe.moods].toSet().toList();
-
-      final mergedOccasions = [
-        ...existing.occasions,
-        ...cafe.occasions,
-      ].toSet().toList();
-
+      final mergedInterests = {...existing.interests, ...cafe.interests}.toList();
+      final mergedMoods = {...existing.moods, ...cafe.moods}.toList();
+      final mergedOccasions = {...existing.occasions, ...cafe.occasions}.toList();
       final nearestDistance = math.min(existing.distanceKm, cafe.distanceKm);
 
       uniqueCafes[cafe.id] = CafeRecommendationEntity(
         id: existing.id,
         name: existing.name,
-        imageUrl: existing.imageUrl.isNotEmpty
-            ? existing.imageUrl
-            : cafe.imageUrl,
+        imageUrl: existing.imageUrl.isNotEmpty ? existing.imageUrl : cafe.imageUrl,
         rating: existing.rating > 0 ? existing.rating : cafe.rating,
-        reviewsCount: existing.reviewsCount > 0
-            ? existing.reviewsCount
-            : cafe.reviewsCount,
+        reviewsCount: existing.reviewsCount > 0 ? existing.reviewsCount : cafe.reviewsCount,
         distanceKm: nearestDistance,
-        location: existing.location.isNotEmpty
-            ? existing.location
-            : cafe.location,
+        location: existing.location.isNotEmpty ? existing.location : cafe.location,
         description: existing.description,
         interests: mergedInterests,
         moods: mergedMoods,
@@ -461,13 +390,22 @@ class RecommendationRepositoryImpl implements RecommendationRepository {
 
     final results = uniqueCafes.values.toList();
 
-    // ============================================================
-    // Sort by distance
-    // ============================================================
-
-    if (userLocation != null) {
-      results.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
-    }
+    // Sort using weighted proximity-first ranking score
+    results.sort((a, b) {
+      final scoreA = _calculateRankScore(
+        cafe: a,
+        userInterests: interests,
+        mood: mood,
+        occasion: occasion,
+      );
+      final scoreB = _calculateRankScore(
+        cafe: b,
+        userInterests: interests,
+        mood: mood,
+        occasion: occasion,
+      );
+      return scoreB.compareTo(scoreA); // Descending order
+    });
 
     return results;
   }

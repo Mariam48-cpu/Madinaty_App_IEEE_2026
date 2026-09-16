@@ -8,8 +8,8 @@ abstract class AppTypography {
   // FONT FAMILIES
   // ============================================================
 
-  /// Arabic primary font.
-  static const String arabicFontFamily = 'ReemKufi';
+  /// Arabic primary font (الخط الأساسي الجديد).
+  static const String arabicFontFamily = 'Kufam';
 
   /// English primary font.
   static const String englishFontFamily = 'Tajawal';
@@ -22,11 +22,12 @@ abstract class AppTypography {
   /// inside AppTheme.
   static const String fontFamily = arabicFontFamily;
 
-  /// Arabic fallback fonts.
+  /// Arabic fallback fonts (دمج القديم ReemKufi مع Kufam والبدائل).
   static const List<String> arabicFontFamilyFallback = [
+    'Kufam',
     'ReemKufi',
-    'Tajawal',
     'Cairo',
+    'Tajawal',
     'Roboto',
     'sans-serif',
   ];
@@ -42,7 +43,7 @@ abstract class AppTypography {
   static const List<String> decorativeFontFamilyFallback = [
     'BerkshireSwash',
     'Tajawal',
-    'ReemKufi',
+    'Kufam',
     'Roboto',
     'sans-serif',
   ];
@@ -160,23 +161,23 @@ abstract class AppTypography {
 
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w500,
     height: 1.5,
     color: AppColors.textPrimary,
   );
 
   static const TextStyle bodyMedium = TextStyle(
     fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w500,
     height: 1.5,
-    color: AppColors.textSecondary,
+    color: AppColors.textPrimary,
   );
 
   static const TextStyle bodySmall = TextStyle(
     fontSize: 12,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.w500,
     height: 1.5,
-    color: AppColors.textMuted,
+    color: AppColors.textSecondary,
   );
 
   // ============================================================
@@ -201,7 +202,7 @@ abstract class AppTypography {
     fontSize: 11,
     fontWeight: FontWeight.w500,
     height: 1.4,
-    color: AppColors.textMuted,
+    color: AppColors.textSecondary,
   );
 
   // ============================================================

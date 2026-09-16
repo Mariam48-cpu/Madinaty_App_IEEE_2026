@@ -76,9 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (!mounted) return;
 
-        // مهم:
-        // ابعت الموقع الحالي للـ HomeCubit
         await context.read<HomeCubit>().fetchHomeData(userLocation: location);
+      } else {
+        if (discoveryCubit.state is DiscoveryError) {
+          if (!mounted) return;
+          await context.read<HomeCubit>().fetchHomeData(userLocation: null);
+        } else {
+          await discoveryCubit.loadNearbyCafes();
+        }
       }
     });
   }
@@ -234,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomePage() {
     return BlocListener<DiscoveryCubit, DiscoveryState>(
       listenWhen: (previous, current) {
-        return current is DiscoverySuccess;
+        return current is DiscoverySuccess || current is DiscoveryError;
       },
 
       listener: (context, state) async {
@@ -242,16 +247,18 @@ class _HomeScreenState extends State<HomeScreen> {
           final location = state.currentLocation;
 
           if (location != null) {
-            // تحديث اسم المنطقة المعروض فوق
+            final homeCubit = context.read<HomeCubit>();
             await _resolveLocationName(location);
 
             if (!mounted) return;
 
-            // تحديث الكافيهات بناءً على الموقع الجديد
-            await context.read<HomeCubit>().fetchHomeData(
+            await homeCubit.fetchHomeData(
               userLocation: location,
             );
           }
+        } else if (state is DiscoveryError) {
+          if (!mounted) return;
+          await context.read<HomeCubit>().fetchHomeData(userLocation: null);
         }
       },
 

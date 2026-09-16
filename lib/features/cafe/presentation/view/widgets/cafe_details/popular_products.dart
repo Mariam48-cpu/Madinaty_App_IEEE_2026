@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/cafe_experience_entity.dart';
 
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
@@ -25,11 +27,19 @@ class PopularProducts extends StatelessWidget {
         .toList();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Text(
+              AppLocale.mostOrdered.getString(context),
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D2521),
+              ),
+            ),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -42,22 +52,13 @@ class PopularProducts extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text(
-                'عرض القائمة',
-                style: TextStyle(
+              child: Text(
+                AppLocale.viewMenu.getString(context),
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF8D6654),
                 ),
-              ),
-            ),
-            const Text(
-              'الأكثر طلبًا',
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D2521),
               ),
             ),
           ],

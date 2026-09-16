@@ -124,12 +124,34 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/fonts/cairo/
+    - assets/fonts/kufam/
+    - assets/fonts/reemkufi/
     - assets/images/splash/
     - assets/images/onboarding/
 
   # Custom font family definition for Cairo (Arabic UI)
 
   fonts:
+    - family: Kufam
+      fonts:
+        - asset: assets/fonts/kufam/Kufam-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/kufam/Kufam-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/kufam/Kufam-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/kufam/Kufam-Bold.ttf
+          weight: 700
+    - family: ReemKufi
+      fonts:
+        - asset: assets/fonts/reemkufi/ReemKufi-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/reemkufi/ReemKufi-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/reemkufi/ReemKufi-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/reemkufi/ReemKufi-Bold.ttf
+          weight: 700
     - family: Cairo
       fonts:
         - asset: assets/fonts/cairo/Cairo-Regular.ttf
@@ -152,16 +174,6 @@ flutter:
           weight: 800
         - asset: assets/fonts/tajawal/Tajawal-Black.ttf
           weight: 900
-    - family: ReemKufi       
-      fonts:
-        - asset: assets/fonts/reemkufi/ReemKufi-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/reemkufi/ReemKufi-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/reemkufi/ReemKufi-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/reemkufi/ReemKufi-Bold.ttf
-          weight: 700
     - family: BerkshireSwash
       fonts:
         - asset: assets/fonts/berkshireswash/BerkshireSwash-Regular.ttf

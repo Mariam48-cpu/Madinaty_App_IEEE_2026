@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/cafe_experience_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/menu_category_entity.dart';
 import 'package:madinaty_app_ieee_2026/features/cafe/domain/entities/product_entity.dart';
@@ -22,10 +24,10 @@ class CafeMenuSection extends StatelessWidget {
           color: const Color(0xFFFFF8F4),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Text(
-          'القائمة غير متاحة حاليًا',
+        child: Text(
+          AppLocale.menuUnavailable.getString(context),
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 11, color: Color(0xFF806C61)),
+          style: const TextStyle(fontSize: 11, color: Color(0xFF806C61)),
         ),
       );
     }

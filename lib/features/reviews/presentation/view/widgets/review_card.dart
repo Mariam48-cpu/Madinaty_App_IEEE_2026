@@ -92,36 +92,44 @@ class _ReviewCardState extends State<ReviewCard> {
                 }),
               ),
 
+              const SizedBox(width: 12),
+
               // User Info & Avatar
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        review.userName.isNotEmpty
-                            ? review.userName
-                            : 'مستخدم مدينتي',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D2521),
-                        ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            review.userName.isNotEmpty
+                                ? review.userName
+                                : 'مستخدم مدينتي',
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D2521),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _formatRelativeDate(review.createdAt),
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF9E948C),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _formatRelativeDate(review.createdAt),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF9E948C),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 10),
-                  _buildAvatar(review.userAvatar, initials),
-                ],
+                    ),
+                    const SizedBox(width: 10),
+                    _buildAvatar(review.userAvatar, initials),
+                  ],
+                ),
               ),
             ],
           ),

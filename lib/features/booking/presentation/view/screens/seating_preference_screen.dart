@@ -32,6 +32,16 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
   int _selectedFilterIndex = 0;
   String? selectedTable;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<BookingCubit>().fetchBookedTables();
+      }
+    });
+  }
+
   List<String> _getFilters(BuildContext context) => [
     AppLocale.filterAll.getString(context),
     AppLocale.filterNileView.getString(context),
@@ -165,7 +175,18 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                       SeatingMap(
                         filterCategory: selectedFilter,
                         selectedTable: selectedTable,
+                        bookedTables: cubit.bookedTableIds,
                         onTableSelected: (table) {
+                          if (cubit.bookedTableIds.contains(table)) {
+                            AppToast.showToast(
+                              context: context,
+                              title: AppLocale.toastError.getString(context),
+                              description: AppLocale.tableAlreadyBookedError
+                                  .getString(context),
+                              type: ToastificationType.warning,
+                            );
+                            return;
+                          }
                           setState(() {
                             selectedTable = table;
                           });
@@ -222,6 +243,17 @@ class _SeatingPreferenceScreenState extends State<SeatingPreferenceScreen> {
                               description: AppLocale.selectFirstTableError
                                   .getString(context),
                               type: ToastificationType.warning,
+                            );
+                            return;
+                          }
+
+                          if (cubit.bookedTableIds.contains(selectedTable!)) {
+                            AppToast.showToast(
+                              context: context,
+                              title: AppLocale.toastError.getString(context),
+                              description: AppLocale.tableAlreadyBookedError
+                                  .getString(context),
+                              type: ToastificationType.error,
                             );
                             return;
                           }

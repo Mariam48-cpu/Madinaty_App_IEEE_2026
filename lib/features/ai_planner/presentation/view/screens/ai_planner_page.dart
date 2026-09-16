@@ -305,7 +305,7 @@ class _AIPlannerPageState extends State<AIPlannerPage>
   Widget _buildErrorScreen() {
     return Center(
       key: const ValueKey('error'),
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

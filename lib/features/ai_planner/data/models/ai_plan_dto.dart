@@ -1,5 +1,19 @@
 import '../../../../../core/localization/app_locale.dart';
 
+num? _parseNum(dynamic value) {
+  if (value is num) return value;
+  if (value is String) return num.tryParse(value.trim());
+  return null;
+}
+
+int _parseInt(dynamic value, int fallback) {
+  return _parseNum(value)?.toInt() ?? fallback;
+}
+
+double _parseDouble(dynamic value, double fallback) {
+  return _parseNum(value)?.toDouble() ?? fallback;
+}
+
 class AIPlanIntentDTO {
   final String mood;
   final int durationHours;
@@ -27,8 +41,8 @@ class AIPlanIntentDTO {
 
     return AIPlanIntentDTO(
       mood: (json['mood'] ?? '').toString(),
-      durationHours: (json['durationHours'] as num?)?.toInt() ?? 2,
-      budget: (json['budget'] as num?)?.toDouble() ?? 0,
+      durationHours: _parseInt(json['durationHours'], 2),
+      budget: _parseDouble(json['budget'], 0),
       activities: strings(json['activities']),
       requirements: strings(json['requirements']),
       weatherPreference: (json['weatherPreference'] ?? '').toString(),
@@ -71,7 +85,7 @@ class AIPlanFinalDTO {
     return AIPlanFinalDTO(
       headline: (json['headline'] ?? AppLocale.aiDefaultHeadline).toString(),
       summary: (json['summary'] ?? '').toString(),
-      estimatedTotal: (json['estimatedTotal'] as num?)?.toDouble() ?? 0,
+      estimatedTotal: _parseDouble(json['estimatedTotal'], 0),
       activities: activities,
     );
   }
@@ -108,9 +122,9 @@ class AIPlanActivityDTO {
       title: (json['title'] ?? AppLocale.aiDefaultActivityTitle).toString(),
       purpose: (json['purpose'] ?? '').toString(),
       category: (json['category'] ?? 'cafe').toString(),
-      durationMinutes: (json['durationMinutes'] as num?)?.toInt() ?? 60,
+      durationMinutes: _parseInt(json['durationMinutes'], 60),
       placeId: (json['placeId'] ?? '').toString(),
-      matchScore: ((json['matchScore'] as num?)?.toInt() ?? 80).clamp(0, 100),
+      matchScore: _parseInt(json['matchScore'], 80).clamp(0, 100),
       reason: (json['reason'] ?? '').toString(),
     );
   }

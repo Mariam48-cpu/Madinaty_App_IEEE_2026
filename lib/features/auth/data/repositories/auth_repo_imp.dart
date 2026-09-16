@@ -7,8 +7,9 @@ import '../data_sources/auth_data_source_interface.dart';
 class AuthRepoImpl implements AuthRepoInterface {
   final AuthRemoteDataSourceInterface _remoteDataSource;
 
-  AuthRepoImpl({required AuthRemoteDataSourceInterface remoteDataSource})
-    : _remoteDataSource = remoteDataSource;
+  AuthRepoImpl({
+    required AuthRemoteDataSourceInterface remoteDataSource,
+  }) : _remoteDataSource = remoteDataSource;
 
   @override
   bool get isAuthenticated => _remoteDataSource.currentUser != null;

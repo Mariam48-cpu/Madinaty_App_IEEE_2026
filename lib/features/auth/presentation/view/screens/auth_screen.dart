@@ -272,19 +272,19 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                title: const Text(
-                  'الموقع غير مفعل',
+                title: Text(
+                  AppLocale.locationDisabledTitle.getString(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                content: const Text(
-                  'لازم تفعّل خدمة الموقع على جهازك علشان نقدر نجيب الكافيهات القريبة منك.',
+                content: Text(
+                  AppLocale.locationDisabledBody.getString(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),
@@ -295,7 +295,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                     onPressed: () {
                       Navigator.pop(dialogContext, false);
                     },
-                    child: const Text('إلغاء'),
+                    child: Text(AppLocale.cancel.getString(context)),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -304,9 +304,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                     ),
-                    child: const Text(
-                      'تفعيل الموقع',
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      AppLocale.enableLocation.getString(context),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
@@ -345,19 +345,19 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  title: const Text(
-                    'صلاحية الموقع مطلوبة',
+                  title: Text(
+                    AppLocale.locationPermissionRequired.getString(context),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  content: const Text(
-                    'لازم تسمح للتطبيق بالوصول إلى موقعك علشان نعرض الكافيهات القريبة منك.',
+                  content: Text(
+                    AppLocale.locationPermissionBody.getString(context),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -368,7 +368,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                       onPressed: () {
                         Navigator.pop(dialogContext);
                       },
-                      child: const Text('حسنًا'),
+                      child: Text(AppLocale.ok.getString(context)),
                     ),
                   ],
                 );
@@ -391,19 +391,19 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                title: const Text(
-                  'صلاحية الموقع مرفوضة',
+                title: Text(
+                  AppLocale.locationPermissionDeniedTitle.getString(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                content: const Text(
-                  'صلاحية الموقع تم رفضها نهائيًا. افتح إعدادات التطبيق واسمح بالوصول إلى الموقع.',
+                content: Text(
+                  AppLocale.locationPermissionDeniedBody.getString(context),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),
@@ -414,7 +414,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                     onPressed: () {
                       Navigator.pop(dialogContext, false);
                     },
-                    child: const Text('إلغاء'),
+                    child: Text(AppLocale.cancel.getString(context)),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -423,9 +423,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                     ),
-                    child: const Text(
-                      'فتح الإعدادات',
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      AppLocale.openSettings.getString(context),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
@@ -603,7 +603,7 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
-                                        'حدث خطأ أثناء جلب الكافيهات القريبة.',
+                                        AppLocale.errorFetchingCafes.getString(context),
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontSize: 13,
@@ -654,9 +654,9 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
                                       .toList();
 
                             if (cafes.isEmpty) {
-                              return const Center(
+                              return Center(
                                 child: Text(
-                                  'لا يوجد كافيه بهذا الاسم.',
+                                  AppLocale.cafeNotFound.getString(context),
                                   textAlign: TextAlign.center,
                                 ),
                               );
@@ -893,13 +893,40 @@ class _AuthScreenBodyState extends State<_AuthScreenBody> {
           }
 
           // Customer:
-          // Register -> Personalization
-          // Login -> Home
-          if (isLogin) {
-            Navigator.pushReplacementNamed(context, AppRoutes.home);
-          } else {
-            Navigator.pushReplacementNamed(context, AppRoutes.personalization);
-          }
+          // Check if user already has saved interests in Firestore:
+          // - If interests exist -> Step 1 ("Why are you going out today?")
+          // - If interests missing/empty -> Step 0 ("What do you like?")
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(state.user.uid)
+              .get()
+              .then((doc) {
+            if (!context.mounted) return;
+            final data = doc.data();
+            final interests =
+                data != null ? data['interests'] as List<dynamic>? : null;
+
+            if (interests != null && interests.isNotEmpty) {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.personalization,
+                arguments: {'initialStep': 1},
+              );
+            } else {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.personalization,
+                arguments: {'initialStep': 0},
+              );
+            }
+          }).catchError((_) {
+            if (!context.mounted) return;
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.personalization,
+              arguments: {'initialStep': 0},
+            );
+          });
         }
       },
       builder: (context, state) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:madinaty_app_ieee_2026/core/localization/app_locale.dart';
 
 
 class CafeBottomButtons extends StatelessWidget {
@@ -44,9 +46,9 @@ class CafeBottomButtons extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  ' طلب مسبق ',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocale.preOrder.getString(context),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -67,9 +69,9 @@ class CafeBottomButtons extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text(
-                  'احجز مكانك',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                child: Text(
+                  AppLocale.bookTable.getString(context),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

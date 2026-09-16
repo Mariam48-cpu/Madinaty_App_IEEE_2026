@@ -9,6 +9,12 @@ abstract class BookingRepositoryInterface {
 
   Stream<List<BookingEntity>> watchUserBookings(String userId);
 
+  Future<List<String>> getBookedTableIds({
+    required String cafeId,
+    required DateTime date,
+    required String time,
+  });
+
   Future<void> updateBookingStatus({
     required String bookingId,
     required BookingStatus status,

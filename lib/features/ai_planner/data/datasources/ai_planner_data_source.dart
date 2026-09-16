@@ -26,9 +26,9 @@ abstract class AIPlannerDataSource {
 @LazySingleton(as: AIPlannerDataSource)
 class AIPlannerDataSourceImpl implements AIPlannerDataSource {
   static const String _apiKey =
-      'AQ.Ab8RN6LQCBC9tgnSdiQxV6kD0DNEhq1IKrswegTYy5dPIO-rsQ';
+      'AQ.Ab8RN6IxW0HSLWUbe7WjCgIz3m0V7f-UVq5Xn0FCBd09t_JR_g';
 
-  static const String _model = 'gemini-3.5-flash';
+  static const String _model = 'gemini-3.6-flash';
 
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta/models';

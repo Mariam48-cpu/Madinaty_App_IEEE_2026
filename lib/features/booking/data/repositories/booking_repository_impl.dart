@@ -182,6 +182,57 @@ class BookingRepositoryImpl implements BookingRepositoryInterface {
   }
 
   @override
+  Future<List<String>> getBookedTableIds({
+    required String cafeId,
+    required DateTime date,
+    required String time,
+  }) async {
+    if (cafeId.trim().isEmpty || time.trim().isEmpty) {
+      return [];
+    }
+
+    try {
+      final snapshot = await bookings()
+          .where('cafeId', isEqualTo: cafeId.trim())
+          .where('time', isEqualTo: time.trim())
+          .get();
+
+      final bookedTables = <String>[];
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final status = data['status']?.toString();
+
+        if (status == BookingStatus.pending.name ||
+            status == BookingStatus.approved.name) {
+          final docDate = data['date'];
+          DateTime? bDate;
+
+          if (docDate is Timestamp) {
+            bDate = docDate.toDate();
+          } else if (docDate is String) {
+            bDate = DateTime.tryParse(docDate);
+          }
+
+          if (bDate != null &&
+              bDate.year == date.year &&
+              bDate.month == date.month &&
+              bDate.day == date.day) {
+            final tableId = data['seatingPreference']?.toString();
+            if (tableId != null && tableId.isNotEmpty) {
+              bookedTables.add(tableId);
+            }
+          }
+        }
+      }
+
+      return bookedTables;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  @override
   Future<void> updateBookingStatus({
     required String bookingId,
     required BookingStatus status,

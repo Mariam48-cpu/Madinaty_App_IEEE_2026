@@ -577,8 +577,43 @@ mixin AppLocale {
   static const String cafesCompetingCount = 'cafesCompetingCount';
   static const String weHaveAWinnerTitle = 'weHaveAWinnerTitle';
   static const String letsGoBtn = 'letsGoBtn';
+  static const String romanticDate = 'romanticDate';
+  static const String locationDisabledTitle = 'locationDisabledTitle';
+  static const String locationDisabledBody = 'locationDisabledBody';
+  static const String locationPermissionRequired = 'locationPermissionRequired';
+  static const String locationPermissionBody = 'locationPermissionBody';
+  static const String locationPermissionDeniedTitle = 'locationPermissionDeniedTitle';
+  static const String locationPermissionDeniedBody = 'locationPermissionDeniedBody';
+  static const String enableLocation = 'enableLocation';
+  static const String cafeNotFound = 'cafeNotFound';
+  static const String errorFetchingCafes = 'errorFetchingCafes';
+  static const String scanQrCode = 'scanQrCode';
+  static const String pointCameraToConfirm = 'pointCameraToConfirm';
+  static const String reservationDetails = 'reservationDetails';
+  static const String customerNameLabel = 'customerNameLabel';
+  static const String guestCountLabel = 'guestCountLabel';
+  static const String notesLabel = 'notesLabel';
+  static const String noNotesText = 'noNotesText';
+  static const String confirmReservationStaff = 'confirmReservationStaff';
+  static const String noOrdersYet = 'noOrdersYet';
+
+  static const String facilitiesAndServices = 'facilitiesAndServices';
+  static const String mostOrdered = 'mostOrdered';
+  static const String fullMenu = 'fullMenu';
+  static const String menuUnavailable = 'menuUnavailable';
+  static const String available = 'available';
+  static const String topSellers = 'topSellers';
+  static const String beveragesAndDesserts = 'beveragesAndDesserts';
+  static const String wifi = 'wifi';
+  static const String petFriendly = 'petFriendly';
+  static const String wheelchairAccessible = 'wheelchairAccessible';
+  static const String defaultCafeFallback = 'defaultCafeFallback';
+  static const String defaultProductFallback = 'defaultProductFallback';
+  static const String addressNotAvailable = 'addressNotAvailable';
+  static const String viewMenu = 'viewMenu';
+
   static const Map<String, dynamic> AR = {
-    'weHaveAWinnerTitle': 'لقد فزنا بواحد!',
+    'weHaveAWinnerTitle': 'عندنا فائز!',
     'letsGoBtn': 'يلا بينا! ☕',
     'whereAreWeGoingTitle': 'رايحين فين؟ ☕',
     'letTheGroupDecideSubtitle': 'خلي الجروب يقرر!',
@@ -648,7 +683,7 @@ mixin AppLocale {
     AppLocale.dateTimeLabel: 'الموعد',
     AppLocale.detailsLabel: 'التفاصيل',
     AppLocale.guestsSuffix: 'أفراد',
-    AppLocale.indoorSeating: 'صالة داخلية',
+    indoorSeating: 'جلسات داخلية',
     AppLocale.paidAmountLabel: 'المبلغ المدفوع',
     AppLocale.currencyEgp: 'ج.م',
     AppLocale.viewDigitalPassBtn: 'عرض التذكرة الرقمية (QR Pass)',
@@ -857,7 +892,7 @@ mixin AppLocale {
     selectedCafesForYou: 'المقاهي المختارة لك',
     discoverySearchHint: 'ابحث عن كافيه، منطقة',
     noRatingText: 'بدون تقييم',
-    typeCafeNamePrompt: 'اكتبي اسم الكافيه',
+    typeCafeNamePrompt: 'اكتب اسم الكافيه',
     noResultsFound: 'لم يتم العثور على نتائج',
     searchCategoryTitle: 'بحث',
     searchForCafeNameHint: 'ابحث عن اسم الكافيه',
@@ -866,10 +901,10 @@ mixin AppLocale {
     openNowDescription: 'مفتوح الآن ويمكنك زيارته في الوقت الحالي.',
     specialtyCoffeeDescription: 'مكان مناسب لمحبي القهوة والمشروبات المختصة.',
     defaultCafeDescription: 'مكان مناسب للقهوة والجلوس وقضاء وقت ممتع.',
-    tryAnotherCategorySubtitle: 'جربي تصنيفاً آخر أو ابحثي عن كافيه مختلف.',
+    tryAnotherCategorySubtitle: 'جرب تصنيفاً آخر أو ابحث عن كافيه مختلف.',
     noOpenPlacesNow: 'لا توجد أماكن مفتوحة الآن.',
     noNearbyPlacesAvailable: 'لا توجد أماكن قريبة متاحة.',
-    tryAnotherFilterSubtitle: 'جربي اختيار فلتر آخر.',
+    tryAnotherFilterSubtitle: 'جرب اختيار فلتر آخر.',
     suitableCafeForYou: 'كافيه مناسب لك',
     suitableForPrefix: 'مناسب لـ',
     nearbyRecommendation: 'مقترح قريب منك',
@@ -1183,6 +1218,42 @@ mixin AppLocale {
     faqA4:
         'يمكنك التوجه إلى قسم "حجوزاتي" في الملف الشخصي واختيار الحجز المراد إلغاؤه واختيار إلغاء الحجز.',
     whatsappNotInstalled: 'تطبيق واتساب غير مثبت على جهازك.',
+    romanticDate: 'موعد رومانسي',
+    locationDisabledTitle: 'الموقع غير مفعل',
+    locationDisabledBody:
+        'يرجى تفعيل خدمة الموقع على جهازك لعرض الكافيهات القريبة منك.',
+    locationPermissionRequired: 'صلاحية الموقع مطلوبة',
+    locationPermissionBody:
+        'يرجى السماح للتطبيق بالوصول إلى موقعك لعرض الكافيهات القريبة منك.',
+    locationPermissionDeniedTitle: 'صلاحية الموقع مرفوضة',
+    locationPermissionDeniedBody:
+        'تم رفض صلاحية الموقع نهائيًا. يرجى فتح إعدادات التطبيق والسماح بالوصول إلى الموقع.',
+    enableLocation: 'تفعيل الموقع',
+    cafeNotFound: 'لا يوجد كافيه بهذا الاسم.',
+    errorFetchingCafes: 'حدث خطأ أثناء جلب الكافيهات القريبة.',
+    scanQrCode: 'امسح رمز الـ QR',
+    pointCameraToConfirm: 'وجّه الكاميرا نحو كود الحجز لتأكيده تلقائيًا',
+    reservationDetails: 'تفاصيل الحجز',
+    customerNameLabel: 'اسم العميل',
+    guestCountLabel: 'عدد الأفراد',
+    notesLabel: 'ملاحظات',
+    noNotesText: 'لا توجد ملاحظات',
+    confirmReservationStaff: 'تأكيد الحجز (كاشير/ويتر)',
+    noOrdersYet: 'لا توجد طلبات حتى الآن',
+    facilitiesAndServices: 'المرافق والخدمات',
+    mostOrdered: 'الأكثر طلبًا',
+    fullMenu: 'القائمة الكاملة',
+    menuUnavailable: 'القائمة غير متاحة حاليًا',
+    available: 'متاح',
+    topSellers: 'الأكثر مبيعاً',
+    beveragesAndDesserts: 'المشروبات والحلويات',
+    wifi: 'واي فاي',
+    petFriendly: 'يسمح بالحيوانات',
+    wheelchairAccessible: 'سهولة الوصول',
+    defaultCafeFallback: 'كافيه',
+    defaultProductFallback: 'منتج',
+    addressNotAvailable: 'العنوان غير متوفر',
+    viewMenu: 'عرض القائمة',
   };
 
   static const Map<String, dynamic> EN = {
@@ -1256,7 +1327,7 @@ mixin AppLocale {
     AppLocale.dateTimeLabel: 'Date & Time',
     AppLocale.detailsLabel: 'Details',
     AppLocale.guestsSuffix: 'Guests',
-    AppLocale.indoorSeating: 'Indoor Hall',
+    indoorSeating: 'Indoor Seating',
     AppLocale.paidAmountLabel: 'Amount Paid',
     AppLocale.currencyEgp: 'EGP',
     AppLocale.viewDigitalPassBtn: 'View Digital Pass (QR Pass)',
@@ -1802,5 +1873,41 @@ mixin AppLocale {
     faqA4:
         'You can go to the "My Bookings" section in your profile, select the booking you want to cancel, and choose cancel booking.',
     whatsappNotInstalled: 'WhatsApp is not installed on your device.',
+    romanticDate: 'Romantic Date',
+    locationDisabledTitle: 'Location Disabled',
+    locationDisabledBody:
+        'Please enable location services on your device to display nearby cafes.',
+    locationPermissionRequired: 'Location Permission Required',
+    locationPermissionBody:
+        'Please allow access to your location to display nearby cafes.',
+    locationPermissionDeniedTitle: 'Location Permission Denied',
+    locationPermissionDeniedBody:
+        'Location permission was permanently denied. Please open application settings and allow location access.',
+    enableLocation: 'Enable Location',
+    cafeNotFound: 'No cafe found with this name.',
+    errorFetchingCafes: 'An error occurred while fetching nearby cafes.',
+    scanQrCode: 'Scan QR Code',
+    pointCameraToConfirm: 'Point camera at reservation code to confirm automatically',
+    reservationDetails: 'Reservation Details',
+    customerNameLabel: 'Customer Name',
+    guestCountLabel: 'Guest Count',
+    notesLabel: 'Notes',
+    noNotesText: 'No notes',
+    confirmReservationStaff: 'Confirm Reservation (Staff)',
+    noOrdersYet: 'No orders found yet',
+    facilitiesAndServices: 'Facilities & Services',
+    mostOrdered: 'Most Ordered',
+    fullMenu: 'Full Menu',
+    menuUnavailable: 'Menu is currently unavailable',
+    available: 'Available',
+    topSellers: 'Best Sellers',
+    beveragesAndDesserts: 'Beverages & Desserts',
+    wifi: 'Wi-Fi',
+    petFriendly: 'Pet Friendly',
+    wheelchairAccessible: 'Wheelchair Accessible',
+    defaultCafeFallback: 'Cafe',
+    defaultProductFallback: 'Product',
+    addressNotAvailable: 'Address not available',
+    viewMenu: 'View Menu',
   };
 }

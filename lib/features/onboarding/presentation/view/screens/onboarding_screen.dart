@@ -21,8 +21,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen>
     with SingleTickerProviderStateMixin {
   late final PageController _pageController;
-
-  bool _isProgrammaticChange = false;
+  int _currentPage = 0;
 
   late AnimationController _bottomAnimationController;
 
@@ -63,22 +62,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.dispose();
   }
 
-  void _restartBottomAnimation() {
-    _bottomAnimationController
-      ..reset()
-      ..forward();
-  }
-
   void _goToPage(int page) {
-    _isProgrammaticChange = true;
-
     _pageController.animateToPage(
       page,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
     );
-
-    _restartBottomAnimation();
   }
 
   @override
@@ -169,31 +158,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: PageView.builder(
                       controller: _pageController,
                       itemCount: state.pages.length,
-
                       physics: const BouncingScrollPhysics(),
-
                       onPageChanged: (index) {
-                        _restartBottomAnimation();
-
-                        if (_isProgrammaticChange) {
-                          _isProgrammaticChange = false;
-                          return;
-                        }
-
-                        if (index > state.currentPage) {
-                          context.read<OnboardingBloc>().add(
-                            OnboardingNextPressed(),
-                          );
-                        } else if (index < state.currentPage) {
-                          context.read<OnboardingBloc>().add(
-                            OnboardingPreviousPressed(),
-                          );
-                        }
+                        setState(() {
+                          _currentPage = index;
+                        });
                       },
-
                       itemBuilder: (context, index) {
                         return OnboardingPage(
-                          key: ValueKey('${state.currentPage}-$index'),
+                          key: ValueKey(index),
                           page: state.pages[index],
                         );
                       },
@@ -206,7 +179,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(state.pages.length, (index) {
-                        final isSelected = index == state.currentPage;
+                        final isSelected = index == _currentPage;
 
                         return AnimatedContainer(
                           duration: const Duration(milliseconds: 350),
@@ -234,15 +207,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
                           children: [
-                            if (state.currentPage > 0)
+                            if (_currentPage > 0)
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: () {
-                                    context.read<OnboardingBloc>().add(
-                                      OnboardingPreviousPressed(),
-                                    );
-
-                                    _goToPage(state.currentPage - 1);
+                                    _goToPage(_currentPage - 1);
                                   },
                                   style: OutlinedButton.styleFrom(
                                     minimumSize: const Size(
@@ -276,19 +245,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                               child: ElevatedButton(
                                 onPressed: () {
                                   final isLastPage =
-                                      state.currentPage ==
-                                      state.pages.length - 1;
+                                      _currentPage == state.pages.length - 1;
 
                                   if (isLastPage) {
                                     context.read<OnboardingBloc>().add(
                                       OnboardingStartedPressed(),
                                     );
                                   } else {
-                                    context.read<OnboardingBloc>().add(
-                                      OnboardingNextPressed(),
-                                    );
-
-                                    _goToPage(state.currentPage + 1);
+                                    _goToPage(_currentPage + 1);
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -315,7 +279,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                     );
                                   },
                                   child: Text(
-                                    state.currentPage == state.pages.length - 1
+                                    _currentPage == state.pages.length - 1
                                         ? AppLocale.getStarted.getString(
                                             context,
                                           )
@@ -323,8 +287,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                             context,
                                           ),
                                     key: ValueKey(
-                                      state.currentPage ==
-                                              state.pages.length - 1
+                                      _currentPage == state.pages.length - 1
                                           ? 'getStarted'
                                           : 'next',
                                     ),

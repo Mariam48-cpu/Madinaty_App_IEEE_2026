@@ -190,24 +190,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         const SizedBox(height: 12),
 
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              name,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
                           ),
                         ),
 
-                        const SizedBox(height: 4),
 
-                        Text(
-                          email,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
 
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16.0),
