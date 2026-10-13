@@ -140,15 +140,13 @@ class _SplashScreenState extends State<SplashScreen>
               child: FadeTransition(
                 opacity: _logoAnimation,
                 child: Image.asset(
-                  'assets/images/splash/cup.png',
+                  'assets/images/splash/splash_2.png',
                   width: 200,
                   height: 200,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-
-            const SizedBox(height: 28),
 
             FadeTransition(
               opacity: _textAnimation,
